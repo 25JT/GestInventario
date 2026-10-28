@@ -3,6 +3,7 @@
 import Layout from "../layouts/Layout.astro";
 import SlideBar from "../components/SlideBar.astro";
 import NavBar from "../components/Nav.astro";
+import AggServicio from "../components/AggServicio.astro";
 ---
 
 <Layout title="Gestión de Servicios - StockControl Enterprise JR">
@@ -45,6 +46,7 @@ import NavBar from "../components/Nav.astro";
               id="btn-new-service"
               class="h-[38px] px-4 bg-primary hover:bg-secondary text-on-primary rounded-xl text-[12px] font-semibold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
               type="button"
+              onclick="window.openServiceModal && window.openServiceModal()"
             >
               <span class="material-symbols-outlined text-[18px]">add</span>
               <span>Registrar Nuevo Servicio</span>
@@ -734,139 +736,8 @@ import NavBar from "../components/Nav.astro";
     </div>
   </div>
 
-  <!-- MODAL: REGISTRAR NUEVO SERVICIO -->
-  <div
-    id="serviceModal"
-    class="fixed inset-0 z-50 hidden flex items-center justify-center bg-primary/40 backdrop-blur-xs p-4"
-    aria-hidden="true"
-  >
-    <div
-      id="serviceModalPanel"
-      class="bg-surface-container-lowest rounded-2xl max-w-lg w-full shadow-2xl p-5 sm:p-6 flex flex-col gap-4 border border-surface-container"
-    >
-      <div class="flex items-center justify-between pb-1 border-b border-surface-container/60">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
-            <span class="material-symbols-outlined text-[20px]">add_box</span>
-          </div>
-          <h3 class="text-[17px] font-bold text-on-surface">Registrar Prestación Técnica</h3>
-        </div>
-        <button
-          id="btn-close-service-modal"
-          class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg hover:bg-surface-container transition-colors cursor-pointer"
-          type="button"
-        >
-          <span class="material-symbols-outlined text-[20px]">close</span>
-        </button>
-      </div>
-
-      <div class="flex flex-col gap-3">
-        <!-- Código y Nombre -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="flex flex-col gap-1">
-            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">Código SKU *</label>
-            <input
-              id="newServiceCode"
-              class="w-full h-9 px-3 bg-surface rounded-xl text-[13px] text-on-surface font-semibold border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-              placeholder="SRV-2024-"
-              type="text"
-            />
-          </div>
-          <div class="sm:col-span-2 flex flex-col gap-1">
-            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">Nombre del Servicio *</label>
-            <input
-              id="newServiceName"
-              class="w-full h-9 px-3 bg-surface rounded-xl text-[13px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-              placeholder="Ej. Diagnóstico y Reparación de Placa Madre"
-              type="text"
-            />
-          </div>
-        </div>
-
-        <!-- Categoría y Tipo de Tarifa -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="flex flex-col gap-1">
-            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">Categoría *</label>
-            <select
-              id="newServiceCategory"
-              class="w-full h-9 px-3 bg-surface text-on-surface rounded-xl text-[12px] border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-            >
-              <option>Mantenimiento</option>
-              <option>Instalación & Redes</option>
-              <option>Soporte POS</option>
-              <option>Laboratorio</option>
-              <option>Soporte Remoto</option>
-              <option>Consultoría</option>
-            </select>
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">Modalidad de Tarifa</label>
-            <select
-              id="newServiceRate"
-              class="w-full h-9 px-3 bg-surface text-on-surface rounded-xl text-[12px] border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-            >
-              <option>Tarifa Fija</option>
-              <option>Por Hora</option>
-              <option>Por Punto / Unidad</option>
-              <option>Por Proyecto</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Precio y Duración Estimada -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="flex flex-col gap-1">
-            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">Precio Unitario ($) *</label>
-            <input
-              id="newServicePrice"
-              class="w-full h-9 px-3 bg-surface rounded-xl text-[13px] text-primary font-bold border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-              placeholder="0.00"
-              type="number"
-              step="0.01"
-            />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">Duración Estimada</label>
-            <input
-              id="newServiceDuration"
-              class="w-full h-9 px-3 bg-surface rounded-xl text-[13px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-              placeholder="Ej. ~1.5 hrs"
-              type="text"
-            />
-          </div>
-        </div>
-
-        <!-- Descripción Técnica -->
-        <div class="flex flex-col gap-1">
-          <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">Descripción Técnica / Alcance</label>
-          <textarea
-            id="newServiceDesc"
-            class="w-full p-2.5 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary resize-none"
-            placeholder="Detalles técnicos de las labores comprendidas, garantías y requisitos..."
-            rows="2"
-          ></textarea>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-end gap-2 pt-2 border-t border-surface-container/60">
-        <button
-          id="btn-cancel-service-modal"
-          class="px-4 h-9 bg-surface-container-low hover:bg-surface-container text-on-surface text-[12px] font-medium rounded-xl transition-colors cursor-pointer"
-          type="button"
-        >
-          Cancelar
-        </button>
-        <button
-          class="px-5 h-9 bg-secondary-container hover:bg-secondary text-on-secondary text-[12px] font-semibold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-          type="button"
-          onclick="window.saveNewService && window.saveNewService()"
-        >
-          <span class="material-symbols-outlined text-[18px]">save</span>
-          <span>Guardar Servicio</span>
-        </button>
-      </div>
-    </div>
-  </div>
+  <!-- MODAL: REGISTRAR NUEVO SERVICIO TÉCNICO -->
+  <AggServicio />
 
   <!-- NOTIFICATION TOAST -->
   <div
@@ -891,18 +762,20 @@ import NavBar from "../components/Nav.astro";
     window.closeServiceModal = closeServiceModal;
     window.showServiceToast = showServiceToast;
 
-    window.saveNewService = function() {
-      const name = (document.getElementById("newServiceName") as HTMLInputElement | null)?.value.trim();
-      const price = (document.getElementById("newServicePrice") as HTMLInputElement | null)?.value.trim();
+    if (!window.saveNewService) {
+      window.saveNewService = function() {
+        const name = (document.getElementById("service-name") as HTMLInputElement | null)?.value.trim();
+        const price = (document.getElementById("price-sale") as HTMLInputElement | null)?.value.trim();
 
-      if (!name || !price) {
-        showServiceToast("Por favor complete el nombre y el precio del servicio.", "warning");
-        return;
-      }
+        if (!name || !price) {
+          showServiceToast("Por favor complete el nombre y el precio del servicio.", "warning");
+          return;
+        }
 
-      closeServiceModal();
-      showServiceToast(`Servicio "${name}" incorporado al catálogo exitosamente.`);
-    };
+        closeServiceModal();
+        showServiceToast(`Servicio "${name}" incorporado al catálogo exitosamente.`);
+      };
+    }
 
     function setupServicios() {
       initServicios();

@@ -69,8 +69,8 @@ export function switchServiceTab(tab) {
  * Control del Modal de Registro de Servicios
  */
 export function openServiceModal() {
-  const modal = document.getElementById("serviceModal");
-  const panel = document.getElementById("serviceModalPanel");
+  const modal = document.getElementById("serviceModalOverlay") || document.getElementById("serviceModal");
+  const panel = document.getElementById("serviceModalContainer") || document.getElementById("serviceModalPanel");
   if (!modal || !panel) return;
 
   modal.classList.remove("hidden");
@@ -79,22 +79,22 @@ export function openServiceModal() {
   gsap.fromTo(modal, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" });
   gsap.fromTo(
     panel,
-    { scale: 0.92, y: 16, opacity: 0 },
+    { scale: 0.94, y: 16, opacity: 0 },
     { scale: 1, y: 0, opacity: 1, duration: 0.25, ease: "power2.out" }
   );
 }
 
 export function closeServiceModal() {
-  const modal = document.getElementById("serviceModal");
-  const panel = document.getElementById("serviceModalPanel");
+  const modal = document.getElementById("serviceModalOverlay") || document.getElementById("serviceModal");
+  const panel = document.getElementById("serviceModalContainer") || document.getElementById("serviceModalPanel");
   if (!modal || !panel) return;
 
   document.body.style.overflow = "";
 
   gsap.to(panel, {
-    scale: 0.95,
+    scale: 0.96,
     opacity: 0,
-    duration: 0.18,
+    duration: 0.16,
     ease: "power2.in",
   });
 
@@ -239,7 +239,7 @@ export function initServicios() {
   // 3. Atajos de teclado (Esc)
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      const modal = document.getElementById("serviceModal");
+      const modal = document.getElementById("serviceModalOverlay") || document.getElementById("serviceModal");
       if (modal && !modal.classList.contains("hidden")) {
         closeServiceModal();
       } else if (searchInput && document.activeElement === searchInput) {
@@ -252,9 +252,9 @@ export function initServicios() {
 
   // 4. Modal listeners
   const btnNewService = document.getElementById("btn-new-service");
-  const btnCloseModal = document.getElementById("btn-close-service-modal");
-  const btnCancelModal = document.getElementById("btn-cancel-service-modal");
-  const modalBackdrop = document.getElementById("serviceModal");
+  const btnCloseModal = document.getElementById("closeServiceModalBtn") || document.getElementById("btn-close-service-modal");
+  const btnCancelModal = document.getElementById("cancelServiceModalBtn") || document.getElementById("btn-cancel-service-modal");
+  const modalBackdrop = document.getElementById("serviceModalOverlay") || document.getElementById("serviceModal");
 
   if (btnNewService) btnNewService.addEventListener("click", openServiceModal);
   if (btnCloseModal) btnCloseModal.addEventListener("click", closeServiceModal);
