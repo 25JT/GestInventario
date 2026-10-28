@@ -1,5 +1,5 @@
 ---
-// SlideBar.astro - Barra de Navegación Lateral Global
+// SlideBar.astro - Menú Lateral de Navegación Global
 interface Props {
   currentPath?: string;
 }
@@ -7,21 +7,21 @@ interface Props {
 const { currentPath = "principal" } = Astro.props;
 ---
 
-{/* Backdrop sombreado para dispositivos móviles con bloqueo de interacción táctil */}
+{/* Backdrop sombreado con desenfoque para cerrar al pulsar fuera */}
 <div
   id="sidebar-backdrop"
-  class="fixed inset-0 bg-primary/50 backdrop-blur-xs z-40 hidden lg:hidden transition-opacity cursor-pointer touch-none"
+  class="fixed inset-0 bg-primary/50 backdrop-blur-xs z-40 hidden transition-opacity cursor-pointer touch-none"
   aria-hidden="true"
 ></div>
 
-{/* Sidebar principal: En móviles inicia invisible y fuera de pantalla sin transición CSS para evitar FOUC */}
+{/* Sidebar principal: Inicia estrictamente oculto fuera de pantalla por defecto */}
 <aside
   id="main-sidebar"
-  class="fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.06)] border-r border-surface-container pointer-events-none invisible lg:pointer-events-auto lg:visible -translate-x-full lg:translate-x-0"
+  class="fixed left-0 top-0 h-screen w-72 max-w-[85vw] bg-surface-container-lowest z-50 flex flex-col justify-between shadow-2xl border-r border-surface-container pointer-events-none invisible -translate-x-full"
   aria-label="Navegación principal"
   aria-hidden="true"
 >
-  {/* Cabecera del Sidebar: Marca & Botón cerrar en móvil */}
+  {/* Cabecera del Sidebar: Marca & Botón Cerrar */}
   <div class="h-16 px-4 flex items-center justify-between border-b border-surface-container/60 shrink-0">
     <div class="flex items-center gap-2.5">
       <div class="w-9 h-9 rounded-xl bg-secondary-container flex items-center justify-center text-on-secondary shadow-xs">
@@ -36,18 +36,18 @@ const { currentPath = "principal" } = Astro.props;
       </div>
     </div>
 
-    {/* Botón cerrar en pantallas pequeñas */}
+    {/* Botón cerrar visible en cualquier tamaño */}
     <button
       id="btn-close-sidebar"
       type="button"
-      class="lg:hidden p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
+      class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer"
       title="Cerrar menú lateral"
     >
       <span class="material-symbols-outlined text-[20px]">close</span>
     </button>
   </div>
 
-  {/* Lista de Navegación Principal (con scroll si hay muchos módulos) */}
+  {/* Lista de Navegación con Scroll Interno si es necesario */}
   <div class="flex-1 overflow-y-auto px-3 py-3">
     <div class="px-2 pb-2">
       <span class="text-[11px] font-semibold text-outline uppercase tracking-wider">Módulos Operativos</span>
@@ -119,29 +119,29 @@ const { currentPath = "principal" } = Astro.props;
           id="user-avatar"
           class="w-10 h-10 rounded-xl bg-primary text-on-primary font-bold text-[13px] flex items-center justify-center shrink-0 shadow-2xs tracking-wider"
         >
-          CM
+          OP
         </div>
 
-        {/* Datos del usuario */}
+        {/* Datos legibles del usuario */}
         <div class="flex flex-col min-w-0 flex-1">
           <span
             id="user-display-name"
-            class="font-label-md text-[13px] text-on-surface font-bold truncate leading-tight"
+            class="font-label-md text-[13px] text-on-surface font-bold truncate leading-tight capitalize"
             title="Nombre del Colaborador"
           >
-            Carlos Mendoza
+            Colaborador
           </span>
-          <div class="flex items-center gap-1.5 mt-0.5">
+          <div class="flex items-center gap-1 mt-0.5 text-[11px] text-on-surface-variant">
             <span
               id="user-display-username"
-              class="text-[11px] text-secondary font-medium truncate"
+              class="text-secondary font-semibold truncate"
             >
-              @cmendoza
+              @usuario
             </span>
-            <span class="text-outline/40 text-[10px]">•</span>
+            <span class="text-outline/40">•</span>
             <span
               id="user-role-badge"
-              class="font-label-sm text-[10px] text-on-surface-variant truncate font-semibold"
+              class="font-medium truncate"
             >
               Operaciones
             </span>
