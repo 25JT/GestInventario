@@ -255,16 +255,14 @@ export function toggleSidebar() {
 }
 
 /**
- * Animación de entrada inicial para la barra superior
+ * Barra de navegación superior fija y sin parpadeos visuales al cargar la página.
  */
 export function animateNavEntrance() {
+  // Mantenemos la cabecera fija, inmediata y estable sin forzar opacity: 0
+  // para evitar FOUC y saltos de layout al navegar entre módulos.
   const header = document.getElementById("top-header");
   if (header) {
-    gsap.fromTo(
-      header,
-      { y: -16, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }
-    );
+    gsap.set(header, { clearProps: "all" });
   }
 }
 
@@ -299,9 +297,6 @@ export function initNavSlide() {
 
   // Marcar enlace activo
   markActiveNavLink();
-
-  // Animación de entrada solo para el navbar superior
-  animateNavEntrance();
 
   // Exponer globalmente toggleSidebar, openSidebar y closeSidebar
   window.toggleSidebar = toggleSidebar;

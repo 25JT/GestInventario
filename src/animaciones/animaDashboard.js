@@ -1,93 +1,49 @@
 import gsap from "gsap";
 
 /**
- * Animación de entrada inicial para los elementos del Panel de Control Ejecutivo
+ * Inicialización de micro-animaciones fluidas para el Dashboard
+ * Sin reinicio de opacidad a 0 ni parpadeos blancos (FOUC).
  */
 export function initDashboardAnimations() {
   if (typeof window === "undefined") return;
 
   const ctx = gsap.context(() => {
-    // 1. Cabecera y Barra de Comandos
-    const subHeader = document.querySelector("#dash-subheader");
-    if (subHeader) {
-      gsap.fromTo(
-        subHeader,
-        { opacity: 0, y: -16 },
-        { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }
-      );
+    // 1. Limpieza de propiedades para garantizar render inmediato y estable
+    const allCards = document.querySelectorAll(
+      "#dash-subheader, .kpi-card, #dash-chart-card, #dash-stock-card, #dash-quick-actions, #dash-transactions-card"
+    );
+    gsap.set(allCards, { opacity: 1, clearProps: "transform" });
+
+    // 2. Animación fluida de trazado para la línea SVG del gráfico financiero
+    const salesLine = document.getElementById("chart-sales-line");
+    if (salesLine) {
+      try {
+        const pathLength = salesLine.getTotalLength ? salesLine.getTotalLength() : 750;
+        gsap.fromTo(
+          salesLine,
+          { strokeDasharray: pathLength, strokeDashoffset: pathLength },
+          {
+            strokeDashoffset: 0,
+            duration: 1.1,
+            ease: "power2.out",
+            delay: 0.05,
+          }
+        );
+      } catch (e) {
+        // Fallback silencioso si no soporta getTotalLength
+      }
     }
 
-    // 2. Tarjetas KPI con entrada en cascada
+    // 3. Micro-interacción interactiva de elevación sutil para las tarjetas KPI
     const kpiCards = document.querySelectorAll(".kpi-card");
-    if (kpiCards.length > 0) {
-      gsap.fromTo(
-        kpiCards,
-        { opacity: 0, y: 24, scale: 0.97 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.45,
-          stagger: 0.07,
-          ease: "power2.out",
-          delay: 0.08,
-          clearProps: "transform",
-        }
-      );
-    }
-
-    // 3. Fila de Gráfica y Stock Crítico
-    const chartCard = document.querySelector("#dash-chart-card");
-    const stockCard = document.querySelector("#dash-stock-card");
-    if (chartCard || stockCard) {
-      gsap.fromTo(
-        [chartCard, stockCard].filter(Boolean),
-        { opacity: 0, y: 20 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          stagger: 0.1,
-          ease: "power2.out",
-          delay: 0.18,
-          clearProps: "transform",
-        }
-      );
-    }
-
-    // 4. Banner de Operaciones Rápidas
-    const quickActions = document.querySelector("#dash-quick-actions");
-    if (quickActions) {
-      gsap.fromTo(
-        quickActions,
-        { opacity: 0, y: 16 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.45,
-          ease: "power2.out",
-          delay: 0.28,
-          clearProps: "transform",
-        }
-      );
-    }
-
-    // 5. Tabla de Transacciones Recientes
-    const tableCard = document.querySelector("#dash-transactions-card");
-    if (tableCard) {
-      gsap.fromTo(
-        tableCard,
-        { opacity: 0, y: 16 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.45,
-          ease: "power2.out",
-          delay: 0.35,
-          clearProps: "transform",
-        }
-      );
-    }
+    kpiCards.forEach((card) => {
+      card.addEventListener("mouseenter", () => {
+        gsap.to(card, { y: -3, duration: 0.22, ease: "power1.out" });
+      });
+      card.addEventListener("mouseleave", () => {
+        gsap.to(card, { y: 0, duration: 0.25, ease: "power1.out", clearProps: "transform" });
+      });
+    });
   });
 
   return () => ctx.revert();

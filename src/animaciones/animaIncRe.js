@@ -2,25 +2,17 @@ import gsap from "gsap";
 
 /**
  * Animación de entrada inicial para la tarjeta contenedora principal.
+ * Sin forzar opacity: 0 sobre elementos ya renderizados en HTML/SSR.
  * @param {HTMLElement} cardElement 
  */
 export function animateEntrance(cardElement) {
   if (!cardElement) return;
 
-  gsap.fromTo(
-    cardElement,
-    { opacity: 0, y: 20, scale: 0.98 },
-    { opacity: 1, y: 0, scale: 1, duration: 0.65, ease: "power3.out" }
-  );
-
-  // Animación escalonada para los elementos interactivos iniciales
+  // Garantizar visibilidad inmediata y limpiar transformaciones para máxima fluidez
+  gsap.set(cardElement, { opacity: 1, clearProps: "transform" });
   const elements = cardElement.querySelectorAll(".animate-stagger-item");
   if (elements.length > 0) {
-    gsap.fromTo(
-      elements,
-      { opacity: 0, y: 12 },
-      { opacity: 1, y: 0, duration: 0.45, stagger: 0.05, ease: "power2.out", delay: 0.15 }
-    );
+    gsap.set(elements, { opacity: 1, clearProps: "transform" });
   }
 }
 
