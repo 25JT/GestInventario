@@ -1,52 +1,913 @@
 ---
+// GastosOperativos.astro - Módulo de Control de Gastos Operativos y Arqueo
 import Layout from "../layouts/Layout.astro";
 import SlideBar from "../components/SlideBar.astro";
 import NavBar from "../components/Nav.astro";
 ---
 
-<Layout title="Gastos Operativos - StockControl Enterprise JR">
+<Layout title="Control de Gastos Operativos - StockControl Enterprise JR">
   <div class="min-h-screen bg-surface flex flex-col font-body-md text-on-surface">
+    {/* Barra lateral y superior globales y responsivas */}
     <SlideBar currentPath="gastos" />
     <NavBar storeName="Central Sucursal 01" operationStatus="Operación Normal" />
 
+    {/* Contenedor principal */}
     <div id="app-content" class="pt-16 min-h-screen flex flex-col flex-1">
       <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
-        <!-- Sub-header del Módulo -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-surface-container/60">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="font-label-sm text-[12px] text-secondary-container tracking-wider uppercase font-semibold">
-                Gestión Financiera
-              </span>
-              <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+
+        <!-- Encabezado de Sección y Acciones Rápidas -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="flex flex-col">
+            <div class="flex items-center gap-1.5 text-on-surface-variant text-[12px] uppercase tracking-wider mb-1 font-semibold">
+              <span>Módulo Financiero</span>
+              <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+              <span class="text-secondary">Gastos Operativos</span>
             </div>
-            <h1 class="text-[22px] sm:text-[26px] font-bold text-on-surface tracking-tight mt-0.5">
-              Gastos Operativos
+            <h1 class="text-[24px] sm:text-[28px] font-bold text-primary tracking-tight">
+              Control de Gastos Operativos
             </h1>
-            <p class="text-[13px] text-on-surface-variant">
-              Trazabilidad de egresos, comprobantes de proveedores y liquidación de costos.
+            <p class="text-[13px] sm:text-[14px] text-on-surface-variant mt-0.5 max-w-2xl">
+              Registro, categorización y control de egresos, compras de suministros, servicios básicos y arqueo de caja operativa.
             </p>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="flex items-center gap-2.5 flex-wrap shrink-0">
+            <button
+              id="btn-export-expenses"
+              class="h-[38px] px-3.5 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface rounded-xl text-[12px] font-medium border border-surface-container/70 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+              type="button"
+              onclick="window.showExpenseToast && window.showExpenseToast('Generando informe financiero...', 'info')"
+            >
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant">download</span>
+              <span>Exportar Informe</span>
+            </button>
+
+            <button
+              id="btn-cash-closing"
+              class="h-[38px] px-3.5 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface rounded-xl text-[12px] font-medium border border-surface-container/70 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+              type="button"
+              onclick="window.showExpenseToast && window.showExpenseToast('Iniciando conciliación de arqueo de caja chica.', 'info')"
+            >
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant">balance</span>
+              <span>Cierre / Arqueo</span>
+            </button>
+
+            <button
+              id="btn-new-expense"
+              class="h-[38px] px-4 bg-secondary-container hover:bg-secondary text-on-secondary rounded-xl text-[12px] font-semibold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+              type="button"
+            >
+              <span class="material-symbols-outlined text-[18px]">add</span>
+              <span>Registrar Nuevo Gasto</span>
+            </button>
           </div>
         </div>
 
-        {/* Contenedor del módulo */}
-        <div class="bg-surface-container-lowest p-8 rounded-2xl border border-surface-container/60 shadow-xs flex flex-col items-center justify-center text-center py-16">
-          <div class="w-14 h-14 rounded-2xl bg-secondary-container/10 text-secondary-container flex items-center justify-center mb-4">
-            <span class="material-symbols-outlined text-[32px]">receipt_long</span>
+        <!-- KPI Grid: 4 Métricas Clave -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Card 1: Gastos Totales -->
+          <div class="expense-kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-[12px] text-on-surface-variant font-medium">Gastos Totales (Mes)</span>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-tertiary-container font-semibold">
+                <span class="material-symbols-outlined text-[13px]">trending_down</span>
+                -3.1% vs mes ant.
+              </span>
+            </div>
+            <div class="mt-3">
+              <span class="text-[26px] font-bold text-primary tracking-tight">$14,820.00</span>
+            </div>
+            <div class="mt-2 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+              <span class="text-[11px] text-on-surface-variant">
+                74% del límite ($20k) <strong class="text-on-surface font-semibold">En Presupuesto</strong>
+              </span>
+            </div>
           </div>
-          <h2 class="text-[18px] font-bold text-on-surface">Módulo de Gastos Operativos</h2>
-          <p class="text-[13px] text-on-surface-variant max-w-md mt-1 mb-6">
-            Pestaña lista para incorporar el registro de egresos diarios, facturas de compras y presupuestos.
-          </p>
-          <a
-            href="/DashPrincipal"
-            class="px-4 py-2 bg-primary hover:bg-secondary text-on-primary font-semibold text-[13px] rounded-xl shadow-xs transition-all flex items-center gap-2"
-          >
-            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-            <span>Volver al Panel Principal</span>
-          </a>
+
+          <!-- Card 2: Fijos Operativos -->
+          <div class="expense-kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-[12px] text-on-surface-variant font-medium">Gastos Operativos Fijos</span>
+              <span class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary">
+                <span class="material-symbols-outlined text-[18px]">apartment</span>
+              </span>
+            </div>
+            <div class="mt-3">
+              <span class="text-[26px] font-bold text-primary tracking-tight">$8,450.00</span>
+            </div>
+            <div class="mt-2 flex items-center gap-1.5">
+              <span class="text-[11px] text-on-surface-variant truncate">
+                Alquiler local, energía, conectividad y pólizas
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 3: Compras & Suministros -->
+          <div class="expense-kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-[12px] text-on-surface-variant font-medium">Compras y Suministros</span>
+              <span class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-primary-container">
+                <span class="material-symbols-outlined text-[18px]">inventory_2</span>
+              </span>
+            </div>
+            <div class="mt-3">
+              <span class="text-[26px] font-bold text-primary tracking-tight">$4,920.00</span>
+            </div>
+            <div class="mt-2 flex items-center gap-1.5">
+              <span class="text-[11px] text-on-surface-variant truncate">
+                Bobinas POS, empaque y refacciones activas
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 4: Caja Chica -->
+          <div class="expense-kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
+            <div class="flex items-center justify-between">
+              <span class="text-[12px] text-on-surface-variant font-medium">Fondo Fijo / Caja Chica</span>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container-high text-[11px] text-secondary font-semibold">
+                Saldo Óptimo
+              </span>
+            </div>
+            <div class="mt-3">
+              <span class="text-[26px] font-bold text-primary tracking-tight">$1,450.00</span>
+            </div>
+            <div class="mt-2 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
+              <span class="text-[11px] text-on-surface-variant truncate">
+                Efectivo físico disponible para gastos menores
+              </span>
+            </div>
+          </div>
         </div>
+
+        <!-- Paneles Intermedios: Distribución y Trazabilidad Fiscal -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Panel Distribución de Gastos (8 cols) -->
+          <div class="lg:col-span-8 bg-surface-container-lowest p-4 sm:p-6 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h2 class="text-[17px] font-bold text-primary">Distribución de Gastos por Categoría</h2>
+                <span class="text-[12px] text-on-surface-variant">Mes Operativo: Octubre 2024</span>
+              </div>
+              <div class="flex items-center gap-1 bg-surface-container-low px-2.5 py-1 rounded-xl border border-surface-container/50">
+                <span class="text-[12px] text-on-surface font-medium">Vista Mensual</span>
+                <span class="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
+              <!-- SVG Donut Chart con Total Central -->
+              <div class="sm:col-span-5 flex flex-col items-center justify-center relative">
+                <div class="relative w-44 h-44">
+                  <svg class="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                    <!-- Background Ring -->
+                    <circle cx="60" cy="60" fill="none" r="48" stroke="#eff4ff" stroke-width="14"></circle>
+                    <!-- Suministros (33%) -->
+                    <circle class="donut-segment" cx="60" cy="60" fill="none" r="48" stroke="#316bf3" stroke-dasharray="99.5 202" stroke-dashoffset="0" stroke-width="14"></circle>
+                    <!-- Servicios Básicos (28%) -->
+                    <circle class="donut-segment" cx="60" cy="60" fill="none" r="48" stroke="#091426" stroke-dasharray="84.4 217.1" stroke-dashoffset="-99.5" stroke-width="14"></circle>
+                    <!-- Mantenimiento (20%) -->
+                    <circle class="donut-segment" cx="60" cy="60" fill="none" r="48" stroke="#00a472" stroke-dasharray="60.3 241.2" stroke-dashoffset="-183.9" stroke-width="14"></circle>
+                    <!-- Logística (12%) -->
+                    <circle class="donut-segment" cx="60" cy="60" fill="none" r="48" stroke="#b4c5ff" stroke-dasharray="36.2 265.3" stroke-dashoffset="-244.2" stroke-width="14"></circle>
+                    <!-- Viáticos (7%) -->
+                    <circle class="donut-segment" cx="60" cy="60" fill="none" r="48" stroke="#75777d" stroke-dasharray="21.1 280.4" stroke-dashoffset="-280.4" stroke-width="14"></circle>
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <span class="text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">Total</span>
+                    <span class="text-[20px] font-bold text-primary">$14.8k</span>
+                    <span class="text-[10px] text-on-surface-variant">42 Registros</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Leyenda con Montos y Porcentajes -->
+              <div class="sm:col-span-7 flex flex-col gap-1.5 text-[13px]">
+                <div class="flex items-center justify-between p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-secondary-container"></span>
+                    <span class="text-on-surface font-medium">Suministros y Empaque</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="font-bold text-primary">$4,890.60</span>
+                    <span class="text-on-surface-variant w-9 text-right font-medium">33%</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-primary"></span>
+                    <span class="text-on-surface font-medium">Servicios Básicos</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="font-bold text-primary">$4,149.60</span>
+                    <span class="text-on-surface-variant w-9 text-right font-medium">28%</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-on-tertiary-container"></span>
+                    <span class="text-on-surface font-medium">Mantenimiento y Taller</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="font-bold text-primary">$2,964.00</span>
+                    <span class="text-on-surface-variant w-9 text-right font-medium">20%</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-secondary-fixed-dim"></span>
+                    <span class="text-on-surface font-medium">Logística y Fletes</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="font-bold text-primary">$1,778.40</span>
+                    <span class="text-on-surface-variant w-9 text-right font-medium">12%</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-outline"></span>
+                    <span class="text-on-surface font-medium">Viáticos e Imprevistos</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="font-bold text-primary">$1,037.40</span>
+                    <span class="text-on-surface-variant w-9 text-right font-medium">7%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel Trazabilidad Fiscal & Caja (4 cols) -->
+          <div class="lg:col-span-4 bg-surface-container-lowest p-4 sm:p-6 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h2 class="text-[17px] font-bold text-primary">Trazabilidad Fiscal</h2>
+                <span class="material-symbols-outlined text-[20px] text-secondary">verified_user</span>
+              </div>
+              <p class="text-[12px] text-on-surface-variant mb-4">
+                Control de comprobantes válidos, facturación y arqueo de caja chica en turno.
+              </p>
+
+              <div class="flex flex-col gap-3">
+                <div class="bg-surface-container-low p-3 rounded-xl border border-surface-container/50">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[12px] text-on-surface-variant">Facturas Conciliadas</span>
+                    <span class="text-[12px] font-bold text-on-tertiary-container">90.4%</span>
+                  </div>
+                  <div class="w-full bg-surface-container-highest h-1.5 rounded-full mt-2 overflow-hidden">
+                    <div class="bg-secondary-container h-full rounded-full" style="width: 90.4%"></div>
+                  </div>
+                  <span class="text-[12px] text-primary font-bold mt-1.5 block">38 de 42 comprobantes</span>
+                </div>
+
+                <div class="bg-surface-container-low p-3 rounded-xl flex items-center justify-between border border-surface-container/50">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-outline text-[18px]">receipt_long</span>
+                    <span class="text-[12px] text-on-surface font-medium">Pendientes de Factura</span>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-error font-semibold">
+                    4 recibos
+                  </span>
+                </div>
+
+                <div class="bg-surface-container-low p-3 rounded-xl flex items-center justify-between border border-surface-container/50">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-outline text-[18px]">history</span>
+                    <span class="text-[12px] text-on-surface font-medium">Último Arqueo Físico</span>
+                  </div>
+                  <span class="text-[11px] font-medium text-on-surface-variant">Hoy, 10:30 AM (Carlos M.)</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              id="btn-new-receipt"
+              class="w-full mt-4 h-10 bg-primary hover:bg-secondary text-on-primary rounded-xl text-[13px] font-semibold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
+              type="button"
+            >
+              <span class="material-symbols-outlined text-[18px]">post_add</span>
+              <span>Asentar Nuevo Recibo</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Barra de Herramientas, Filtros y Búsqueda -->
+        <div class="bg-surface-container-lowest p-4 rounded-xl border border-surface-container/60 shadow-xs flex flex-col gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-surface-container/50">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[20px] text-secondary">tune</span>
+              <h3 class="text-[15px] font-bold text-primary">Filtros de Búsqueda Avanzada</h3>
+              <span class="px-2 py-0.5 rounded-full bg-surface-container-low text-[11px] text-secondary font-semibold">
+                Activos
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                id="btn-reset-expense-filters"
+                class="h-8 px-3 bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-error rounded-xl text-[12px] flex items-center gap-1 transition-colors cursor-pointer border border-surface-container/50"
+                type="button"
+              >
+                <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+                <span>Limpiar Filtros</span>
+              </button>
+              <button
+                class="h-8 px-3.5 bg-secondary-container hover:bg-secondary text-on-secondary rounded-xl text-[12px] font-semibold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+                type="button"
+                onclick="window.showExpenseToast && window.showExpenseToast('Informe filtrado generado con 42 registros.', 'info')"
+              >
+                <span class="material-symbols-outlined text-[17px]">analytics</span>
+                <span>Generar Informe</span>
+                <span class="px-1.5 py-0.2 rounded bg-surface-container-lowest/20 text-[10px] font-bold">42</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+            <!-- Concepto / Proveedor -->
+            <div class="lg:col-span-3 flex flex-col gap-1">
+              <label class="text-[11px] text-on-surface-variant font-semibold uppercase tracking-wider">Concepto o Proveedor</label>
+              <div class="relative w-full">
+                <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[17px]">
+                  search
+                </span>
+                <input
+                  id="expense-search"
+                  class="w-full h-9 pl-8 pr-3 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant/70 border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary focus:bg-surface-container-lowest transition-all"
+                  placeholder="Ej. Papelera, Enel, compresor..."
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <!-- Rango de Fechas -->
+            <div class="lg:col-span-3 flex flex-col gap-1">
+              <label class="text-[11px] text-on-surface-variant font-semibold uppercase tracking-wider">Rango de Fechas</label>
+              <div class="flex items-center gap-1.5">
+                <input
+                  class="w-full h-9 px-2.5 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
+                  type="text"
+                  value="01/10/2024"
+                />
+                <span class="text-on-surface-variant text-[12px]">-</span>
+                <input
+                  class="w-full h-9 px-2.5 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
+                  type="text"
+                  value="24/10/2024"
+                />
+              </div>
+            </div>
+
+            <!-- Categoría -->
+            <div class="lg:col-span-3 flex flex-col gap-1">
+              <label class="text-[11px] text-on-surface-variant font-semibold uppercase tracking-wider">Categoría de Gasto</label>
+              <div class="relative">
+                <select
+                  id="expense-category-filter"
+                  class="w-full h-9 pl-3 pr-7 bg-surface text-on-surface rounded-xl text-[12px] border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary appearance-none cursor-pointer"
+                >
+                  <option selected>Todas las Categorías</option>
+                  <option>Suministros y Empaque</option>
+                  <option>Servicios Básicos</option>
+                  <option>Mantenimiento y Taller</option>
+                  <option>Logística y Fletes</option>
+                  <option>Viáticos e Imprevistos</option>
+                </select>
+                <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px] pointer-events-none">
+                  expand_more
+                </span>
+              </div>
+            </div>
+
+            <!-- Rango de Monto -->
+            <div class="lg:col-span-3 flex flex-col gap-1">
+              <label class="text-[11px] text-on-surface-variant font-semibold uppercase tracking-wider">Rango de Monto ($)</label>
+              <div class="flex items-center gap-1.5">
+                <div class="relative flex-1">
+                  <span class="absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[12px]">$</span>
+                  <input
+                    class="w-full h-9 pl-5 pr-2 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
+                    placeholder="0"
+                    type="text"
+                    value="0"
+                  />
+                </div>
+                <span class="text-on-surface-variant text-[12px]">-</span>
+                <div class="relative flex-1">
+                  <span class="absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[12px]">$</span>
+                  <input
+                    class="w-full h-9 pl-5 pr-2 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
+                    placeholder="Max"
+                    type="text"
+                    value="5,000"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumen de Coincidencias -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2 bg-surface-container-low px-3 py-2 rounded-xl border border-surface-container/50">
+            <div class="flex items-center gap-2 flex-wrap text-[11px]">
+              <span class="text-on-surface-variant font-medium">Filtro rápido:</span>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-surface-container-lowest text-primary font-semibold shadow-2xs">
+                Mes: Octubre 2024
+              </span>
+            </div>
+            <div class="flex items-center gap-2 text-on-surface-variant text-[12px] shrink-0">
+              <span>Coincidencias: <strong id="expense-matches-count" class="text-primary font-bold">7 egresos</strong></span>
+              <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+              <span id="expense-accum-total" class="font-bold text-secondary">$1,573.70 acumulado</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Datos CRUD: Egresos Operativos -->
+        <div class="bg-surface-container-lowest rounded-xl border border-surface-container/60 shadow-xs overflow-hidden flex flex-col">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-[13px]">
+              <thead>
+                <tr class="h-10 bg-surface-container-low text-on-surface-variant text-[11px] uppercase tracking-wider border-b border-surface-container/60">
+                  <th class="w-10 px-4 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </th>
+                  <th class="px-4 font-semibold">Folio / Comprobante</th>
+                  <th class="px-4 font-semibold">Fecha & Hora</th>
+                  <th class="px-4 font-semibold min-w-[220px]">Concepto / Descripción</th>
+                  <th class="px-4 font-semibold">Categoría</th>
+                  <th class="px-4 font-semibold">Proveedor</th>
+                  <th class="px-4 font-semibold">Método Pago</th>
+                  <th class="px-4 text-right font-semibold">Monto</th>
+                  <th class="px-4 text-center font-semibold">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-surface-container/40">
+                <!-- Fila 1 -->
+                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group" data-category="suministros y empaque" data-amount="185.00">
+                  <td class="px-4 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </td>
+                  <td class="px-4">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[12px] font-bold text-primary">#EXP-2024-089</span>
+                      <span class="px-1.5 py-0.2 rounded bg-surface-container text-[10px] font-semibold text-on-tertiary-container">Fac. Electrónica</span>
+                    </div>
+                  </td>
+                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">24 Oct, 09:15 AM</td>
+                  <td class="px-4">
+                    <div class="flex flex-col">
+                      <span class="font-semibold text-primary">Compra de bobinas papel térmico y resmas</span>
+                      <span class="text-[11px] text-on-surface-variant">12 bobinas 80mm + 4 resmas bond A4</span>
+                    </div>
+                  </td>
+                  <td class="px-4">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container-high text-[11px] text-secondary font-semibold">
+                      Suministros
+                    </span>
+                  </td>
+                  <td class="px-4 font-medium text-primary">Papelera Central S.A.</td>
+                  <td class="px-4 text-[12px] text-on-surface-variant">Tarjeta / Transferencia</td>
+                  <td class="px-4 text-right font-bold text-primary tabular-nums">$185.00</td>
+                  <td class="px-4 text-center">
+                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Fila 2 -->
+                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group bg-surface-container-low/20" data-category="servicios básicos" data-amount="640.20">
+                  <td class="px-4 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </td>
+                  <td class="px-4">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[12px] font-bold text-primary">#EXP-2024-088</span>
+                      <span class="px-1.5 py-0.2 rounded bg-surface-container text-[10px] font-semibold text-on-tertiary-container">Fac. Electrónica</span>
+                    </div>
+                  </td>
+                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">23 Oct, 04:30 PM</td>
+                  <td class="px-4">
+                    <div class="flex flex-col">
+                      <span class="font-semibold text-primary">Servicio de Energía Eléctrica Sucursal 01</span>
+                      <span class="text-[11px] text-on-surface-variant">Periodo Septiembre - Octubre 2024</span>
+                    </div>
+                  </td>
+                  <td class="px-4">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-primary font-semibold">
+                      Servicios Básicos
+                    </span>
+                  </td>
+                  <td class="px-4 font-medium text-primary">Empresa Eléctrica Nacional</td>
+                  <td class="px-4 text-[12px] text-on-surface-variant">Débito Automático</td>
+                  <td class="px-4 text-right font-bold text-primary tabular-nums">$640.20</td>
+                  <td class="px-4 text-center">
+                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Fila 3 -->
+                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group" data-category="suministros y empaque" data-amount="95.00">
+                  <td class="px-4 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </td>
+                  <td class="px-4">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[12px] font-bold text-primary">#EXP-2024-087</span>
+                      <span class="px-1.5 py-0.2 rounded bg-surface-container-high text-[10px] font-semibold text-on-surface-variant">Recibo Simple</span>
+                    </div>
+                  </td>
+                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">23 Oct, 11:20 AM</td>
+                  <td class="px-4">
+                    <div class="flex flex-col">
+                      <span class="font-semibold text-primary">Cajas de cartón corrugado y cinta de embalaje</span>
+                      <span class="text-[11px] text-on-surface-variant">50 unidades calibre industrial para envíos</span>
+                    </div>
+                  </td>
+                  <td class="px-4">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container-high text-[11px] text-secondary font-semibold">
+                      Suministros
+                    </span>
+                  </td>
+                  <td class="px-4 font-medium text-primary">Distribuidora Empaques Pack</td>
+                  <td class="px-4 text-[12px] text-on-surface-variant">Efectivo Caja Chica</td>
+                  <td class="px-4 text-right font-bold text-primary tabular-nums">$95.00</td>
+                  <td class="px-4 text-center">
+                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Fila 4 -->
+                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group bg-surface-container-low/20" data-category="mantenimiento y taller" data-amount="320.00">
+                  <td class="px-4 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox">
+                  </td>
+                  <td class="px-4">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[12px] font-bold text-primary">#EXP-2024-086</span>
+                      <span class="px-1.5 py-0.2 rounded bg-surface-container text-[10px] font-semibold text-on-tertiary-container">Fac. Electrónica</span>
+                    </div>
+                  </td>
+                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">22 Oct, 02:45 PM</td>
+                  <td class="px-4">
+                    <div class="flex flex-col">
+                      <span class="font-semibold text-primary">Mantenimiento preventivo compresor taller</span>
+                      <span class="text-[11px] text-on-surface-variant">Cambio de filtros de aire, válvulas y aceite</span>
+                    </div>
+                  </td>
+                  <td class="px-4">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-tertiary-container font-semibold">
+                      Mantenimiento
+                    </span>
+                  </td>
+                  <td class="px-4 font-medium text-primary">Técnicos & Maquinarias Pro</td>
+                  <td class="px-4 text-[12px] text-on-surface-variant">Transferencia</td>
+                  <td class="px-4 text-right font-bold text-primary tabular-nums">$320.00</td>
+                  <td class="px-4 text-center">
+                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Fila 5 -->
+                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group" data-category="logística y fletes" data-amount="145.00">
+                  <td class="px-4 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </td>
+                  <td class="px-4">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[12px] font-bold text-primary">#EXP-2024-085</span>
+                      <span class="px-1.5 py-0.2 rounded bg-surface-container text-[10px] font-semibold text-on-tertiary-container">Fac. Electrónica</span>
+                    </div>
+                  </td>
+                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">21 Oct, 05:10 PM</td>
+                  <td class="px-4">
+                    <div class="flex flex-col">
+                      <span class="font-semibold text-primary">Flete urgente reposición de repuestos</span>
+                      <span class="text-[11px] text-on-surface-variant">Envío express ruta norte a bodega central</span>
+                    </div>
+                  </td>
+                  <td class="px-4">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container-low text-[11px] text-on-surface font-semibold">
+                      Logística y Fletes
+                    </span>
+                  </td>
+                  <td class="px-4 font-medium text-primary">Transportes Express Andina</td>
+                  <td class="px-4 text-[12px] text-on-surface-variant">Tarjeta Débito</td>
+                  <td class="px-4 text-right font-bold text-primary tabular-nums">$145.00</td>
+                  <td class="px-4 text-center">
+                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Fila 6 -->
+                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group bg-surface-container-low/20" data-category="viáticos e imprevistos" data-amount="78.50">
+                  <td class="px-4 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </td>
+                  <td class="px-4">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[12px] font-bold text-primary">#EXP-2024-084</span>
+                      <span class="px-1.5 py-0.2 rounded bg-surface-container-high text-[10px] font-semibold text-on-surface-variant">Recibo Simple</span>
+                    </div>
+                  </td>
+                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">20 Oct, 01:15 PM</td>
+                  <td class="px-4">
+                    <div class="flex flex-col">
+                      <span class="font-semibold text-primary">Alimentación jornada inventario general</span>
+                      <span class="text-[11px] text-on-surface-variant">Almuerzos equipo de conteo físico (6 pers.)</span>
+                    </div>
+                  </td>
+                  <td class="px-4">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface-variant font-semibold">
+                      Viáticos / Alim.
+                    </span>
+                  </td>
+                  <td class="px-4 font-medium text-primary">ServiCatering Express</td>
+                  <td class="px-4 text-[12px] text-on-surface-variant">Efectivo</td>
+                  <td class="px-4 text-right font-bold text-primary tabular-nums">$78.50</td>
+                  <td class="px-4 text-center">
+                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Fila 7 -->
+                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group" data-category="servicios básicos" data-amount="110.00">
+                  <td class="px-4 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </td>
+                  <td class="px-4">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[12px] font-bold text-primary">#EXP-2024-083</span>
+                      <span class="px-1.5 py-0.2 rounded bg-surface-container text-[10px] font-semibold text-on-tertiary-container">Fac. Electrónica</span>
+                    </div>
+                  </td>
+                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">19 Oct, 10:00 AM</td>
+                  <td class="px-4">
+                    <div class="flex flex-col">
+                      <span class="font-semibold text-primary">Conectividad Fibra Óptica e Internet Sucursal</span>
+                      <span class="text-[11px] text-on-surface-variant">Enlace dedicado 300Mbps simétrico mensual</span>
+                    </div>
+                  </td>
+                  <td class="px-4">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-primary font-semibold">
+                      Servicios Básicos
+                    </span>
+                  </td>
+                  <td class="px-4 font-medium text-primary">Telecom Redes Globales</td>
+                  <td class="px-4 text-[12px] text-on-surface-variant">Transferencia</td>
+                  <td class="px-4 text-right font-bold text-primary tabular-nums">$110.00</td>
+                  <td class="px-4 text-center">
+                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      </button>
+                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginación y Control de Registros -->
+          <div class="p-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-on-surface-variant border-t border-surface-container/60">
+            <div class="flex items-center gap-4">
+              <span>Mostrando <strong class="text-on-surface font-semibold">1-7</strong> de <strong class="text-on-surface font-semibold">42</strong> egresos</span>
+              <div class="hidden sm:flex items-center gap-1.5">
+                <span>Filas por página:</span>
+                <select class="bg-surface text-on-surface rounded-lg px-2 py-1 border border-surface-container/60 text-[11px] focus:outline-none cursor-pointer">
+                  <option>10</option>
+                  <option>20</option>
+                  <option>50</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex items-center gap-1">
+              <button class="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface hover:bg-surface-container border border-surface-container/60 disabled:opacity-40 cursor-pointer" disabled type="button">
+                <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+              </button>
+              <button class="w-7 h-7 rounded-lg flex items-center justify-center bg-primary text-on-primary font-semibold cursor-pointer" type="button">1</button>
+              <button class="w-7 h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-surface-container text-on-surface border border-surface-container/60 cursor-pointer" type="button">2</button>
+              <button class="w-7 h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-surface-container text-on-surface border border-surface-container/60 cursor-pointer" type="button">3</button>
+              <button class="w-7 h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-surface-container text-on-surface border border-surface-container/60 cursor-pointer" type="button">4</button>
+              <button class="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface hover:bg-surface-container border border-surface-container/60 cursor-pointer" type="button">
+                <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
+
+  <!-- MODAL: REGISTRAR NUEVO GASTO / ASENTAR RECIBO -->
+  <div
+    id="expenseModal"
+    class="fixed inset-0 z-50 hidden flex items-center justify-center bg-primary/40 backdrop-blur-xs p-4"
+    aria-hidden="true"
+  >
+    <div
+      id="expenseModalPanel"
+      class="bg-surface-container-lowest rounded-2xl max-w-lg w-full shadow-2xl p-5 sm:p-6 flex flex-col gap-4 border border-surface-container"
+    >
+      <div class="flex items-center justify-between pb-1 border-b border-surface-container/60">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
+            <span class="material-symbols-outlined text-[20px]">post_add</span>
+          </div>
+          <h3 class="text-[17px] font-bold text-on-surface">Registrar Egreso Operativo</h3>
+        </div>
+        <button
+          id="btn-close-expense-modal"
+          class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg hover:bg-surface-container transition-colors cursor-pointer"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <!-- Concepto -->
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">
+            Concepto / Motivo del Gasto *
+          </label>
+          <input
+            id="newExpenseConcept"
+            class="w-full h-9 px-3 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant/70 border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary focus:bg-surface-container-lowest transition-all"
+            placeholder="Ej. Compra de resmas de papel bond y cartuchos"
+            type="text"
+          />
+        </div>
+
+        <!-- Categoría y Proveedor -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">Categoría *</label>
+            <select
+              id="newExpenseCategory"
+              class="w-full h-9 px-3 bg-surface text-on-surface rounded-xl text-[12px] border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
+            >
+              <option>Suministros y Empaque</option>
+              <option>Servicios Básicos</option>
+              <option>Mantenimiento y Taller</option>
+              <option>Logística y Fletes</option>
+              <option>Viáticos e Imprevistos</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">Proveedor / Beneficiario *</label>
+            <input
+              id="newExpenseProvider"
+              class="w-full h-9 px-3 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant/70 border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
+              placeholder="Ej. Papelera Central S.A."
+              type="text"
+            />
+          </div>
+        </div>
+
+        <!-- Monto, Comprobante y Método -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">Monto ($) *</label>
+            <input
+              id="newExpenseAmount"
+              class="w-full h-9 px-3 bg-surface rounded-xl text-[13px] text-primary font-bold border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
+              placeholder="0.00"
+              type="number"
+              step="0.01"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">Comprobante</label>
+            <select
+              id="newExpenseDocType"
+              class="w-full h-9 px-2.5 bg-surface text-on-surface rounded-xl text-[12px] border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
+            >
+              <option>Fac. Electrónica</option>
+              <option>Recibo Simple</option>
+              <option>Sin Comprobante</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">Método Pago</label>
+            <select
+              id="newExpenseMethod"
+              class="w-full h-9 px-2.5 bg-surface text-on-surface rounded-xl text-[12px] border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
+            >
+              <option>Transferencia</option>
+              <option>Caja Chica (Efectivo)</option>
+              <option>Tarjeta Débito</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-surface-container/60">
+        <button
+          id="btn-cancel-expense-modal"
+          class="px-4 h-9 bg-surface-container-low hover:bg-surface-container text-on-surface text-[12px] font-medium rounded-xl transition-colors cursor-pointer"
+          type="button"
+        >
+          Cancelar
+        </button>
+        <button
+          class="px-5 h-9 bg-secondary-container hover:bg-secondary text-on-secondary text-[12px] font-semibold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+          type="button"
+          onclick="window.saveNewExpense && window.saveNewExpense()"
+        >
+          <span class="material-symbols-outlined text-[18px]">save</span>
+          <span>Guardar Egreso</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION TOAST -->
+  <div
+    id="expenseToast"
+    class="fixed bottom-6 right-6 z-50 hidden bg-primary text-on-primary px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 transition-all pointer-events-none"
+  >
+    <span id="expenseToastIcon" class="material-symbols-outlined text-secondary-fixed text-[20px]">check_circle</span>
+    <span id="expenseToastMsg" class="text-[13px] font-medium">Operación completada con éxito</span>
+  </div>
+
+  <script>
+    import {
+      initGastos,
+      openExpenseModal,
+      closeExpenseModal,
+      showExpenseToast,
+    } from "../animaciones/animaGastos.js";
+
+    window.openExpenseModal = openExpenseModal;
+    window.closeExpenseModal = closeExpenseModal;
+    window.showExpenseToast = showExpenseToast;
+
+    window.saveNewExpense = function() {
+      const concept = (document.getElementById("newExpenseConcept") as HTMLInputElement | null)?.value.trim();
+      const amount = (document.getElementById("newExpenseAmount") as HTMLInputElement | null)?.value.trim();
+
+      if (!concept || !amount) {
+        showExpenseToast("Por favor complete el concepto y el monto.", "warning");
+        return;
+      }
+
+      closeExpenseModal();
+      showExpenseToast(`Gasto por $${amount} asentado en libros correctamente.`);
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        initGastos();
+      });
+    } else {
+      initGastos();
+    }
+  </script>
 </Layout>
