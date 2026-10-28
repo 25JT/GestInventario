@@ -1,4 +1,5 @@
 ---
+// ControldeInventario.astro - Módulo Maestro de Control de Inventario
 import Layout from "../layouts/Layout.astro";
 import SlideBar from "../components/SlideBar.astro";
 import NavBar from "../components/Nav.astro";
@@ -6,47 +7,1061 @@ import NavBar from "../components/Nav.astro";
 
 <Layout title="Control de Inventario - StockControl Enterprise JR">
   <div class="min-h-screen bg-surface flex flex-col font-body-md text-on-surface">
+    {/* Barra lateral y superior globales y responsivas */}
     <SlideBar currentPath="inventario" />
     <NavBar storeName="Central Sucursal 01" operationStatus="Operación Normal" />
 
+    {/* Contenedor principal */}
     <div id="app-content" class="pt-16 min-h-screen flex flex-col flex-1">
       <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
-        <!-- Sub-header del Módulo -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-surface-container/60">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="font-label-sm text-[12px] text-secondary-container tracking-wider uppercase font-semibold">
-                Módulo Operativo
+
+        <!-- Top Operations & Header Bar -->
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-label-sm text-[12px] uppercase tracking-wider text-secondary-container font-semibold bg-surface-container-high px-2 py-0.5 rounded-lg">
+                Módulo Almacén
               </span>
               <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
             </div>
-            <h1 class="text-[22px] sm:text-[26px] font-bold text-on-surface tracking-tight mt-0.5">
+            <h1 class="text-[24px] sm:text-[28px] font-bold text-primary tracking-tight">
               Control de Inventario
             </h1>
-            <p class="text-[13px] text-on-surface-variant">
-              Gestión centralizada de existencias, catálogo de productos y kardex de almacén.
+            <p class="text-[13px] sm:text-[14px] text-on-surface-variant mt-0.5 max-w-2xl">
+              Catálogo maestro de existencias, valuación en tiempo real y rotación de activos físicos.
             </p>
+          </div>
+
+          <!-- Quick Action Controls -->
+          <div class="flex flex-wrap items-center gap-2.5">
+            {/* 1. Botón Carga Masiva (preparado para modal o drawer posterior) */}
+            <button
+              id="btn-bulk-upload"
+              class="h-[38px] px-3.5 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface rounded-xl font-label-md text-[13px] font-medium border border-surface-container/70 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+              type="button"
+              title="Importar catálogo masivo vía CSV o Excel"
+            >
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant">upload_file</span>
+              <span>Carga masiva</span>
+            </button>
+
+            {/* 2. Botón Agregar Categoría (preparado para modal posterior) */}
+            <button
+              id="btn-open-category"
+              class="h-[38px] px-3.5 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface rounded-xl font-label-md text-[13px] font-medium border border-surface-container/70 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+              type="button"
+              title="Gestionar y agregar nuevas categorías de productos"
+            >
+              <span class="material-symbols-outlined text-[18px] text-on-surface-variant">category</span>
+              <span>Agregar categoría</span>
+            </button>
+
+            {/* 3. Botón Agregar Producto (despliega Drawer) */}
+            <button
+              id="btn-open-drawer"
+              class="h-[38px] px-4 bg-primary hover:bg-secondary text-on-primary rounded-xl font-label-md text-[13px] font-semibold shadow-xs hover:shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+              type="button"
+            >
+              <span class="material-symbols-outlined text-[18px]">add_box</span>
+              <span>Agregar Producto</span>
+            </button>
           </div>
         </div>
 
-        {/* Contenedor del módulo */}
-        <div class="bg-surface-container-lowest p-8 rounded-2xl border border-surface-container/60 shadow-xs flex flex-col items-center justify-center text-center py-16">
-          <div class="w-14 h-14 rounded-2xl bg-secondary-container/10 text-secondary-container flex items-center justify-center mb-4">
-            <span class="material-symbols-outlined text-[32px]">inventory_2</span>
+        <!-- KPI Live Metric Bento Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <!-- KPI 1: Catálogo Total SKUs -->
+          <div class="inv-kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+            <div class="flex items-center justify-between">
+              <span class="text-[12px] uppercase tracking-wide text-on-surface-variant font-semibold">
+                Catálogo Total SKUs
+              </span>
+              <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] font-semibold text-secondary-container">
+                +14 este mes
+              </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-[26px] sm:text-[28px] text-primary font-bold tracking-tight">852</span>
+              <span class="text-[12px] text-on-surface-variant">ítems registrados</span>
+            </div>
+            <div class="w-full bg-surface-container h-1.5 rounded-full mt-3 overflow-hidden">
+              <div class="bg-secondary-container h-full w-[82%] rounded-full"></div>
+            </div>
           </div>
-          <h2 class="text-[18px] font-bold text-on-surface">Módulo de Control de Inventario</h2>
-          <p class="text-[13px] text-on-surface-variant max-w-md mt-1 mb-6">
-            Pestaña lista para incorporar el catálogo de productos, registro de stock físico, lotes y kardex.
-          </p>
-          <a
-            href="/DashPrincipal"
-            class="px-4 py-2 bg-primary hover:bg-secondary text-on-primary font-semibold text-[13px] rounded-xl shadow-xs transition-all flex items-center gap-2"
-          >
-            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-            <span>Volver al Panel Principal</span>
-          </a>
+
+          <!-- KPI 2: Valorización Total -->
+          <div class="inv-kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+            <div class="flex items-center justify-between">
+              <span class="text-[12px] uppercase tracking-wide text-on-surface-variant font-semibold">
+                Valorización de Activos
+              </span>
+              <span class="px-2 py-0.5 rounded-lg bg-surface-container-high text-[11px] font-semibold text-on-tertiary-container">
+                +6.2% vs prev
+              </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-[26px] sm:text-[28px] text-primary font-bold tracking-tight">$124,500</span>
+              <span class="text-[12px] text-on-surface-variant">USD costo repo.</span>
+            </div>
+            <div class="w-full bg-surface-container h-1.5 rounded-full mt-3 overflow-hidden">
+              <div class="bg-on-tertiary-container h-full w-[64%] rounded-full"></div>
+            </div>
+          </div>
+
+          <!-- KPI 3: Productos en Riesgo -->
+          <div class="inv-kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+            <div class="flex items-center justify-between">
+              <span class="text-[12px] uppercase tracking-wide text-on-surface-variant font-semibold">
+                Stock en Umbral Crítico
+              </span>
+              <span class="px-2 py-0.5 rounded-lg bg-error-container text-error text-[11px] font-bold animate-pulse">
+                18 en alerta
+              </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-[26px] sm:text-[28px] text-error font-bold tracking-tight">18</span>
+              <span class="text-[12px] text-on-surface-variant">requieren reabastecimiento</span>
+            </div>
+            <div class="w-full bg-surface-container h-1.5 rounded-full mt-3 overflow-hidden">
+              <div class="bg-error h-full w-[28%] rounded-full"></div>
+            </div>
+          </div>
+
+          <!-- KPI 4: Rotación Promedio -->
+          <div class="inv-kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+            <div class="flex items-center justify-between">
+              <span class="text-[12px] uppercase tracking-wide text-on-surface-variant font-semibold">
+                Índice Rotación Días
+              </span>
+              <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] font-semibold text-on-surface-variant">
+                Saludable
+              </span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-[26px] sm:text-[28px] text-primary font-bold tracking-tight">21.4</span>
+              <span class="text-[12px] text-on-surface-variant">días de permanencia</span>
+            </div>
+            <div class="w-full bg-surface-container h-1.5 rounded-full mt-3 overflow-hidden">
+              <div class="bg-primary-container h-full w-[76%] rounded-full"></div>
+            </div>
+          </div>
         </div>
+
+        <!-- Filtration & Search Bar (Dense Ergonomic Strip) -->
+        <div class="bg-surface-container-lowest p-3 rounded-xl border border-surface-container/60 shadow-xs mb-4 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+          <!-- Live Search -->
+          <div class="relative flex-1 min-w-[260px]">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">
+              search
+            </span>
+            <input
+              id="inventory-search"
+              class="w-full h-9 pl-9 pr-14 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant/70 border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary focus:bg-surface-container-lowest transition-all"
+              placeholder="Filtrar por Nombre de artículo, SKU o Código EAN-13..."
+              type="text"
+            />
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold uppercase bg-surface-container px-1.5 py-0.5 rounded text-on-surface-variant pointer-events-none">
+              Esc
+            </span>
+          </div>
+
+          <!-- Quick Filter Selectors -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Categoria -->
+            <div class="relative">
+              <select
+                id="filter-category"
+                class="h-9 pl-3 pr-7 bg-surface hover:bg-surface-container-low text-on-surface rounded-xl text-[12px] font-medium appearance-none cursor-pointer border border-transparent hover:border-surface-container focus:outline-none focus:bg-surface-container-lowest transition-all"
+              >
+                <option value="">Categoría: Todas</option>
+                <option value="electrónicos">Electrónicos</option>
+                <option value="repuestos">Repuestos & Refacciones</option>
+                <option value="consumibles">Consumibles</option>
+                <option value="herramientas">Herramientas Pro</option>
+              </select>
+              <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant">
+                expand_more
+              </span>
+            </div>
+
+            <!-- Estado Stock -->
+            <div class="relative">
+              <select
+                id="filter-status"
+                class="h-9 pl-3 pr-7 bg-surface hover:bg-surface-container-low text-on-surface rounded-xl text-[12px] font-medium appearance-none cursor-pointer border border-transparent hover:border-surface-container focus:outline-none focus:bg-surface-container-lowest transition-all"
+              >
+                <option value="">Salud Stock: Todo</option>
+                <option value="opt">En Stock (Normal)</option>
+                <option value="low">Stock Crítico (< Mínimo)</option>
+                <option value="zero">Agotado (0 Unidades)</option>
+              </select>
+              <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant">
+                expand_more
+              </span>
+            </div>
+
+            <!-- Almacén Selector -->
+            <div class="relative">
+              <select
+                id="filter-warehouse"
+                class="h-9 pl-3 pr-7 bg-surface hover:bg-surface-container-low text-on-surface rounded-xl text-[12px] font-semibold appearance-none cursor-pointer border border-transparent hover:border-surface-container focus:outline-none focus:bg-surface-container-lowest transition-all"
+              >
+                <option value="main">Depósito: Sucursal Principal</option>
+                <option value="north">Depósito: Bodega Norte 02</option>
+                <option value="transit">En Tránsito Logístico</option>
+              </select>
+              <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant">
+                expand_more
+              </span>
+            </div>
+
+            <!-- Clear / Reset Filter Button -->
+            <button
+              id="btn-reset-filters"
+              class="h-9 w-9 bg-surface hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface rounded-xl text-[12px] flex items-center justify-center transition-colors cursor-pointer border border-transparent hover:border-surface-container"
+              title="Restablecer filtros"
+              type="button"
+            >
+              <span class="material-symbols-outlined text-[18px]">restart_alt</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- High-Density Inventory Data Table Canvas -->
+        <div class="bg-surface-container-lowest rounded-xl border border-surface-container/60 shadow-xs overflow-hidden flex flex-col">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-[13px]">
+              <thead>
+                <tr class="bg-surface-container-low h-10 text-on-surface-variant uppercase text-[11px] tracking-wider border-b border-surface-container/60">
+                  <th class="w-10 px-3 py-2 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </th>
+                  <th class="px-3 py-2 font-semibold">SKU / Código</th>
+                  <th class="px-3 py-2 font-semibold min-w-[220px]">Producto / Descripción</th>
+                  <th class="px-3 py-2 font-semibold">Categoría</th>
+                  <th class="px-3 py-2 font-semibold text-right">P. Compra</th>
+                  <th class="px-3 py-2 font-semibold text-right">P. Venta</th>
+                  <th class="px-3 py-2 font-semibold text-right">Margen</th>
+                  <th class="px-3 py-2 font-semibold text-center min-w-[140px]">Salud / Existencias</th>
+                  <th class="px-3 py-2 font-semibold min-w-[140px]">Ubicación</th>
+                  <th class="px-4 py-2 font-semibold text-right min-w-[120px]">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-surface-container/40">
+                <!-- Row 1: Healthy Stock -->
+                <tr
+                  class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
+                  data-category="electrónicos"
+                  data-status="opt"
+                >
+                  <td class="px-3 py-2 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </td>
+                  <td class="px-3 py-2 font-semibold text-primary">
+                    SKU-7729-EL
+                    <div class="text-[11px] text-on-surface-variant font-normal">75010098231</div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 overflow-hidden">
+                        <img
+                          class="w-full h-full object-cover"
+                          alt="Sensor Óptico Láser HD-40"
+                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeRpQVoH8yEXmbMjCMUDpNZ43WSPGlOaufpUL07WZtovK_FXzCjGrYwk97NCa2jnrPeYRToZGepHekMze9DYc2-1e-L9HA0jFCqxUaJvKJiHJvndDzF7TgiaERWHLK0WA02FGWb71MmLdCbjpcfyNuQ0aHeo-riPXEeKW3-l-Wd6hULuGlVGU7mI5V22B34WVLh2zI14e5DMdixNNZy0yQj-Z2cDLhq_KtBpPaGlDND7Jbzi83PcX50w"
+                        />
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <span class="font-semibold text-on-surface truncate">Sensor Óptico Láser HD-40</span>
+                        <span class="text-[11px] text-on-surface-variant truncate">Rango dinámico 120m con calibración digital</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
+                      Electrónicos
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-right text-on-surface-variant font-medium">$42.50</td>
+                  <td class="px-3 py-2 text-right text-on-surface font-bold">$89.00</td>
+                  <td class="px-3 py-2 text-right">
+                    <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
+                      +52.2%
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-center">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-surface-container-high text-on-tertiary-container text-[11px] font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                      <span>142 unid.</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2 text-[12px] text-on-surface-variant">Pasillo B · Est. 04</td>
+                  <td class="px-4 py-2 text-right">
+                    <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Ajustar Stock Rápido"
+                        type="button"
+                        data-action="quick-adjust"
+                        data-sku="SKU-7729-EL"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">tune</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Editar Producto"
+                        type="button"
+                        onclick="window.openProductDrawer && window.openProductDrawer()"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Historial Kárdex"
+                        type="button"
+                        data-action="kardex"
+                        data-sku="SKU-7729-EL"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">history</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
+                        title="Eliminar"
+                        type="button"
+                        data-action="delete-item"
+                        data-sku="SKU-7729-EL"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 2: Low Stock Warning -->
+                <tr
+                  class="inventory-row h-12 bg-surface-container-low/30 hover:bg-surface-container-low transition-colors group"
+                  data-category="repuestos"
+                  data-status="low"
+                >
+                  <td class="px-3 py-2 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </td>
+                  <td class="px-3 py-2 font-semibold text-primary">
+                    SKU-9104-RP
+                    <div class="text-[11px] text-on-surface-variant font-normal">75099304128</div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 overflow-hidden">
+                        <img
+                          class="w-full h-full object-cover"
+                          alt="Kit Rodamientos Blindados 608-2RS"
+                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPtXaqTJSW1Q4eIfMfN41VYosfpOlM98t9s6MhrMhNULclcz4pSY1t9DA2lQaFJ1qydOml9pC5hCoVzFgpfLRKAj4bPqO7m0AbVrpgxpji7Gyni_xg70j9ouYeKgmy1MBpekahdsymp8H36ru0M-KoiFv3zYjbmF7R9X7KECo3zKSFjlfvC8p99UgPfbLJVU2w71IB8iCXCth1DaUm9XwdyobbVQ0sdNfGOgO60fj5U6s7Pu6InwYSTg"
+                        />
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <span class="font-semibold text-on-surface truncate">Kit Rodamientos Blindados 608-2RS</span>
+                        <span class="text-[11px] text-on-surface-variant truncate">Acero al cromo alta fricción para transmisiones</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
+                      Repuestos
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-right text-on-surface-variant font-medium">$11.20</td>
+                  <td class="px-3 py-2 text-right text-on-surface font-bold">$24.00</td>
+                  <td class="px-3 py-2 text-right">
+                    <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
+                      +53.3%
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-center">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-error-container/60 text-error text-[11px] font-bold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span>
+                      <span>4 unid. (Mín: 15)</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2 text-[12px] text-on-surface-variant">Rack E · Cajón 12</td>
+                  <td class="px-4 py-2 text-right">
+                    <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Ajustar Stock"
+                        type="button"
+                        data-action="quick-adjust"
+                        data-sku="SKU-9104-RP"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">tune</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Editar Producto"
+                        type="button"
+                        onclick="window.openProductDrawer && window.openProductDrawer()"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Historial Kárdex"
+                        type="button"
+                        data-action="kardex"
+                        data-sku="SKU-9104-RP"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">history</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
+                        title="Eliminar"
+                        type="button"
+                        data-action="delete-item"
+                        data-sku="SKU-9104-RP"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 3: Out of Stock (Zero) -->
+                <tr
+                  class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
+                  data-category="consumibles"
+                  data-status="zero"
+                >
+                  <td class="px-3 py-2 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </td>
+                  <td class="px-3 py-2 font-semibold text-primary">
+                    SKU-3312-CS
+                    <div class="text-[11px] text-on-surface-variant font-normal">75038472911</div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 overflow-hidden">
+                        <img
+                          class="w-full h-full object-cover"
+                          alt="Lubricante Sintético Dieléctrico 400ml"
+                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3hqpnpNk5OqGMBo7L6E9pMUZx5iR35ZNFkfPTRyqPcV49lArSkNFi7bFKaESAplPs5QV5-dp-S6mpVVbqFEW0Un9fk3gGX4AhL5lQMxefv1Nzq26RtKtFFVnvamo47PHbFN7UQKpR0wW2ReNLPq0eHbYa_SjBVz7d3JXB9X8_ndRJihW8d4W-z6IJCGcdh7E70Qi3umzg-Rm6vIWMINuKdu4hgEyMN3VNIusRvcAHsbUefNRGxKUnDg"
+                        />
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <span class="font-semibold text-on-surface truncate">Lubricante Sintético Dieléctrico 400ml</span>
+                        <span class="text-[11px] text-on-surface-variant truncate">Aerosol repelente humedad para contactores</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
+                      Consumibles
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-right text-on-surface-variant font-medium">$6.50</td>
+                  <td class="px-3 py-2 text-right text-on-surface font-bold">$14.50</td>
+                  <td class="px-3 py-2 text-right">
+                    <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
+                      +55.1%
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-center">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-error-container text-error text-[11px] font-bold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                      <span>Agotado (0)</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2 text-[12px] text-on-surface-variant">Pasillo A · Bahía 01</td>
+                  <td class="px-4 py-2 text-right">
+                    <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Ajustar Stock"
+                        type="button"
+                        data-action="quick-adjust"
+                        data-sku="SKU-3312-CS"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">tune</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Editar Producto"
+                        type="button"
+                        onclick="window.openProductDrawer && window.openProductDrawer()"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Historial Kárdex"
+                        type="button"
+                        data-action="kardex"
+                        data-sku="SKU-3312-CS"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">history</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
+                        title="Eliminar"
+                        type="button"
+                        data-action="delete-item"
+                        data-sku="SKU-3312-CS"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 4: Tools Pro -->
+                <tr
+                  class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
+                  data-category="herramientas"
+                  data-status="opt"
+                >
+                  <td class="px-3 py-2 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </td>
+                  <td class="px-3 py-2 font-semibold text-primary">
+                    SKU-5541-HT
+                    <div class="text-[11px] text-on-surface-variant font-normal">75088219450</div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[20px]">handyman</span>
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <span class="font-semibold text-on-surface truncate">Pinza Crimpadora Hexagonal 6-50mm²</span>
+                        <span class="text-[11px] text-on-surface-variant truncate">Cuerpo reforzado con mangos aislados 1000V</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
+                      Herramientas
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-right text-on-surface-variant font-medium">$38.00</td>
+                  <td class="px-3 py-2 text-right text-on-surface font-bold">$68.50</td>
+                  <td class="px-3 py-2 text-right">
+                    <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
+                      +44.5%
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-center">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-surface-container-high text-on-tertiary-container text-[11px] font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                      <span>28 unid.</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2 text-[12px] text-on-surface-variant">Zona C · Armario 02</td>
+                  <td class="px-4 py-2 text-right">
+                    <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Ajustar Stock"
+                        type="button"
+                        data-action="quick-adjust"
+                        data-sku="SKU-5541-HT"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">tune</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Editar Producto"
+                        type="button"
+                        onclick="window.openProductDrawer && window.openProductDrawer()"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Historial Kárdex"
+                        type="button"
+                        data-action="kardex"
+                        data-sku="SKU-5541-HT"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">history</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
+                        title="Eliminar"
+                        type="button"
+                        data-action="delete-item"
+                        data-sku="SKU-5541-HT"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 5: Electronic Module -->
+                <tr
+                  class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
+                  data-category="electrónicos"
+                  data-status="opt"
+                >
+                  <td class="px-3 py-2 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </td>
+                  <td class="px-3 py-2 font-semibold text-primary">
+                    SKU-1088-EL
+                    <div class="text-[11px] text-on-surface-variant font-normal">75099182341</div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[20px]">memory</span>
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <span class="font-semibold text-on-surface truncate">Microcontrolador ESP32-WROOM-32D</span>
+                        <span class="text-[11px] text-on-surface-variant truncate">Módulo Wi-Fi & BLE dual-core 240MHz</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
+                      Electrónicos
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-right text-on-surface-variant font-medium">$3.20</td>
+                  <td class="px-3 py-2 text-right text-on-surface font-bold">$7.50</td>
+                  <td class="px-3 py-2 text-right">
+                    <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
+                      +57.3%
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-center">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-surface-container-high text-on-tertiary-container text-[11px] font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                      <span>310 unid.</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2 text-[12px] text-on-surface-variant">Pasillo B · Gaveta 09</td>
+                  <td class="px-4 py-2 text-right">
+                    <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Ajustar Stock"
+                        type="button"
+                        data-action="quick-adjust"
+                        data-sku="SKU-1088-EL"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">tune</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Editar Producto"
+                        type="button"
+                        onclick="window.openProductDrawer && window.openProductDrawer()"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Historial Kárdex"
+                        type="button"
+                        data-action="kardex"
+                        data-sku="SKU-1088-EL"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">history</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
+                        title="Eliminar"
+                        type="button"
+                        data-action="delete-item"
+                        data-sku="SKU-1088-EL"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 6: Healthy Stock -->
+                <tr
+                  class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
+                  data-category="repuestos"
+                  data-status="opt"
+                >
+                  <td class="px-3 py-2 text-center">
+                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                  </td>
+                  <td class="px-3 py-2 font-semibold text-primary">
+                    SKU-8920-RP
+                    <div class="text-[11px] text-on-surface-variant font-normal">75066491028</div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[20px]">settings_input_component</span>
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <span class="font-semibold text-on-surface truncate">Válvula Solenoide Neumática 24V DC</span>
+                        <span class="text-[11px] text-on-surface-variant truncate">Conector DIN 43650 con indicador LED</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2">
+                    <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
+                      Repuestos
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-right text-on-surface-variant font-medium">$22.40</td>
+                  <td class="px-3 py-2 text-right text-on-surface font-bold">$45.00</td>
+                  <td class="px-3 py-2 text-right">
+                    <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
+                      +50.2%
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-center">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-surface-container-high text-on-tertiary-container text-[11px] font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                      <span>65 unid.</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2 text-[12px] text-on-surface-variant">Pasillo E · Est. 01</td>
+                  <td class="px-4 py-2 text-right">
+                    <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Ajustar Stock"
+                        type="button"
+                        data-action="quick-adjust"
+                        data-sku="SKU-8920-RP"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">tune</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Editar Producto"
+                        type="button"
+                        onclick="window.openProductDrawer && window.openProductDrawer()"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
+                        title="Historial Kárdex"
+                        type="button"
+                        data-action="kardex"
+                        data-sku="SKU-8920-RP"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">history</span>
+                      </button>
+                      <button
+                        class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
+                        title="Eliminar"
+                        type="button"
+                        data-action="delete-item"
+                        data-sku="SKU-8920-RP"
+                      >
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Ergonomic Pagination Footer -->
+          <div class="p-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-surface-container/60">
+            <div class="flex items-center gap-4 text-[12px] text-on-surface-variant">
+              <span>
+                Mostrando <span id="inventory-visible-count" class="text-on-surface font-semibold">6</span> de <span class="text-on-surface font-semibold">852</span> artículos
+              </span>
+              <div class="flex items-center gap-1.5">
+                <span>Filas:</span>
+                <select class="h-6 px-1.5 bg-surface text-on-surface rounded text-[11px] border border-surface-container focus:outline-none cursor-pointer">
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                  <option>100</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1">
+              <button class="h-7 w-7 rounded-lg bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest flex items-center justify-center transition-colors disabled:opacity-40 cursor-pointer" disabled type="button">
+                <span class="material-symbols-outlined text-[16px]">first_page</span>
+              </button>
+              <button class="h-7 w-7 rounded-lg bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest flex items-center justify-center transition-colors disabled:opacity-40 cursor-pointer" disabled type="button">
+                <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+              </button>
+              <button class="h-7 px-2.5 rounded-lg bg-primary-container text-on-primary text-[12px] font-semibold cursor-pointer" type="button">1</button>
+              <button class="h-7 px-2.5 rounded-lg bg-surface hover:bg-surface-container-lowest text-on-surface text-[12px] font-medium cursor-pointer" type="button">2</button>
+              <button class="h-7 px-2.5 rounded-lg bg-surface hover:bg-surface-container-lowest text-on-surface text-[12px] font-medium cursor-pointer" type="button">3</button>
+              <span class="text-[12px] text-on-surface-variant px-1">...</span>
+              <button class="h-7 px-2.5 rounded-lg bg-surface hover:bg-surface-container-lowest text-on-surface text-[12px] font-medium cursor-pointer" type="button">86</button>
+              <button class="h-7 w-7 rounded-lg bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest flex items-center justify-center transition-colors cursor-pointer" type="button">
+                <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+              </button>
+              <button class="h-7 w-7 rounded-lg bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest flex items-center justify-center transition-colors cursor-pointer" type="button">
+                <span class="material-symbols-outlined text-[16px]">last_page</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
+
+  <!-- Slide-Over Drawer: 'Agregar Inventario / Nuevo Ítem' Flow -->
+  <div
+    id="drawer-backdrop"
+    class="fixed inset-0 bg-primary/40 backdrop-blur-xs z-50 transition-opacity hidden pointer-events-none"
+    aria-hidden="true"
+  >
+    <div
+      id="drawer-panel"
+      class="fixed top-0 right-0 h-full w-full max-w-lg bg-surface-container-lowest shadow-2xl flex flex-col justify-between z-50 pointer-events-none translate-x-full border-l border-surface-container"
+    >
+      <!-- Drawer Header -->
+      <div class="p-4 sm:p-5 bg-surface-container-low flex items-center justify-between border-b border-surface-container/60 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-xs">
+            <span class="material-symbols-outlined text-[20px]">add_box</span>
+          </div>
+          <div>
+            <h2 class="text-[17px] font-bold text-primary leading-tight">Agregar Producto</h2>
+            <p class="text-[12px] text-on-surface-variant">Flujo de alta en catálogo maestro de almacén</p>
+          </div>
+        </div>
+        <button
+          id="btn-close-drawer"
+          class="p-1.5 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
+          type="button"
+          title="Cerrar formulario"
+        >
+          <span class="material-symbols-outlined text-[22px]">close</span>
+        </button>
+      </div>
+
+      <!-- Drawer Body (Form Fields) -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+        <!-- Nombre del Producto -->
+        <div class="space-y-1">
+          <label class="text-[12px] font-semibold text-on-surface uppercase tracking-wide">
+            Nombre del Producto / Activo *
+          </label>
+          <input
+            id="drawer-name"
+            class="w-full h-9 px-3 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant/70 border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary focus:bg-surface-container-lowest transition-all"
+            placeholder="Ej. Multímetro Digital True RMS Fluke-117"
+            type="text"
+          />
+        </div>
+
+        <!-- SKU y Código de Barras -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="text-[12px] font-semibold text-on-surface uppercase tracking-wide">
+              SKU Interno *
+            </label>
+            <input
+              id="drawer-sku"
+              class="w-full h-9 px-3 bg-surface rounded-xl text-[13px] text-on-surface font-semibold border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary focus:bg-surface-container-lowest"
+              type="text"
+              value="SKU-2024-"
+            />
+          </div>
+          <div class="space-y-1">
+            <label class="text-[12px] font-semibold text-on-surface uppercase tracking-wide">
+              Código de Barras EAN
+            </label>
+            <div class="relative">
+              <input
+                id="drawer-ean"
+                class="w-full h-9 px-3 pr-8 bg-surface rounded-xl text-[13px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary focus:bg-surface-container-lowest"
+                placeholder="750XXXXXXXX"
+                type="text"
+              />
+              <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant pointer-events-none">
+                barcode_scanner
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categoría y Ubicación -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="text-[12px] font-semibold text-on-surface uppercase tracking-wide">
+              Categoría *
+            </label>
+            <select
+              id="drawer-category"
+              class="w-full h-9 px-3 bg-surface text-on-surface rounded-xl text-[13px] border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary focus:bg-surface-container-lowest"
+            >
+              <option value="">Seleccione categoría...</option>
+              <option value="electrónicos">Electrónicos</option>
+              <option value="repuestos">Repuestos & Refacciones</option>
+              <option value="consumibles">Consumibles</option>
+              <option value="herramientas">Herramientas Pro</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[12px] font-semibold text-on-surface uppercase tracking-wide">
+              Ubicación / Gaveta
+            </label>
+            <input
+              id="drawer-location"
+              class="w-full h-9 px-3 bg-surface rounded-xl text-[13px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary focus:bg-surface-container-lowest"
+              placeholder="Ej. Pasillo C · Est. 02"
+              type="text"
+            />
+          </div>
+        </div>
+
+        <!-- Cantidades y Umbrales -->
+        <div class="p-3 bg-surface-container-low rounded-xl space-y-2 border border-surface-container/60">
+          <span class="text-[11px] text-on-surface-variant font-semibold uppercase tracking-wider">
+            Gestión de Stock Inicial
+          </span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-on-surface">Cantidad Inicial (Ingreso)</label>
+              <input
+                id="drawer-stock-initial"
+                class="w-full h-9 px-3 bg-surface-container-lowest rounded-xl text-[13px] text-primary font-bold border border-surface-container/60 focus:outline-none focus:border-secondary"
+                min="0"
+                type="number"
+                value="10"
+              />
+            </div>
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold text-on-surface">Alerta Stock Mínimo</label>
+              <input
+                id="drawer-stock-min"
+                class="w-full h-9 px-3 bg-surface-container-lowest rounded-xl text-[13px] text-error font-bold border border-surface-container/60 focus:outline-none focus:border-error"
+                min="1"
+                type="number"
+                value="5"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Precios y Márgenes con cálculo dinámico -->
+        <div class="grid grid-cols-3 gap-2">
+          <div class="space-y-1">
+            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">P. Compra ($)</label>
+            <input
+              id="drawer-cost"
+              class="w-full h-9 px-2.5 bg-surface rounded-xl text-[13px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
+              placeholder="0.00"
+              type="number"
+              step="0.01"
+            />
+          </div>
+          <div class="space-y-1">
+            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">P. Venta ($)</label>
+            <input
+              id="drawer-price"
+              class="w-full h-9 px-2.5 bg-surface rounded-xl text-[13px] text-primary font-bold border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
+              placeholder="0.00"
+              type="number"
+              step="0.01"
+            />
+          </div>
+          <div class="space-y-1">
+            <label class="text-[11px] font-semibold text-on-surface-variant uppercase tracking-wide">Margen Est.</label>
+            <div
+              id="drawer-margin"
+              class="h-9 px-2 bg-surface-container-high rounded-xl flex items-center justify-center text-[12px] text-on-tertiary-container font-bold transition-colors"
+            >
+              0.0%
+            </div>
+          </div>
+        </div>
+
+        <!-- Proveedor -->
+        <div class="space-y-1">
+          <label class="text-[12px] font-semibold text-on-surface uppercase tracking-wide">
+            Proveedor Asignado
+          </label>
+          <select
+            id="drawer-supplier"
+            class="w-full h-9 px-3 bg-surface text-on-surface rounded-xl text-[13px] border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
+          >
+            <option>Importadora Logística Global S.A.</option>
+            <option>Distribuidora Industrial del Norte</option>
+            <option>Electro Componentes Monterrey</option>
+          </select>
+        </div>
+
+        <!-- Notas Operativas -->
+        <div class="space-y-1">
+          <label class="text-[12px] font-semibold text-on-surface uppercase tracking-wide">
+            Notas / Observaciones de Recepción
+          </label>
+          <textarea
+            id="drawer-notes"
+            class="w-full p-2.5 bg-surface rounded-xl text-[13px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary resize-none"
+            placeholder="Especificaciones de almacenaje, lote de fábrica o condiciones de garantía..."
+            rows="2"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Drawer Footer Action Bar -->
+      <div class="p-4 sm:p-5 bg-surface-container-low flex items-center justify-end gap-3 border-t border-surface-container/60 shrink-0">
+        <button
+          id="btn-cancel-drawer"
+          class="h-9 px-4 bg-surface hover:bg-surface-container text-on-surface-variant hover:text-on-surface rounded-xl text-[13px] font-medium transition-colors cursor-pointer"
+          type="button"
+        >
+          Cancelar
+        </button>
+        <button
+          id="btn-save-drawer"
+          class="h-9 px-5 bg-secondary-container hover:bg-secondary text-on-secondary rounded-xl text-[13px] font-semibold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[18px]">save</span>
+          <span>Guardar Producto</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast Global de Inventario -->
+  <div
+    id="inventory-toast"
+    class="fixed bottom-6 right-6 bg-primary text-on-primary px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 z-50 pointer-events-none opacity-0 translate-y-20 transition-all duration-300"
+  >
+    <span id="inventory-toast-icon" class="material-symbols-outlined text-secondary-fixed text-[20px]">
+      check_circle
+    </span>
+    <span id="inventory-toast-text" class="text-[13px] font-medium">
+      Producto registrado exitosamente en el catálogo.
+    </span>
+  </div>
+
+  <script>
+    import {
+      initInventoryAnimations,
+      openProductDrawer,
+      closeProductDrawer,
+      showInventoryToast,
+    } from "../animaciones/animaInventario.js";
+
+    // Exponer funciones necesarias al scope global
+    window.openProductDrawer = openProductDrawer;
+    window.closeProductDrawer = closeProductDrawer;
+    window.showInventoryToast = showInventoryToast;
+
+    // Inicializar eventos y micro-interacciones de inventario
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        initInventoryAnimations();
+      });
+    } else {
+      initInventoryAnimations();
+    }
+  </script>
 </Layout>
