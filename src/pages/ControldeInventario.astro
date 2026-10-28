@@ -3,6 +3,7 @@
 import Layout from "../layouts/Layout.astro";
 import SlideBar from "../components/SlideBar.astro";
 import NavBar from "../components/Nav.astro";
+import AggCategoria from "../components/AggCategoria.astro";
 ---
 
 <Layout title="Control de Inventario - StockControl Enterprise JR">
@@ -45,11 +46,12 @@ import NavBar from "../components/Nav.astro";
               <span>Carga masiva</span>
             </button>
 
-            {/* 2. Botón Agregar Categoría (preparado para modal posterior) */}
+            {/* 2. Botón Agregar Categoría (abre componente modal AggCategoria) */}
             <button
               id="btn-open-category"
               class="h-[38px] px-3.5 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface rounded-xl font-label-md text-[13px] font-medium border border-surface-container/70 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
               type="button"
+              onclick="window.openCategoryModal && window.openCategoryModal()"
               title="Gestionar y agregar nuevas categorías de productos"
             >
               <span class="material-symbols-outlined text-[18px] text-on-surface-variant">category</span>
@@ -1042,6 +1044,9 @@ import NavBar from "../components/Nav.astro";
     </span>
   </div>
 
+  <!-- Componente Modal de Gestión y Creación de Categorías -->
+  <AggCategoria />
+
   <script>
     import {
       initInventoryAnimations,
@@ -1051,9 +1056,16 @@ import NavBar from "../components/Nav.astro";
     } from "../animaciones/animaInventario.js";
 
     // Exponer funciones necesarias al scope global
-    window.openProductDrawer = openProductDrawer;
-    window.closeProductDrawer = closeProductDrawer;
-    window.showInventoryToast = showInventoryToast;
+    (window as any).openProductDrawer = openProductDrawer;
+    (window as any).closeProductDrawer = closeProductDrawer;
+    (window as any).showInventoryToast = showInventoryToast;
+
+    // Vincular apertura del modal de categorías
+    (window as any).onOpenCategoryModal = function() {
+      if (typeof (window as any).openCategoryModal === "function") {
+        (window as any).openCategoryModal();
+      }
+    };
 
     // Inicializar eventos y micro-interacciones de inventario
     if (document.readyState === "loading") {
