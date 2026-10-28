@@ -1,0 +1,264 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Panel Principal - Control de Stock Enterprise JR">
+  <div class="min-h-screen bg-surface flex flex-col font-body-md text-on-surface">
+    {/* Barra de Navegación Superior */}
+    <header class="bg-surface-container-lowest border-b border-surface-container px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-xs">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary shadow-sm">
+          <span class="material-symbols-outlined text-[20px]">layers</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-headline-md text-[16px] font-bold tracking-tight text-on-surface">Control de Stock</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+          </div>
+          <span class="font-label-sm text-[10px] uppercase tracking-wider text-on-surface-variant font-semibold">
+            Enterprise JR
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="hidden md:flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded-lg text-label-sm font-label-sm text-on-surface-variant border border-surface-container">
+          <span class="material-symbols-outlined text-[16px] text-tertiary-container">storefront</span>
+          <span>Sucursal Central</span>
+          <span class="text-outline">•</span>
+          <span class="text-secondary font-semibold">Terminal 01</span>
+        </div>
+
+        <div class="flex items-center gap-2 pl-2 border-l border-surface-container">
+          <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-label-sm">
+            <span id="user-avatar">CM</span>
+          </div>
+          <div class="hidden sm:flex flex-col text-left">
+            <span id="user-display-name" class="font-label-md text-label-md font-semibold leading-tight">
+              Carlos Mendoza
+            </span>
+            <span id="user-role-badge" class="font-label-sm text-[11px] text-on-surface-variant">
+              Vendedor POS
+            </span>
+          </div>
+        </div>
+
+        <button
+          id="logout-btn"
+          class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-error-container hover:text-on-error-container text-on-surface-variant font-label-sm text-label-sm transition-all cursor-pointer ml-2"
+          title="Cerrar Sesión"
+        >
+          <span class="material-symbols-outlined text-[16px]">logout</span>
+          <span class="hidden sm:inline">Cerrar Sesión</span>
+        </button>
+      </div>
+    </header>
+
+    {/* Contenido Principal */}
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+      {/* Banner de Bienvenida */}
+      <div class="bg-primary text-on-primary rounded-xl p-6 relative overflow-hidden shadow-md">
+        <div class="absolute -right-12 -top-12 w-64 h-64 bg-secondary-container opacity-20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary-container text-tertiary-fixed text-[11px] font-semibold mb-2">
+              <span class="material-symbols-outlined text-[13px]">verified_user</span>
+              Sesión de Turno Activa
+            </div>
+            <h1 class="font-headline-lg text-headline-lg text-on-primary font-bold">
+              Bienvenido, <span id="welcome-name">Carlos</span>
+            </h1>
+            <p class="font-body-md text-body-md text-surface-variant max-w-xl mt-1">
+              Terminal sincronizado en tiempo real. Sistema preparado para operaciones de inventario, consulta de stock y registro de comprobantes.
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <a
+              href="/"
+              class="px-4 py-2 bg-surface-container-lowest/10 hover:bg-surface-container-lowest/20 text-on-primary rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 border border-surface-variant/20"
+            >
+              <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+              Volver a Login
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Tarjetas de Métricas Rápidas */}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-surface-container-lowest p-5 rounded-xl border border-surface-container shadow-xs flex items-center justify-between">
+          <div>
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+              Productos en Catálogo
+            </span>
+            <div class="font-headline-lg text-headline-lg font-bold text-on-surface mt-1">
+              1,428
+            </div>
+            <span class="font-label-sm text-[11px] text-on-tertiary-container flex items-center gap-0.5 mt-0.5">
+              <span class="material-symbols-outlined text-[13px]">arrow_upward</span> +12 nuevos hoy
+            </span>
+          </div>
+          <div class="w-11 h-11 rounded-lg bg-surface-container-low text-secondary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">inventory_2</span>
+          </div>
+        </div>
+
+        <div class="bg-surface-container-lowest p-5 rounded-xl border border-surface-container shadow-xs flex items-center justify-between">
+          <div>
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+              Alertas de Stock Bajo
+            </span>
+            <div class="font-headline-lg text-headline-lg font-bold text-error mt-1">
+              9
+            </div>
+            <span class="font-label-sm text-[11px] text-error flex items-center gap-0.5 mt-0.5">
+              <span class="material-symbols-outlined text-[13px]">warning</span> Requieren reposición
+            </span>
+          </div>
+          <div class="w-11 h-11 rounded-lg bg-error-container/30 text-error flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">production_quantity_limits</span>
+          </div>
+        </div>
+
+        <div class="bg-surface-container-lowest p-5 rounded-xl border border-surface-container shadow-xs flex items-center justify-between">
+          <div>
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+              Ventas del Turno
+            </span>
+            <div class="font-headline-lg text-headline-lg font-bold text-on-surface mt-1">
+              $ 384,500
+            </div>
+            <span class="font-label-sm text-[11px] text-on-tertiary-container flex items-center gap-0.5 mt-0.5">
+              <span class="material-symbols-outlined text-[13px]">trending_up</span> 28 comprobantes
+            </span>
+          </div>
+          <div class="w-11 h-11 rounded-lg bg-tertiary-container/10 text-on-tertiary-container flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">point_of_sale</span>
+          </div>
+        </div>
+
+        <div class="bg-surface-container-lowest p-5 rounded-xl border border-surface-container shadow-xs flex items-center justify-between">
+          <div>
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+              Estado de Servidor
+            </span>
+            <div class="font-headline-lg text-headline-lg font-bold text-secondary mt-1">
+              Conectado
+            </div>
+            <span class="font-label-sm text-[11px] text-on-surface-variant flex items-center gap-0.5 mt-0.5">
+              <span class="material-symbols-outlined text-[13px]">sync</span> Latencia: 24ms
+            </span>
+          </div>
+          <div class="w-11 h-11 rounded-lg bg-secondary-fixed/40 text-secondary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">dns</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Accesos Rápidos y Notificación de Fase */}
+      <div class="bg-surface-container-lowest p-6 rounded-xl border border-surface-container shadow-xs">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-surface-container">
+          <div>
+            <h2 class="font-headline-md text-headline-md font-bold text-on-surface">
+              Módulos del Sistema Operativo
+            </h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">
+              Seleccione la operación a ejecutar según sus atribuciones autorizadas.
+            </p>
+          </div>
+          <span class="hidden sm:inline-block px-2.5 py-1 rounded bg-secondary-container/10 text-secondary font-label-sm text-label-sm font-semibold">
+            Modo Integración Activo
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-lg bg-surface-container-low hover:bg-surface-container transition-all border border-surface-container flex flex-col justify-between cursor-pointer group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="w-9 h-9 rounded-lg bg-secondary text-on-secondary flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[20px]">shopping_cart_checkout</span>
+                </span>
+                <span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors">
+                  arrow_forward
+                </span>
+              </div>
+              <h3 class="font-label-md text-label-md font-bold text-on-surface">Terminal POS / Ventas</h3>
+              <p class="font-body-sm text-[12px] text-on-surface-variant mt-1">
+                Emisión de comprobantes, lectura por código de barras y cobro en caja.
+              </p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-lg bg-surface-container-low hover:bg-surface-container transition-all border border-surface-container flex flex-col justify-between cursor-pointer group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="w-9 h-9 rounded-lg bg-primary text-on-primary flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[20px]">shelves</span>
+                </span>
+                <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">
+                  arrow_forward
+                </span>
+              </div>
+              <h3 class="font-label-md text-label-md font-bold text-on-surface">Control de Inventario</h3>
+              <p class="font-body-sm text-[12px] text-on-surface-variant mt-1">
+                Altas de mercadería, ajustes de stock físico y control de lotes.
+              </p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-lg bg-surface-container-low hover:bg-surface-container transition-all border border-surface-container flex flex-col justify-between cursor-pointer group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="w-9 h-9 rounded-lg bg-tertiary-container text-on-tertiary-container flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[20px]">query_stats</span>
+                </span>
+                <span class="material-symbols-outlined text-outline group-hover:text-on-tertiary-container transition-colors">
+                  arrow_forward
+                </span>
+              </div>
+              <h3 class="font-label-md text-label-md font-bold text-on-surface">Gastos & Reportes</h3>
+              <p class="font-body-sm text-[12px] text-on-surface-variant mt-1">
+                Trazabilidad de gastos operacionales y cierre contable de turno.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Recuperar información de la sesión activa
+    const storedUser = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        const displayName = document.getElementById("user-display-name");
+        const welcomeName = document.getElementById("welcome-name");
+        const roleBadge = document.getElementById("user-role-badge");
+        const avatar = document.getElementById("user-avatar");
+
+        if (displayName && user.nombre) displayName.textContent = user.nombre;
+        if (welcomeName && user.nombre) welcomeName.textContent = user.nombre;
+        if (roleBadge && user.roleName) roleBadge.textContent = user.roleName;
+        if (avatar && user.nombre) {
+          avatar.textContent = user.nombre.substring(0, 2).toUpperCase();
+        }
+      } catch (e) {
+        console.error("Error al cargar sesión de usuario:", e);
+      }
+    }
+
+    // Botón de Cerrar Sesión
+    const logoutBtn = document.getElementById("logout-btn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("stock_auth_user");
+        localStorage.removeItem("stock_auth_token");
+        sessionStorage.removeItem("stock_auth_user");
+        sessionStorage.removeItem("stock_auth_token");
+        window.location.href = "/";
+      });
+    }
+  </script>
+</Layout>
