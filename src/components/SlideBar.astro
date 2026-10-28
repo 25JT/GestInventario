@@ -4,7 +4,16 @@ interface Props {
   currentPath?: string;
 }
 
-const { currentPath = "principal" } = Astro.props;
+const { currentPath = "" } = Astro.props;
+const currentUrl = (Astro.url.pathname || "").replace(/\/$/, "").toLowerCase();
+
+// Helper para determinar si un enlace está activo tanto en SSR como en cliente
+const isLinkActive = (path: string, url: string) => {
+  if (currentPath === path) return true;
+  if (currentUrl === url.toLowerCase()) return true;
+  if (path === "principal" && (currentUrl === "" || currentUrl === "/dashprincipal")) return true;
+  return false;
+};
 ---
 
 {/* Backdrop sombreado con desenfoque para cerrar al pulsar fuera */}
@@ -54,55 +63,91 @@ const { currentPath = "principal" } = Astro.props;
     </div>
 
     <nav class="flex flex-col gap-1">
+      {/* 1. Principal */}
       <a
         href="/DashPrincipal"
         data-path="principal"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
+          isLinkActive("principal", "/DashPrincipal")
+            ? "bg-primary-container text-on-primary font-semibold shadow-xs"
+            : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        }`}
+        aria-current={isLinkActive("principal", "/DashPrincipal") ? "page" : undefined}
       >
         <span class="material-symbols-outlined text-[20px]">grid_view</span>
         <span>Principal</span>
       </a>
 
+      {/* 2. Control de Inventario */}
       <a
-        href="#control-de-inventario"
-        data-path="control-de-inventario"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        href="/ControldeInventario"
+        data-path="inventario"
+        class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
+          isLinkActive("inventario", "/ControldeInventario")
+            ? "bg-primary-container text-on-primary font-semibold shadow-xs"
+            : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        }`}
+        aria-current={isLinkActive("inventario", "/ControldeInventario") ? "page" : undefined}
       >
         <span class="material-symbols-outlined text-[20px]">inventory_2</span>
         <span>Control de Inventario</span>
       </a>
 
+      {/* 3. Registro de Ventas */}
       <a
-        href="#registro-de-ventas"
-        data-path="registro-de-ventas"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        href="/RegVenta"
+        data-path="ventas"
+        class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
+          isLinkActive("ventas", "/RegVenta")
+            ? "bg-primary-container text-on-primary font-semibold shadow-xs"
+            : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        }`}
+        aria-current={isLinkActive("ventas", "/RegVenta") ? "page" : undefined}
       >
         <span class="material-symbols-outlined text-[20px]">point_of_sale</span>
         <span>Registro de Ventas</span>
       </a>
 
+      {/* 4. Gastos Operativos */}
       <a
-        href="#gastos-operativos"
-        data-path="gastos-operativos"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        href="/GastosOperativos"
+        data-path="gastos"
+        class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
+          isLinkActive("gastos", "/GastosOperativos")
+            ? "bg-primary-container text-on-primary font-semibold shadow-xs"
+            : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        }`}
+        aria-current={isLinkActive("gastos", "/GastosOperativos") ? "page" : undefined}
       >
         <span class="material-symbols-outlined text-[20px]">receipt_long</span>
         <span>Gastos Operativos</span>
       </a>
 
+      {/* 5. Servicios */}
       <a
-        href="#servicios"
+        href="/Servicios"
         data-path="servicios"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
+          isLinkActive("servicios", "/Servicios")
+            ? "bg-primary-container text-on-primary font-semibold shadow-xs"
+            : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        }`}
+        aria-current={isLinkActive("servicios", "/Servicios") ? "page" : undefined}
       >
         <span class="material-symbols-outlined text-[20px]">home_repair_service</span>
         <span>Servicios</span>
       </a>
 
+      {/* 6. Usuarios y Roles */}
       <a
-        href="#usuarios-y-roles"
-        data-path="usuarios-y-roles"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        href="/UsuariosRoles"
+        data-path="usuarios"
+        class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
+          isLinkActive("usuarios", "/UsuariosRoles")
+            ? "bg-primary-container text-on-primary font-semibold shadow-xs"
+            : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        }`}
+        aria-current={isLinkActive("usuarios", "/UsuariosRoles") ? "page" : undefined}
       >
         <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
         <span>Usuarios y Roles</span>

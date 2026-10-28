@@ -97,16 +97,17 @@ export function hydrateUserSession() {
 export function markActiveNavLink() {
   if (typeof window === "undefined") return;
 
-  const currentPath = window.location.pathname.replace(/\/$/, "");
+  const currentPath = window.location.pathname.replace(/\/$/, "").toLowerCase();
   const links = document.querySelectorAll("#main-sidebar nav a[data-path]");
 
   links.forEach((link) => {
-    const linkPath = link.getAttribute("href")?.replace(/\/$/, "") || "";
+    const linkPath = (link.getAttribute("href")?.replace(/\/$/, "") || "").toLowerCase();
+    const linkDataPath = (link.getAttribute("data-path") || "").toLowerCase();
     const isCurrent =
       linkPath === currentPath ||
-      (currentPath === "" && linkPath === "/DashPrincipal") ||
-      (link.getAttribute("data-path") === "principal" &&
-        (currentPath.includes("DashPrincipal") || currentPath === ""));
+      (currentPath === "" && linkPath === "/dashprincipal") ||
+      (linkDataPath === "principal" &&
+        (currentPath.includes("dashprincipal") || currentPath === ""));
 
     if (isCurrent) {
       link.classList.remove(

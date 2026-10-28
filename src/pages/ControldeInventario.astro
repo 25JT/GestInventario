@@ -1,0 +1,52 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SlideBar from "../components/SlideBar.astro";
+import NavBar from "../components/Nav.astro";
+---
+
+<Layout title="Control de Inventario - StockControl Enterprise JR">
+  <div class="min-h-screen bg-surface flex flex-col font-body-md text-on-surface">
+    <SlideBar currentPath="inventario" />
+    <NavBar storeName="Central Sucursal 01" operationStatus="Operación Normal" />
+
+    <div id="app-content" class="pt-16 min-h-screen flex flex-col flex-1">
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <!-- Sub-header del Módulo -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-surface-container/60">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-label-sm text-[12px] text-secondary-container tracking-wider uppercase font-semibold">
+                Módulo Operativo
+              </span>
+              <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+            </div>
+            <h1 class="text-[22px] sm:text-[26px] font-bold text-on-surface tracking-tight mt-0.5">
+              Control de Inventario
+            </h1>
+            <p class="text-[13px] text-on-surface-variant">
+              Gestión centralizada de existencias, catálogo de productos y kardex de almacén.
+            </p>
+          </div>
+        </div>
+
+        {/* Contenedor del módulo */}
+        <div class="bg-surface-container-lowest p-8 rounded-2xl border border-surface-container/60 shadow-xs flex flex-col items-center justify-center text-center py-16">
+          <div class="w-14 h-14 rounded-2xl bg-secondary-container/10 text-secondary-container flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-[32px]">inventory_2</span>
+          </div>
+          <h2 class="text-[18px] font-bold text-on-surface">Módulo de Control de Inventario</h2>
+          <p class="text-[13px] text-on-surface-variant max-w-md mt-1 mb-6">
+            Pestaña lista para incorporar el catálogo de productos, registro de stock físico, lotes y kardex.
+          </p>
+          <a
+            href="/DashPrincipal"
+            class="px-4 py-2 bg-primary hover:bg-secondary text-on-primary font-semibold text-[13px] rounded-xl shadow-xs transition-all flex items-center gap-2"
+          >
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span>Volver al Panel Principal</span>
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+</Layout>
