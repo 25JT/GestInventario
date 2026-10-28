@@ -1,60 +1,117 @@
+---
+// Nav.astro - Barra de Navegación Superior Global
+interface Props {
+  storeName?: string;
+  operationStatus?: string;
+}
+
+const {
+  storeName = "Central Sucursal 01",
+  operationStatus = "Operación Normal",
+} = Astro.props;
+---
+
 <header
-  class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.04)] px-space-lg flex items-center justify-between gap-space-md transition-all duration-300"
   id="top-header"
+  class="fixed top-0 left-0 lg:left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-30 shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-surface-container/60 px-4 sm:px-6 flex items-center justify-between gap-4 transition-all duration-300"
 >
-  <div class="flex items-center gap-space-lg flex-1 max-w-xl">
+  {/* Sección Izquierda: Botón Menú + Buscador */}
+  <div class="flex items-center gap-3 sm:gap-4 flex-1 max-w-xl">
+    {/* Botón de alternar Menú Lateral */}
     <button
-      class="p-2 -ml-1 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors shrink-0 flex items-center justify-center"
-      onclick="toggleSidebar()"
+      id="btn-toggle-sidebar"
+      type="button"
+      data-action="toggle-sidebar"
+      class="p-2 -ml-1 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors shrink-0 flex items-center justify-center cursor-pointer"
       title="Alternar menú lateral"
-      type="button"
-      ><span class="material-symbols-outlined text-[22px]">menu</span></button
-    ><div class="relative w-full">
-      <span
-        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]"
-        >search</span
-      ><input
-        class="w-full h-[34px] pl-9 pr-14 bg-surface rounded-xl font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:bg-surface-container-lowest transition-all"
-        placeholder="Buscar productos, SKU, ventas..."
-        type="text"
-      /><div
-        class="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5 bg-surface-container px-1.5 py-0.5 rounded text-[10px] font-label-sm font-semibold text-on-surface-variant"
-      >
-        <span class="">⌘K</span>
-      </div>
-    </div><div
-      class="hidden xl:flex items-center gap-1.5 px-space-sm py-1 rounded-xl bg-surface-container-low text-on-surface shrink-0"
     >
-      <span
-        class="material-symbols-outlined text-[16px] text-secondary-container"
-        >store</span
-      ><span class="font-label-sm text-label-sm text-on-surface-variant"
-        >Almacén:</span
-      ><span class="font-label-sm text-label-sm font-semibold text-on-surface"
-        >Central Sucursal 01</span>
+      <span class="material-symbols-outlined text-[22px]">menu</span>
+    </button>
+
+    {/* Campo de Búsqueda Rápida */}
+    <div class="relative w-full">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px] pointer-events-none">
+        search
+      </span>
+      <input
+        type="text"
+        placeholder="Buscar productos, SKU, comprobantes..."
+        class="w-full h-9 pl-9 pr-4 bg-surface rounded-xl font-body-md text-[13px] text-on-surface placeholder:text-outline border border-transparent hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all shadow-2xs"
+      />
     </div>
-  </div><div class="flex items-center gap-space-md shrink-0">
-    <div class="hidden md:flex flex-col text-right">
-      <span
-        class="font-label-sm text-label-sm text-on-surface-variant font-medium"
-        >Jueves, 24 Octubre</span
-      ><span
-        class="font-label-sm text-label-sm text-on-tertiary-container font-semibold flex items-center justify-end gap-1"
-        ><span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
-        ></span>Operación Normal</span>
-    </div><button
-      class="relative p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors"
-      title="Notificaciones"
-      type="button"
-      ><span class="material-symbols-outlined text-[20px]">notifications</span
-      ><span class="absolute top-1.5 right-1.5 flex h-2 w-2"
-        ><span
-          class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"
-        ></span><span class="relative inline-flex rounded-full h-2 w-2 bg-error"
-        ></span></span
-      ></button
-    ><div class="relative"></div>
+
+    {/* Sucursal / Almacén (visible en pantallas grandes) */}
+    <div class="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low text-on-surface shrink-0 border border-surface-container/50">
+      <span class="material-symbols-outlined text-[17px] text-secondary">store</span>
+      <span class="font-label-sm text-[11px] text-on-surface-variant">Almacén:</span>
+      <span class="font-label-sm text-[11px] font-semibold text-on-surface">{storeName}</span>
+    </div>
   </div>
-</header><main class="w-full pt-16 bg-surface px-space-lg py-space-lg flex-1">
-  <div class="flex flex-col w-full"></div>
-</main>
+
+  {/* Sección Derecha: Estado de Operación + Notificaciones + Perfil */}
+  <div class="flex items-center gap-3 sm:gap-4 shrink-0">
+    {/* Fecha y Estado Operativo */}
+    <div class="hidden md:flex flex-col text-right">
+      <span id="nav-live-date" class="font-label-sm text-[11px] text-on-surface-variant font-medium">
+        Turno Operativo
+      </span>
+      <span class="font-label-sm text-[11px] text-on-tertiary-container font-semibold flex items-center justify-end gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+        {operationStatus}
+      </span>
+    </div>
+
+    {/* Notificaciones */}
+    <button
+      type="button"
+      class="relative p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer"
+      title="Notificaciones operativas"
+    >
+      <span class="material-symbols-outlined text-[20px]">notifications</span>
+      <span class="absolute top-1.5 right-1.5 flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-error"></span>
+      </span>
+    </button>
+
+    {/* Avatar compacto visible en móvil */}
+    <div class="lg:hidden flex items-center">
+      <div
+        data-user-avatar
+        class="w-8 h-8 rounded-lg bg-primary text-on-primary text-[11px] font-bold flex items-center justify-center cursor-pointer shadow-2xs"
+        onclick="window.toggleSidebar && window.toggleSidebar()"
+        title="Abrir menú"
+      >
+        CM
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  import { initNavSlide } from "../animaciones/animaNavSlide.js";
+
+  // Inicializar animaciones GSAP y eventos de navegación
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      initNavSlide();
+      updateDate();
+    });
+  } else {
+    initNavSlide();
+    updateDate();
+  }
+
+  function updateDate() {
+    const dateEl = document.getElementById("nav-live-date");
+    if (dateEl) {
+      const now = new Date();
+      const options: Intl.DateTimeFormatOptions = {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+      };
+      dateEl.textContent = now.toLocaleDateString("es-ES", options);
+    }
+  }
+</script>
