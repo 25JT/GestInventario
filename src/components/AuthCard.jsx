@@ -138,6 +138,45 @@ export default function AuthCard() {
     setRegUsername(namePart + lastnamePart);
   }, [regName, regLastname]);
 
+  // Manejo y sanitización del campo de teléfono (solo números, '+' inicial, espacios y guiones)
+  const handlePhoneChange = (e) => {
+    const rawVal = e.target.value;
+    let sanitized = "";
+    if (rawVal.startsWith("+")) {
+      sanitized = "+" + rawVal.slice(1).replace(/[^0-9\s\-]/g, "");
+    } else {
+      sanitized = rawVal.replace(/[^0-9\s\-]/g, "");
+    }
+    setRegPhone(sanitized);
+  };
+
+  // Bloqueo de teclas alfabéticas u otros símbolos en el campo de teléfono
+  const handlePhoneKeyDown = (e) => {
+    const allowedKeys = [
+      "Backspace",
+      "Tab",
+      "Enter",
+      "Escape",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "ArrowDown",
+      "Delete",
+      "Home",
+      "End",
+    ];
+    if (allowedKeys.includes(e.key) || e.ctrlKey || e.metaKey) {
+      return;
+    }
+    if (e.key === "+" && e.target.selectionStart === 0 && !e.target.value.includes("+")) {
+      return;
+    }
+    if (/^[0-9\s\-]$/.test(e.key)) {
+      return;
+    }
+    e.preventDefault();
+  };
+
   // Cambio de Tab con GSAP
   const handleTabChange = (newMode) => {
     if (mode === newMode || isTransitioning) return;
@@ -197,6 +236,32 @@ export default function AuthCard() {
         );
         return;
       }
+
+      // Validación estricta de teléfono
+      const phoneDigits = regPhone.replace(/\D/g, "");
+      if (!regPhone.trim()) {
+        shakeElement(stepContainerRef.current);
+        openModal(
+          "error",
+          "bg-error-container",
+          "text-on-error-container",
+          "Teléfono Requerido",
+          "Por favor ingrese su número de teléfono corporativo o móvil."
+        );
+        return;
+      }
+      if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+        shakeElement(stepContainerRef.current);
+        openModal(
+          "error",
+          "bg-error-container",
+          "text-on-error-container",
+          "Teléfono Inválido",
+          "El número telefónico debe contener entre 7 y 15 dígitos numéricos (no se permiten letras ni símbolos no autorizados)."
+        );
+        return;
+      }
+
       animateStepTransition(stepContainerRef.current, "next", () => {
         setRegStep(3);
       });
@@ -931,7 +996,7 @@ export default function AuthCard() {
                           "1"
                         )}
                       </span>
-                      <span>Invitación</span>
+                      <span>Token</span>
                     </button>
 
                     {/* Paso 2: Datos Personales */}
@@ -1151,7 +1216,7 @@ export default function AuthCard() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <label className="block font-label-sm text-[12px] text-on-surface font-semibold mb-1.5">
-                            Teléfono Móvil
+                            Teléfono 
                           </label>
                           <div className="relative flex items-center group">
                             <span className="material-symbols-outlined absolute left-3.5 text-[19px] text-outline group-focus-within:text-secondary pointer-events-none transition-colors">
@@ -1159,9 +1224,11 @@ export default function AuthCard() {
                             </span>
                             <input
                               type="tel"
+                              inputMode="tel"
                               value={regPhone}
-                              onChange={(e) => setRegPhone(e.target.value)}
-                              placeholder="+56 9 8765 4321"
+                              onChange={handlePhoneChange}
+                              onKeyDown={handlePhoneKeyDown}
+                              placeholder="+57 300 123 1234"
                               className="w-full h-11 pl-11 pr-4 bg-surface-container-low hover:bg-surface-container-lowest focus:bg-surface-container-lowest border border-surface-container hover:border-outline/40 focus:border-secondary focus:ring-2 focus:ring-secondary/20 rounded-xl text-on-surface font-numeric-data text-numeric-data placeholder:text-outline transition-all shadow-2xs"
                               required
                             />
@@ -1169,7 +1236,7 @@ export default function AuthCard() {
                         </div>
                         <div>
                           <label className="block font-label-sm text-[12px] text-on-surface font-semibold mb-1.5">
-                            Correo Corporativo
+                            Correo 
                           </label>
                           <div className="relative flex items-center group">
                             <span className="material-symbols-outlined absolute left-3.5 text-[19px] text-outline group-focus-within:text-secondary pointer-events-none transition-colors">
@@ -1208,7 +1275,7 @@ export default function AuthCard() {
                           />
                           <div className="absolute right-3 flex items-center gap-1 text-[11px] text-on-surface-variant font-medium">
                             <span className="material-symbols-outlined text-[14px] text-outline">lock</span>
-                            <span className="text-[10px] uppercase font-semibold text-outline">Regla 2+3</span>
+                     
                           </div>
                         </div>
                         <p className="text-[11px] text-on-surface-variant mt-1">
