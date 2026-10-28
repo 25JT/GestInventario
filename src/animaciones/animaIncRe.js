@@ -25,68 +25,43 @@ export function animateEntrance(cardElement) {
 }
 
 /**
- * Transición suave al alternar entre la vista de Login y la vista de Registro.
- * @param {HTMLElement} panelLeft
- * @param {HTMLElement} panelRight
- * @param {'login' | 'register'} targetMode
- * @param {Function} callback
+ * Transición suave y optimizada al alternar entre la vista de Login y la vista de Registro.
+ * @param {HTMLElement} panelLeftContent Contenido dinámico del panel izquierdo
+ * @param {HTMLElement} formContent Contenedor del formulario activo
+ * @param {'next' | 'prev'} direction
  */
-export function animateTabSwitch(panelLeft, panelRight, targetMode, callback) {
-  const tl = gsap.timeline({
-    onComplete: () => {
-      if (typeof callback === "function") callback();
-    }
-  });
+export function animateTabEnter(panelLeftContent, formContent, direction = "next") {
+  const deltaX = direction === "next" ? 14 : -14;
 
-  // Animación del panel derecho (formulario)
-  if (panelRight) {
-    tl.to(panelRight, {
-      opacity: 0,
-      x: targetMode === "register" ? -15 : 15,
-      duration: 0.22,
-      ease: "power2.in"
-    });
-  }
-
-  // Animación del panel izquierdo (información / pasos)
-  if (panelLeft) {
-    tl.to(panelLeft, {
-      opacity: 0.6,
-      scale: 0.99,
-      duration: 0.2,
-      ease: "power2.in"
-    }, "<");
-  }
-
-  return tl;
-}
-
-/**
- * Animación de aparición cuando el contenido del nuevo tab entra.
- * @param {HTMLElement} panelLeft 
- * @param {HTMLElement} panelRight 
- */
-export function animateTabEnter(panelLeft, panelRight) {
-  const tl = gsap.timeline();
-
-  if (panelRight) {
-    tl.fromTo(
-      panelRight,
-      { opacity: 0, x: 15 },
-      { opacity: 1, x: 0, duration: 0.35, ease: "power3.out" }
+  if (formContent) {
+    gsap.killTweensOf(formContent);
+    gsap.fromTo(
+      formContent,
+      { opacity: 0, x: deltaX },
+      {
+        opacity: 1,
+        x: 0,
+        duration: 0.2,
+        ease: "power2.out",
+        clearProps: "transform,opacity",
+      }
     );
   }
 
-  if (panelLeft) {
-    tl.fromTo(
-      panelLeft,
-      { opacity: 0.7, scale: 0.99 },
-      { opacity: 1, scale: 1, duration: 0.35, ease: "power3.out" },
-      "<0.05"
+  if (panelLeftContent) {
+    gsap.killTweensOf(panelLeftContent);
+    gsap.fromTo(
+      panelLeftContent,
+      { opacity: 0.3, y: 6 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.2,
+        ease: "power2.out",
+        clearProps: "transform,opacity",
+      }
     );
   }
-
-  return tl;
 }
 
 /**
@@ -101,20 +76,27 @@ export function animateStepTransition(stepElement, direction = "next", callback)
     return;
   }
 
-  const outX = direction === "next" ? -25 : 25;
-  const inX = direction === "next" ? 25 : -25;
+  const outX = direction === "next" ? -18 : 18;
+  const inX = direction === "next" ? 18 : -18;
 
+  gsap.killTweensOf(stepElement);
   gsap.to(stepElement, {
     opacity: 0,
     x: outX,
-    duration: 0.18,
+    duration: 0.12,
     ease: "power2.in",
     onComplete: () => {
       if (typeof callback === "function") callback();
       gsap.fromTo(
         stepElement,
         { opacity: 0, x: inX },
-        { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" }
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.2,
+          ease: "power2.out",
+          clearProps: "transform,opacity",
+        }
       );
     },
   });

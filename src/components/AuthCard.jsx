@@ -3,7 +3,6 @@ import { iniciarSesion } from "../scripts/login.js";
 import { registrarUsuario, validarTokenInvitacion } from "../scripts/registro.js";
 import {
   animateEntrance,
-  animateTabSwitch,
   animateTabEnter,
   shakeElement,
   animateModalOpen,
@@ -14,7 +13,6 @@ import {
 
 export default function AuthCard() {
   const [mode, setMode] = useState("login"); // 'login' | 'register'
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Estados de Login
   const [loginIdentifier, setLoginIdentifier] = useState("");
@@ -55,6 +53,8 @@ export default function AuthCard() {
   const cardRef = useRef(null);
   const panelLeftRef = useRef(null);
   const panelRightRef = useRef(null);
+  const leftContentRef = useRef(null);
+  const formContentRef = useRef(null);
   const loginFormRef = useRef(null);
   const registerFormRef = useRef(null);
   const stepContainerRef = useRef(null);
@@ -177,20 +177,21 @@ export default function AuthCard() {
     e.preventDefault();
   };
 
-  // Cambio de Tab con GSAP
+  // Cambio de Tab instantáneo con transición fluida del contenido
   const handleTabChange = (newMode) => {
-    if (mode === newMode || isTransitioning) return;
-    setIsTransitioning(true);
+    if (mode === newMode) return;
 
-    animateTabSwitch(panelLeftRef.current, panelRightRef.current, newMode, () => {
-      setMode(newMode);
-      if (newMode === "login") {
-        setRegStep(1);
-      }
-      setTimeout(() => {
-        animateTabEnter(panelLeftRef.current, panelRightRef.current);
-        setIsTransitioning(false);
-      }, 30);
+    setMode(newMode);
+    if (newMode === "login") {
+      setRegStep(1);
+    }
+
+    requestAnimationFrame(() => {
+      animateTabEnter(
+        leftContentRef.current,
+        formContentRef.current,
+        newMode === "register" ? "next" : "prev"
+      );
     });
   };
 
@@ -477,7 +478,7 @@ export default function AuthCard() {
         {/* ======================================================== */}
         <div
           ref={panelLeftRef}
-          className="col-span-1 md:col-span-5 bg-primary text-on-primary p-6 sm:p-8 lg:p-10 flex flex-col justify-between relative overflow-hidden transition-all duration-300"
+          className="col-span-1 md:col-span-5 bg-primary text-on-primary p-6 sm:p-8 lg:p-10 flex flex-col justify-between relative overflow-hidden"
         >
           {/* Capa de degradado ambiental animado moderno con GSAP */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -511,7 +512,7 @@ export default function AuthCard() {
 
           {mode === "login" ? (
             /* Vista Izquierda: Modo Login */
-            <div className="relative z-10 flex flex-col justify-between h-full gap-8">
+            <div ref={leftContentRef} className="relative z-10 flex flex-col justify-between h-full gap-8">
               <div>
                 {/* Logo & Brand Header */}
                 <div className="flex items-center gap-3.5 mb-8">
@@ -559,7 +560,7 @@ export default function AuthCard() {
             </div>
           ) : (
             /* Vista Izquierda: Modo Registro / Alta */
-            <div className="relative z-10 flex flex-col justify-between h-full gap-8">
+            <div ref={leftContentRef} className="relative z-10 flex flex-col justify-between h-full gap-8">
               <div className="space-y-6">
                 {/* Logo & Brand Header */}
                 <div className="flex items-center gap-3.5">
@@ -720,7 +721,7 @@ export default function AuthCard() {
         {/* ======================================================== */}
         <div
           ref={panelRightRef}
-          className="col-span-1 md:col-span-7 bg-surface-container-lowest p-6 sm:p-8 lg:p-10 flex flex-col justify-between relative overflow-hidden transition-all duration-300"
+          className="col-span-1 md:col-span-7 bg-surface-container-lowest p-6 sm:p-8 lg:p-10 flex flex-col justify-between relative overflow-hidden"
         >
           {/* Capa de degradado ambiental suave en panel derecho con GSAP */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -774,9 +775,11 @@ export default function AuthCard() {
               </div>
             </div>
 
-            {/* ========================================== */}
-            {/* VISTA 1: FORMULARIO DE INICIO DE SESIÓN    */}
-            {/* ========================================== */}
+            {/* Contenedor dinámico del Formulario Activo con Transición Acelerada por Hardware */}
+            <div ref={formContentRef}>
+              {/* ========================================== */}
+              {/* VISTA 1: FORMULARIO DE INICIO DE SESIÓN    */}
+              {/* ========================================== */}
             {mode === "login" && (
               <form
                 ref={loginFormRef}
@@ -1457,6 +1460,7 @@ export default function AuthCard() {
                 </div>
               </div>
             )}
+            </div>
           </div>
 
           {/* Footer del Panel Derecho */}
