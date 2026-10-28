@@ -4,8 +4,8 @@ import gsap from "gsap";
  * Control del Modal de Registro de Gastos Operativos
  */
 export function openExpenseModal() {
-  const modal = document.getElementById("expenseModal");
-  const panel = document.getElementById("expenseModalPanel");
+  const modal = document.getElementById("expenseModalOverlay") || document.getElementById("expenseModal");
+  const panel = document.getElementById("expenseModalContainer") || document.getElementById("expenseModalPanel");
   if (!modal || !panel) return;
 
   modal.classList.remove("hidden");
@@ -19,14 +19,14 @@ export function openExpenseModal() {
 
   gsap.fromTo(
     panel,
-    { scale: 0.92, y: 16, opacity: 0 },
+    { scale: 0.94, y: 20, opacity: 0 },
     { scale: 1, y: 0, opacity: 1, duration: 0.25, ease: "power2.out" }
   );
 }
 
 export function closeExpenseModal() {
-  const modal = document.getElementById("expenseModal");
-  const panel = document.getElementById("expenseModalPanel");
+  const modal = document.getElementById("expenseModalOverlay") || document.getElementById("expenseModal");
+  const panel = document.getElementById("expenseModalContainer") || document.getElementById("expenseModalPanel");
   if (!modal || !panel) return;
 
   document.body.style.overflow = "";
@@ -187,9 +187,9 @@ export function initGastos() {
   // 4. Modal de nuevo gasto
   const btnNewExpense = document.getElementById("btn-new-expense");
   const btnNewReceipt = document.getElementById("btn-new-receipt");
-  const btnCloseModal = document.getElementById("btn-close-expense-modal");
-  const btnCancelModal = document.getElementById("btn-cancel-expense-modal");
-  const modalBackdrop = document.getElementById("expenseModal");
+  const btnCloseModal = document.getElementById("closeModalBtn") || document.getElementById("btn-close-expense-modal");
+  const btnCancelModal = document.getElementById("cancelModalBtn") || document.getElementById("btn-cancel-expense-modal");
+  const modalBackdrop = document.getElementById("expenseModalOverlay") || document.getElementById("expenseModal");
 
   if (btnNewExpense) btnNewExpense.addEventListener("click", openExpenseModal);
   if (btnNewReceipt) btnNewReceipt.addEventListener("click", openExpenseModal);
@@ -207,7 +207,7 @@ export function initGastos() {
   // Atajo de escape para cerrar modal
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      const modal = document.getElementById("expenseModal");
+      const modal = document.getElementById("expenseModalOverlay") || document.getElementById("expenseModal");
       if (modal && !modal.classList.contains("hidden")) {
         closeExpenseModal();
       }
