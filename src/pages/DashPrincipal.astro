@@ -6,6 +6,26 @@ import NavBar from "../components/Nav.astro";
 ---
 
 <Layout title="Panel de Control Ejecutivo - Control de Stock Enterprise JR">
+  <script is:inline>
+    // Prepara el estado inicial para la animación GSAP evitando el destello FOUC
+    document.documentElement.classList.add("dash-preparing");
+    setTimeout(() => {
+      document.documentElement.classList.remove("dash-preparing");
+    }, 1500);
+  </script>
+
+  <style is:global>
+    html.dash-preparing #dash-subheader,
+    html.dash-preparing .kpi-card,
+    html.dash-preparing #dash-chart-card,
+    html.dash-preparing #dash-stock-card,
+    html.dash-preparing #dash-quick-actions,
+    html.dash-preparing #dash-transactions-card {
+      opacity: 0 !important;
+      transform: translateY(18px) !important;
+    }
+  </style>
+
   <div class="min-h-screen bg-surface flex flex-col font-body-md text-on-surface">
     {/* Barra Lateral y Barra Superior Responsivas Globales */}
     <SlideBar currentPath="principal" />
