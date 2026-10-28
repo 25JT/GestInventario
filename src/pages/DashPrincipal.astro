@@ -1,10 +1,11 @@
 ---
+// DashPrincipal.astro - Panel de Control Ejecutivo Principal
 import Layout from "../layouts/Layout.astro";
 import SlideBar from "../components/SlideBar.astro";
 import NavBar from "../components/Nav.astro";
 ---
 
-<Layout title="Panel Principal - Control de Stock Enterprise JR">
+<Layout title="Panel de Control Ejecutivo - Control de Stock Enterprise JR">
   <div class="min-h-screen bg-surface flex flex-col font-body-md text-on-surface">
     {/* Barra Lateral y Barra Superior Responsivas Globales */}
     <SlideBar currentPath="principal" />
@@ -16,323 +17,863 @@ import NavBar from "../components/Nav.astro";
       class="pt-16 min-h-screen flex flex-col flex-1"
     >
       <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
-      {/* Banner de Bienvenida */}
-      <div
-        class="bg-primary text-on-primary rounded-xl p-6 relative overflow-hidden shadow-md"
-      >
-        <div
-          class="absolute -right-12 -top-12 w-64 h-64 bg-secondary-container opacity-20 rounded-full blur-3xl pointer-events-none"
-        >
-        </div>
-        <div
-          class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4"
-        >
-          <div>
-            <div
-              class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary-container text-tertiary-fixed text-[11px] font-semibold mb-2"
-            >
-              <span class="material-symbols-outlined text-[13px]"
-                >verified_user</span
-              >
-              Sesión de Turno Activa
+        <!-- Sub-header / Command Bar -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md mb-space-lg">
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2">
+              <span class="font-label-sm text-label-sm text-secondary-container tracking-wider uppercase font-semibold">
+                Panel de Control Ejecutivo
+              </span>
+              <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
             </div>
-            <h1
-              class="font-headline-lg text-headline-lg text-on-primary font-bold"
-            >
-              Bienvenido, <span id="welcome-name">Carlos</span>
+            <h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight mt-0.5 font-bold">
+              Bienvenido, <span id="welcome-name">Carlos Mendoza</span>
             </h1>
-            <p
-              class="font-body-md text-body-md text-surface-variant max-w-xl mt-1"
-            >
-              Terminal sincronizado en tiempo real. Sistema preparado para
-              operaciones de inventario, consulta de stock y registro de
-              comprobantes.
-            </p>
-          </div>
-          <div class="flex items-center gap-3">
-            <a
-              href="/"
-              class="px-4 py-2 bg-surface-container-lowest/10 hover:bg-surface-container-lowest/20 text-on-primary rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 border border-surface-variant/20"
-            >
-              <span class="material-symbols-outlined text-[18px]"
-                >arrow_back</span
-              >
-              Volver a Login
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* Tarjetas de Métricas Rápidas */}
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div
-          class="bg-surface-container-lowest p-5 rounded-xl border border-surface-container shadow-xs flex items-center justify-between"
-        >
-          <div>
-            <span
-              class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold"
-            >
-              Productos en Catálogo
-            </span>
-            <div
-              class="font-headline-lg text-headline-lg font-bold text-on-surface mt-1"
-            >
-              1,428
-            </div>
-            <span
-              class="font-label-sm text-[11px] text-on-tertiary-container flex items-center gap-0.5 mt-0.5"
-            >
-              <span class="material-symbols-outlined text-[13px]"
-                >arrow_upward</span
-              > +12 nuevos hoy
-            </span>
-          </div>
-          <div
-            class="w-11 h-11 rounded-lg bg-surface-container-low text-secondary flex items-center justify-center"
-          >
-            <span class="material-symbols-outlined text-[24px]"
-              >inventory_2</span
-            >
-          </div>
-        </div>
-
-        <div
-          class="bg-surface-container-lowest p-5 rounded-xl border border-surface-container shadow-xs flex items-center justify-between"
-        >
-          <div>
-            <span
-              class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold"
-            >
-              Alertas de Stock Bajo
-            </span>
-            <div
-              class="font-headline-lg text-headline-lg font-bold text-error mt-1"
-            >
-              9
-            </div>
-            <span
-              class="font-label-sm text-[11px] text-error flex items-center gap-0.5 mt-0.5"
-            >
-              <span class="material-symbols-outlined text-[13px]">warning</span> Requieren
-              reposición
-            </span>
-          </div>
-          <div
-            class="w-11 h-11 rounded-lg bg-error-container/30 text-error flex items-center justify-center"
-          >
-            <span class="material-symbols-outlined text-[24px]"
-              >production_quantity_limits</span
-            >
-          </div>
-        </div>
-
-        <div
-          class="bg-surface-container-lowest p-5 rounded-xl border border-surface-container shadow-xs flex items-center justify-between"
-        >
-          <div>
-            <span
-              class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold"
-            >
-              Ventas del Turno
-            </span>
-            <div
-              class="font-headline-lg text-headline-lg font-bold text-on-surface mt-1"
-            >
-              $ 384,500
-            </div>
-            <span
-              class="font-label-sm text-[11px] text-on-tertiary-container flex items-center gap-0.5 mt-0.5"
-            >
-              <span class="material-symbols-outlined text-[13px]"
-                >trending_up</span
-              > 28 comprobantes
-            </span>
-          </div>
-          <div
-            class="w-11 h-11 rounded-lg bg-tertiary-container/10 text-on-tertiary-container flex items-center justify-center"
-          >
-            <span class="material-symbols-outlined text-[24px]"
-              >point_of_sale</span
-            >
-          </div>
-        </div>
-
-        <div
-          class="bg-surface-container-lowest p-5 rounded-xl border border-surface-container shadow-xs flex items-center justify-between"
-        >
-          <div>
-            <span
-              class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold"
-            >
-              Estado de Servidor
-            </span>
-            <div
-              class="font-headline-lg text-headline-lg font-bold text-secondary mt-1"
-            >
-              Conectado
-            </div>
-            <span
-              class="font-label-sm text-[11px] text-on-surface-variant flex items-center gap-0.5 mt-0.5"
-            >
-              <span class="material-symbols-outlined text-[13px]">sync</span> Latencia:
-              24ms
-            </span>
-          </div>
-          <div
-            class="w-11 h-11 rounded-lg bg-secondary-fixed/40 text-secondary flex items-center justify-center"
-          >
-            <span class="material-symbols-outlined text-[24px]">dns</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Accesos Rápidos y Notificación de Fase */}
-      <div
-        class="bg-surface-container-lowest p-6 rounded-xl border border-surface-container shadow-xs"
-      >
-        <div
-          class="flex items-center justify-between mb-4 pb-3 border-b border-surface-container"
-        >
-          <div>
-            <h2
-              class="font-headline-md text-headline-md font-bold text-on-surface"
-            >
-              Módulos del Sistema Operativo
-            </h2>
             <p class="font-body-sm text-body-sm text-on-surface-variant">
-              Seleccione la operación a ejecutar según sus atribuciones
-              autorizadas.
+              Visión general del rendimiento operativo, flujo de caja e inventario central.
             </p>
           </div>
-          <span
-            class="hidden sm:inline-block px-2.5 py-1 rounded bg-secondary-container/10 text-secondary font-label-sm text-label-sm font-semibold"
-          >
-            Modo Integración Activo
-          </span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <div
-            class="p-4 rounded-lg bg-surface-container-low hover:bg-surface-container transition-all border border-surface-container flex flex-col justify-between cursor-pointer group"
-          >
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <span
-                  class="w-9 h-9 rounded-lg bg-secondary text-on-secondary flex items-center justify-center"
-                >
-                  <span class="material-symbols-outlined text-[20px]"
-                    >shopping_cart_checkout</span
-                  >
-                </span>
-                <span
-                  class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors"
-                >
-                  arrow_forward
-                </span>
-              </div>
-              <h3 class="font-label-md text-label-md font-bold text-on-surface">
-                Terminal POS / Ventas
-              </h3>
-              <p class="font-body-sm text-[12px] text-on-surface-variant mt-1">
-                Emisión de comprobantes, lectura por código de barras y cobro en
-                caja.
-              </p>
+          <div class="flex flex-wrap items-center gap-space-sm">
+            <div class="inline-flex p-1 bg-surface-container-low rounded-xl shadow-xs" id="time-filter-group">
+              <button
+                class="time-tab px-3 py-1 font-label-md text-label-md rounded-lg text-on-surface-variant hover:text-on-surface transition-all cursor-pointer"
+                onclick="window.setTimeFilter && window.setTimeFilter(this, 'hoy')"
+                type="button"
+              >
+                Hoy
+              </button>
+              <button
+                class="time-tab px-3 py-1 font-label-md text-label-md rounded-lg text-on-surface-variant hover:text-on-surface transition-all cursor-pointer"
+                onclick="window.setTimeFilter && window.setTimeFilter(this, 'semana')"
+                type="button"
+              >
+                Esta semana
+              </button>
+              <button
+                class="time-tab active px-3 py-1 font-label-md text-label-md rounded-lg bg-surface-container-lowest text-primary shadow-xs font-semibold transition-all cursor-pointer"
+                onclick="window.setTimeFilter && window.setTimeFilter(this, 'mes')"
+                type="button"
+              >
+                Este mes
+              </button>
             </div>
-          </div>
-
-          <div
-            class="p-4 rounded-lg bg-surface-container-low hover:bg-surface-container transition-all border border-surface-container flex flex-col justify-between cursor-pointer group"
-          >
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <span
-                  class="w-9 h-9 rounded-lg bg-primary text-on-primary flex items-center justify-center"
-                >
-                  <span class="material-symbols-outlined text-[20px]"
-                    >shelves</span
-                  >
-                </span>
-                <span
-                  class="material-symbols-outlined text-outline group-hover:text-primary transition-colors"
-                >
-                  arrow_forward
-                </span>
-              </div>
-              <h3 class="font-label-md text-label-md font-bold text-on-surface">
-                Control de Inventario
-              </h3>
-              <p class="font-body-sm text-[12px] text-on-surface-variant mt-1">
-                Altas de mercadería, ajustes de stock físico y control de lotes.
-              </p>
-            </div>
-          </div>
-
-          <div
-            class="p-4 rounded-lg bg-surface-container-low hover:bg-surface-container transition-all border border-surface-container flex flex-col justify-between cursor-pointer group"
-          >
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <span
-                  class="w-9 h-9 rounded-lg bg-tertiary-container text-on-tertiary-container flex items-center justify-center"
-                >
-                  <span class="material-symbols-outlined text-[20px]"
-                    >query_stats</span
-                  >
-                </span>
-                <span
-                  class="material-symbols-outlined text-outline group-hover:text-on-tertiary-container transition-colors"
-                >
-                  arrow_forward
-                </span>
-              </div>
-              <h3 class="font-label-md text-label-md font-bold text-on-surface">
-                Gastos & Reportes
-              </h3>
-              <p class="font-body-sm text-[12px] text-on-surface-variant mt-1">
-                Trazabilidad de gastos operacionales y cierre contable de turno.
-              </p>
+            <div class="flex items-center gap-2">
+              <button
+                id="btn-export"
+                class="h-[34px] px-3.5 bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md rounded-xl shadow-xs flex items-center gap-2 transition-colors cursor-pointer"
+                type="button"
+              >
+                <span class="material-symbols-outlined text-[18px]">download</span>
+                <span>Exportar Informe</span>
+              </button>
             </div>
           </div>
         </div>
-      </div>
+
+        <!-- Row 1: KPI Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md mb-space-lg">
+          <!-- KPI 1 -->
+          <div class="bg-surface-container-lowest p-4 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
+            <div class="flex items-start justify-between">
+              <div class="flex flex-col">
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+                  Ventas Totales (Mes)
+                </span>
+                <span id="kpi-ventas-val" class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-1 font-bold">
+                  $48,250.00
+                </span>
+              </div>
+              <div class="w-9 h-9 rounded-xl bg-surface-container-low flex items-center justify-center text-on-tertiary-container shrink-0">
+                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-3 pt-2 bg-surface-container-low/50 -mx-4 -mb-4 px-4 py-2 rounded-b-xl border-t border-surface-container/40">
+              <div class="flex items-center gap-1 text-on-tertiary-container font-label-sm text-label-sm font-semibold">
+                <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+                <span>+12.4%</span>
+                <span class="text-on-surface-variant font-normal">vs mes ant.</span>
+              </div>
+              <span class="font-label-sm text-label-sm text-on-surface-variant">Obj: 94%</span>
+            </div>
+          </div>
+
+          <!-- KPI 2 -->
+          <div class="bg-surface-container-lowest p-4 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
+            <div class="flex items-start justify-between">
+              <div class="flex flex-col">
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+                  Gastos Operativos
+                </span>
+                <span id="kpi-gastos-val" class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-1 font-bold">
+                  $14,820.00
+                </span>
+              </div>
+              <div class="w-9 h-9 rounded-xl bg-surface-container-low flex items-center justify-center text-secondary-container shrink-0">
+                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-3 pt-2 bg-surface-container-low/50 -mx-4 -mb-4 px-4 py-2 rounded-b-xl border-t border-surface-container/40">
+              <div class="flex items-center gap-1 text-on-tertiary-container font-label-sm text-label-sm font-semibold">
+                <span class="material-symbols-outlined text-[16px]">arrow_downward</span>
+                <span>-3.1%</span>
+                <span class="text-on-surface-variant font-normal">reducción</span>
+              </div>
+              <span class="font-label-sm text-label-sm text-on-surface-variant">Presupuesto OK</span>
+            </div>
+          </div>
+
+          <!-- KPI 3 -->
+          <div class="bg-surface-container-lowest p-4 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
+            <div class="flex items-start justify-between">
+              <div class="flex flex-col">
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+                  DINERO TOTAL
+                </span>
+                <span id="kpi-utilidad-val" class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-1 font-bold">
+                  $33,430.00
+                </span>
+              </div>
+              <div class="w-9 h-9 rounded-xl bg-tertiary-container text-on-tertiary-container flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">pie_chart</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-3 pt-2 bg-surface-container-low/50 -mx-4 -mb-4 px-4 py-2 rounded-b-xl border-t border-surface-container/40">
+              <div class="flex items-center gap-1.5 font-label-sm text-label-sm">
+                <span class="px-1.5 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed font-semibold text-[11px]">
+                  Margen 69.3%
+                </span>
+              </div>
+              <span class="font-label-sm text-label-sm text-on-surface-variant font-semibold text-on-tertiary-container">
+                +$5,120
+              </span>
+            </div>
+          </div>
+
+          <!-- KPI 4 -->
+          <div class="bg-surface-container-lowest p-4 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
+            <div class="flex items-start justify-between">
+              <div class="flex flex-col">
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+                  Estado de Inventario
+                </span>
+                <div class="flex items-baseline gap-2 mt-1">
+                  <span class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold">1,248</span>
+                  <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">items activos</span>
+                </div>
+              </div>
+              <div class="w-9 h-9 rounded-xl bg-surface-container-low text-on-surface flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">inventory</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 mt-3 pt-2 bg-surface-container-low/50 -mx-4 -mb-4 px-4 py-2 rounded-b-xl border-t border-surface-container/40">
+              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-surface-container-high text-on-surface text-[11px] font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                14 stock bajo
+              </span>
+              <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-error-container text-on-error-container text-[11px] font-semibold">
+                3 agotados
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Analytics Split (65% / 35%) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md mb-space-lg">
+          <!-- Left Column: Chart & Sales Metrics (65% ~ 8 cols) -->
+          <div class="lg:col-span-8 flex flex-col gap-space-md">
+            <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-xs border border-surface-container/60">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 gap-2">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-headline-md text-headline-md text-on-surface font-bold">
+                      Flujo Financiero &amp; Rendimiento
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm font-semibold">
+                      Oct 2024
+                    </span>
+                  </div>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Monitoreo dinámico de ingresos, egresos de almacén y margen neto
+                  </p>
+                </div>
+                <div class="inline-flex p-0.5 bg-surface-container-low rounded-xl self-start sm:self-auto shadow-2xs">
+                  <button
+                    class="chart-tab px-3 py-1 font-label-md text-label-md rounded-lg bg-surface-container-lowest text-primary shadow-xs font-semibold transition-all cursor-pointer"
+                    id="tab-ventas"
+                    onclick="window.switchChartTab && window.switchChartTab('ventas')"
+                    type="button"
+                  >
+                    Ventas
+                  </button>
+                  <button
+                    class="chart-tab px-3 py-1 font-label-md text-label-md rounded-lg text-on-surface-variant hover:text-on-surface transition-all cursor-pointer"
+                    id="tab-gastos"
+                    onclick="window.switchChartTab && window.switchChartTab('gastos')"
+                    type="button"
+                  >
+                    Gastos
+                  </button>
+                  <button
+                    class="chart-tab px-3 py-1 font-label-md text-label-md rounded-lg text-on-surface-variant hover:text-on-surface transition-all cursor-pointer"
+                    id="tab-utilidad"
+                    onclick="window.switchChartTab && window.switchChartTab('utilidad')"
+                    type="button"
+                  >
+                    Utilidad
+                  </button>
+                </div>
+              </div>
+
+              <!-- SVG Financial Trend Visualizer -->
+              <div class="w-full relative pt-2">
+                <div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm mb-1 px-1">
+                  <span id="chart-max-label" class="font-semibold">$50k</span>
+                  <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-1.5">
+                      <span class="w-2.5 h-2.5 rounded-full bg-secondary-container"></span>
+                      <span>Ventas registradas</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="w-2.5 h-2.5 rounded-full bg-outline-variant"></span>
+                      <span>Gastos operativos</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="h-44 w-full relative">
+                  <svg id="financial-svg-chart" class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 600 160">
+                    <defs>
+                      <linearGradient id="salesGrad" x1="0%" x2="0%" y1="0%" y2="100%">
+                        <stop offset="0%" stop-color="#316bf3" stop-opacity="0.28"></stop>
+                        <stop offset="100%" stop-color="#316bf3" stop-opacity="0.0"></stop>
+                      </linearGradient>
+                      <linearGradient id="expenseGrad" x1="0%" x2="0%" y1="0%" y2="100%">
+                        <stop offset="0%" stop-color="#75777d" stop-opacity="0.15"></stop>
+                        <stop offset="100%" stop-color="#75777d" stop-opacity="0.0"></stop>
+                      </linearGradient>
+                    </defs>
+                    <!-- Subtle Gridlines -->
+                    <line stroke="#eff4ff" stroke-width="1.5" x1="0" x2="600" y1="30" y2="30"></line>
+                    <line stroke="#eff4ff" stroke-width="1.5" x1="0" x2="600" y1="80" y2="80"></line>
+                    <line stroke="#eff4ff" stroke-width="1.5" x1="0" x2="600" y1="130" y2="130"></line>
+
+                    <!-- Expenses Area -->
+                    <path
+                      id="chart-expense-area"
+                      d="M 0,110 Q 75,95 150,115 T 300,105 T 450,120 T 600,95 L 600,160 L 0,160 Z"
+                      fill="url(#expenseGrad)"
+                      class="transition-all duration-500"
+                    ></path>
+                    <path
+                      id="chart-expense-line"
+                      d="M 0,110 Q 75,95 150,115 T 300,105 T 450,120 T 600,95"
+                      fill="none"
+                      stroke="#75777d"
+                      stroke-dasharray="3,3"
+                      stroke-width="2"
+                      class="transition-all duration-500"
+                    ></path>
+
+                    <!-- Sales Area -->
+                    <path
+                      id="chart-sales-area"
+                      d="M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20 L 600,160 L 0,160 Z"
+                      fill="url(#salesGrad)"
+                      class="transition-all duration-500"
+                    ></path>
+                    <path
+                      id="chart-sales-line"
+                      d="M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20"
+                      fill="none"
+                      stroke="#316bf3"
+                      stroke-width="2.5"
+                      class="transition-all duration-500"
+                    ></path>
+
+                    <!-- Interactive Peak Indicators -->
+                    <circle id="peak-dot-1" cx="460" cy="55" fill="#316bf3" r="4.5" stroke="#ffffff" stroke-width="2"></circle>
+                    <circle id="peak-dot-2" cx="600" cy="20" fill="#00a472" r="5" stroke="#ffffff" stroke-width="2.5"></circle>
+                  </svg>
+                </div>
+
+                <div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm pt-2 px-1">
+                  <span>01 Oct</span>
+                  <span>07 Oct</span>
+                  <span>14 Oct</span>
+                  <span>21 Oct</span>
+                  <span class="font-semibold text-primary">Hoy (24 Oct)</span>
+                </div>
+              </div>
+
+              <!-- Category breakdown micro-cards inside graph panel -->
+              <div class="mt-4 pt-3 bg-surface-container-low rounded-xl p-3 grid grid-cols-1 sm:grid-cols-3 gap-3 border border-surface-container/50">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-surface-container-lowest flex items-center justify-center text-secondary-container shadow-xs">
+                    <span class="material-symbols-outlined text-[18px]">devices</span>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <span class="font-label-sm text-label-sm text-on-surface-variant truncate">Productos</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <span class="font-numeric-data text-numeric-data font-bold text-on-surface">$24,190</span>
+                      <span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">+18%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary shadow-xs">
+                    <span class="material-symbols-outlined text-[18px]">build</span>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <span class="font-label-sm text-label-sm text-on-surface-variant truncate">Servicios</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <span class="font-numeric-data text-numeric-data font-bold text-on-surface">$16,310</span>
+                      <span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">+7%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-surface-container-lowest flex items-center justify-center text-outline shadow-xs">
+                    <span class="material-symbols-outlined text-[18px]">category</span>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <span class="font-label-sm text-label-sm text-on-surface-variant truncate">Consumibles</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <span class="font-numeric-data text-numeric-data font-bold text-on-surface">$7,750</span>
+                      <span class="font-label-sm text-label-sm text-error font-semibold">-2%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Critical Stock Alerts (35% ~ 4 cols) -->
+          <div class="lg:col-span-4 flex flex-col">
+            <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between h-full">
+              <div>
+                <div class="flex items-center justify-between pb-2">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-error animate-pulse"></span>
+                    <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Stock Crítico</h2>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold">
+                    14 Urgentes
+                  </span>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mb-3">
+                  Reorden inmediata requerida para sucursal central.
+                </p>
+
+                <!-- List of critical items -->
+                <div class="flex flex-col gap-2">
+                  <!-- Item 1 -->
+                  <div class="p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between border border-surface-container/40">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div class="w-8 h-8 rounded-lg bg-error-container text-on-error-container flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">memory</span>
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <span class="font-label-md text-label-md font-semibold text-on-surface truncate">SSD NVMe 1TB Kingston</span>
+                        <div class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+                          <span class="font-mono text-[10px] bg-surface-container px-1 rounded font-bold">SKU-9904</span>
+                          <span class="text-error font-semibold">2 en stock</span>
+                          <span>(Mín: 15)</span>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      class="h-7 px-2.5 bg-primary hover:bg-primary-container text-on-primary font-label-sm text-label-sm font-medium rounded-lg shadow-xs shrink-0 transition-all flex items-center gap-1 cursor-pointer"
+                      onclick="window.quickRestock && window.quickRestock('SKU-9904', 'SSD NVMe 1TB Kingston')"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">local_shipping</span>
+                      <span>Pedir</span>
+                    </button>
+                  </div>
+
+                  <!-- Item 2 -->
+                  <div class="p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between border border-surface-container/40">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container-high text-on-surface flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">cable</span>
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <span class="font-label-md text-label-md font-semibold text-on-surface truncate">Cable USB-C Blindado 2m</span>
+                        <div class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+                          <span class="font-mono text-[10px] bg-surface-container px-1 rounded font-bold">SKU-3108</span>
+                          <span class="text-error font-semibold">0 agotado</span>
+                          <span>(Mín: 25)</span>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      class="h-7 px-2.5 bg-primary hover:bg-primary-container text-on-primary font-label-sm text-label-sm font-medium rounded-lg shadow-xs shrink-0 transition-all flex items-center gap-1 cursor-pointer"
+                      onclick="window.quickRestock && window.quickRestock('SKU-3108', 'Cable USB-C Blindado')"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">local_shipping</span>
+                      <span>Pedir</span>
+                    </button>
+                  </div>
+
+                  <!-- Item 3 -->
+                  <div class="p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between border border-surface-container/40">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container-high text-on-surface flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">power</span>
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <span class="font-label-md text-label-md font-semibold text-on-surface truncate">Fuente Poder 650W Modular</span>
+                        <div class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+                          <span class="font-mono text-[10px] bg-surface-container px-1 rounded font-bold">SKU-7721</span>
+                          <span class="text-on-surface font-semibold">4 en stock</span>
+                          <span>(Mín: 10)</span>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      class="h-7 px-2.5 bg-surface-container hover:bg-surface-container-highest text-on-surface font-label-sm text-label-sm font-medium rounded-lg shadow-xs shrink-0 transition-all flex items-center gap-1 cursor-pointer"
+                      onclick="window.quickRestock && window.quickRestock('SKU-7721', 'Fuente Poder 650W')"
+                      type="button"
+                    >
+                      <span>Pedir</span>
+                    </button>
+                  </div>
+
+                  <!-- Item 4 -->
+                  <div class="p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between border border-surface-container/40">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container-high text-on-surface flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">heat_pump</span>
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <span class="font-label-md text-label-md font-semibold text-on-surface truncate">Pasta Térmica Artic MX-4</span>
+                        <div class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+                          <span class="font-mono text-[10px] bg-surface-container px-1 rounded font-bold">SKU-4419</span>
+                          <span class="text-error font-semibold">1 en stock</span>
+                          <span>(Mín: 12)</span>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      class="h-7 px-2.5 bg-surface-container hover:bg-surface-container-highest text-on-surface font-label-sm text-label-sm font-medium rounded-lg shadow-xs shrink-0 transition-all flex items-center gap-1 cursor-pointer"
+                      onclick="window.quickRestock && window.quickRestock('SKU-4419', 'Pasta Térmica Artic MX-4')"
+                      type="button"
+                    >
+                      <span>Pedir</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-3 mt-2">
+                <a
+                  class="w-full h-8 bg-surface-container-low hover:bg-surface-container text-secondary-container font-label-md text-label-md font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors border border-surface-container/40"
+                  href="#control-de-inventario"
+                >
+                  <span>Ver reporte de compras sugeridas</span>
+                  <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Frequent Role Actions & Latest Transactions -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
+          <!-- Quick Actions Banner (Role-tailored) -->
+          <div class="lg:col-span-12">
+            <div class="bg-surface-container-low p-space-md rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-space-md border border-surface-container/50">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-xs">
+                  <span class="material-symbols-outlined text-[22px]">bolt</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-headline-md text-headline-md text-on-surface font-bold">Operaciones Rápidas</span>
+                  <span class="font-body-sm text-body-sm text-on-surface-variant">
+                    Accesos directos para agilizar transacciones en caja y taller
+                  </span>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button
+                  class="h-9 px-3 bg-surface-container-lowest hover:bg-secondary-container hover:text-on-secondary text-on-surface font-label-md text-label-md font-medium rounded-xl shadow-xs flex items-center gap-2 transition-all group cursor-pointer border border-surface-container/40"
+                  type="button"
+                  onclick="alert('Módulo de Terminal POS en construcción.')"
+                >
+                  <span class="material-symbols-outlined text-[18px] text-secondary-container group-hover:text-on-secondary">point_of_sale</span>
+                  <span>Nueva Venta</span>
+                </button>
+                <button
+                  class="h-9 px-3 bg-surface-container-lowest hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-medium rounded-xl shadow-xs flex items-center gap-2 transition-all group cursor-pointer border border-surface-container/40"
+                  type="button"
+                  onclick="alert('Módulo de Gastos Operacionales en construcción.')"
+                >
+                  <span class="material-symbols-outlined text-[18px] text-outline group-hover:text-on-primary">receipt_long</span>
+                  <span>Registrar Gasto</span>
+                </button>
+                <button
+                  class="h-9 px-3 bg-surface-container-lowest hover:bg-primary-container hover:text-on-primary text-on-surface font-label-md text-label-md font-medium rounded-xl shadow-xs flex items-center gap-2 transition-all group cursor-pointer border border-surface-container/40"
+                  type="button"
+                  onclick="alert('Módulo de Alta de Producto en construcción.')"
+                >
+                  <span class="material-symbols-outlined text-[18px] text-outline group-hover:text-on-primary">add_box</span>
+                  <span>Nuevo Producto</span>
+                </button>
+                <button
+                  class="h-9 px-3 bg-surface-container-lowest hover:bg-secondary hover:text-on-secondary text-on-surface font-label-md text-label-md font-medium rounded-xl shadow-xs flex items-center gap-2 transition-all group cursor-pointer border border-surface-container/40"
+                  type="button"
+                  onclick="alert('Módulo de Servicios Técnicos en construcción.')"
+                >
+                  <span class="material-symbols-outlined text-[18px] text-secondary-container group-hover:text-on-secondary">build_circle</span>
+                  <span>Nuevo Servicio</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Sales Table -->
+          <div class="lg:col-span-12">
+            <div class="bg-surface-container-lowest rounded-xl shadow-xs border border-surface-container/60 overflow-hidden">
+              <div class="px-space-md py-space-sm flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm border-b border-surface-container/40">
+                <div class="flex items-center gap-2">
+                  <span class="font-headline-md text-headline-md text-on-surface font-bold">
+                    Últimas Transacciones Registradas
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="relative">
+                    <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px] pointer-events-none">
+                      filter_list
+                    </span>
+                    <input
+                      id="search-transactions-input"
+                      class="h-8 pl-8 pr-3 bg-surface-container-low rounded-lg text-body-sm font-body-sm text-on-surface placeholder:text-outline border border-transparent focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
+                      placeholder="Filtrar por ticket o cliente..."
+                      type="text"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Compact Data Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-left" id="transactions-table">
+                  <thead>
+                    <tr class="h-9 bg-surface-container-low text-on-surface-variant uppercase font-label-sm text-label-sm tracking-wider">
+                      <th class="px-space-md font-semibold">ID Ticket</th>
+                      <th class="px-space-md font-semibold">Cliente</th>
+                      <th class="px-space-md font-semibold">Responsable</th>
+                      <th class="px-space-md font-semibold">Fecha / Hora</th>
+                      <th class="px-space-md font-semibold">Método de Pago</th>
+                      <th class="px-space-md font-semibold text-right">Total</th>
+                      <th class="px-space-md font-semibold">Estado</th>
+                      <th class="px-space-md font-semibold text-center">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-surface-container-low">
+                    <!-- Row 1 -->
+                    <tr class="h-10 hover:bg-surface-container-low/60 transition-colors transaction-row">
+                      <td class="px-space-md font-mono font-medium text-secondary-container">#TCK-8841</td>
+                      <td class="px-space-md">
+                        <div class="flex items-center gap-2">
+                          <div class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-label-sm font-bold text-[10px]">
+                            DA
+                          </div>
+                          <span class="font-body-md text-body-md font-semibold text-on-surface">Distribuidora Andina S.A.</span>
+                        </div>
+                      </td>
+                      <td class="px-space-md font-body-sm text-body-sm text-on-surface-variant">Lucía Herrera</td>
+                      <td class="px-space-md font-body-sm text-body-sm text-on-surface-variant">Hoy, 15:42</td>
+                      <td class="px-space-md">
+                        <span class="inline-flex items-center gap-1 text-on-surface font-body-sm text-body-sm">
+                          <span class="material-symbols-outlined text-[16px] text-outline">credit_card</span>
+                          <span>Transferencia</span>
+                        </span>
+                      </td>
+                      <td class="px-space-md text-right font-numeric-data text-numeric-data font-bold text-on-surface">$1,450.00</td>
+                      <td class="px-space-md">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm font-semibold">
+                          <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                          Completado
+                        </span>
+                      </td>
+                      <td class="px-space-md text-center">
+                        <button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Ver detalles y factura" type="button">
+                          <span class="material-symbols-outlined text-[18px]">receipt</span>
+                        </button>
+                      </td>
+                    </tr>
+
+                    <!-- Row 2 -->
+                    <tr class="h-10 hover:bg-surface-container-low/60 transition-colors transaction-row">
+                      <td class="px-space-md font-mono font-medium text-secondary-container">#TCK-8840</td>
+                      <td class="px-space-md">
+                        <div class="flex items-center gap-2">
+                          <div class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-label-sm font-bold text-[10px]">
+                            MR
+                          </div>
+                          <span class="font-body-md text-body-md font-semibold text-on-surface">Martín Ramos</span>
+                        </div>
+                      </td>
+                      <td class="px-space-md font-body-sm text-body-sm text-on-surface-variant">Carlos Mendoza</td>
+                      <td class="px-space-md font-body-sm text-body-sm text-on-surface-variant">Hoy, 14:15</td>
+                      <td class="px-space-md">
+                        <span class="inline-flex items-center gap-1 text-on-surface font-body-sm text-body-sm">
+                          <span class="material-symbols-outlined text-[16px] text-outline">payments</span>
+                          <span>Efectivo</span>
+                        </span>
+                      </td>
+                      <td class="px-space-md text-right font-numeric-data text-numeric-data font-bold text-on-surface">$320.00</td>
+                      <td class="px-space-md">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm font-semibold">
+                          <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                          Completado
+                        </span>
+                      </td>
+                      <td class="px-space-md text-center">
+                        <button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Ver detalles y factura" type="button">
+                          <span class="material-symbols-outlined text-[18px]">receipt</span>
+                        </button>
+                      </td>
+                    </tr>
+
+                    <!-- Row 3 -->
+                    <tr class="h-10 hover:bg-surface-container-low/60 transition-colors transaction-row">
+                      <td class="px-space-md font-mono font-medium text-secondary-container">#TCK-8839</td>
+                      <td class="px-space-md">
+                        <div class="flex items-center gap-2">
+                          <div class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-label-sm font-bold text-[10px]">
+                            ST
+                          </div>
+                          <span class="font-body-md text-body-md font-semibold text-on-surface">Soluciones Tech C.A.</span>
+                        </div>
+                      </td>
+                      <td class="px-space-md font-body-sm text-body-sm text-on-surface-variant">Lucía Herrera</td>
+                      <td class="px-space-md font-body-sm text-body-sm text-on-surface-variant">Hoy, 12:50</td>
+                      <td class="px-space-md">
+                        <span class="inline-flex items-center gap-1 text-on-surface font-body-sm text-body-sm">
+                          <span class="material-symbols-outlined text-[16px] text-outline">credit_card</span>
+                          <span>POS / Tarjeta</span>
+                        </span>
+                      </td>
+                      <td class="px-space-md text-right font-numeric-data text-numeric-data font-bold text-on-surface">$2,890.50</td>
+                      <td class="px-space-md">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm font-semibold">
+                          <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                          Completado
+                        </span>
+                      </td>
+                      <td class="px-space-md text-center">
+                        <button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Ver detalles y factura" type="button">
+                          <span class="material-symbols-outlined text-[18px]">receipt</span>
+                        </button>
+                      </td>
+                    </tr>
+
+                    <!-- Row 4 -->
+                    <tr class="h-10 hover:bg-surface-container-low/60 transition-colors transaction-row">
+                      <td class="px-space-md font-mono font-medium text-secondary-container">#TCK-8838</td>
+                      <td class="px-space-md">
+                        <div class="flex items-center gap-2">
+                          <div class="w-6 h-6 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-label-sm font-bold text-[10px]">
+                            EG
+                          </div>
+                          <span class="font-body-md text-body-md font-semibold text-on-surface">Elena Gómez</span>
+                        </div>
+                      </td>
+                      <td class="px-space-md font-body-sm text-body-sm text-on-surface-variant">Rodrigo Paz</td>
+                      <td class="px-space-md font-body-sm text-body-sm text-on-surface-variant">Hoy, 11:10</td>
+                      <td class="px-space-md">
+                        <span class="inline-flex items-center gap-1 text-on-surface font-body-sm text-body-sm">
+                          <span class="material-symbols-outlined text-[16px] text-outline">payments</span>
+                          <span>Efectivo</span>
+                        </span>
+                      </td>
+                      <td class="px-space-md text-right font-numeric-data text-numeric-data font-bold text-on-surface">$75.00</td>
+                      <td class="px-space-md">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm font-semibold">
+                          <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                          Completado
+                        </span>
+                      </td>
+                      <td class="px-space-md text-center">
+                        <button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Ver detalles y factura" type="button">
+                          <span class="material-symbols-outlined text-[18px]">receipt</span>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="px-space-md py-space-sm bg-surface-container-low flex items-center justify-between border-t border-surface-container/40">
+                <span class="font-body-sm text-body-sm text-on-surface-variant" id="table-summary-text">
+                  Mostrando 4 de 128 transacciones hoy
+                </span>
+                <a
+                  class="font-label-md text-label-md text-secondary-container hover:text-secondary font-semibold flex items-center gap-1 transition-colors"
+                  href="#registro-de-ventas"
+                >
+                  <span>Ver historial completo de ventas</span>
+                  <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Restock Notification Toast container (Dynamic) -->
+        <div
+          id="restock-toast"
+          class="fixed bottom-5 right-5 z-50 bg-primary text-on-primary px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 translate-y-24 opacity-0 transition-all duration-300 pointer-events-none"
+        >
+          <span class="material-symbols-outlined text-[20px] text-on-tertiary-container">check_circle</span>
+          <div class="flex flex-col">
+            <span class="font-label-md text-label-md font-semibold" id="toast-title">Orden generada</span>
+            <span class="font-body-sm text-body-sm text-surface-variant" id="toast-msg">Reabastecimiento solicitado al proveedor central.</span>
+          </div>
+        </div>
       </main>
     </div>
   </div>
 
   <script>
-    // Recuperar información de la sesión activa
-    const storedUser =
-      localStorage.getItem("stock_auth_user") ||
-      sessionStorage.getItem("stock_auth_user");
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        const displayName = document.getElementById("user-display-name");
-        const welcomeName = document.getElementById("welcome-name");
-        const roleBadge = document.getElementById("user-role-badge");
-        const avatar = document.getElementById("user-avatar");
-
-        if (displayName && user.nombre) displayName.textContent = user.nombre;
-        if (welcomeName && user.nombre) welcomeName.textContent = user.nombre;
-        if (roleBadge && user.roleName) roleBadge.textContent = user.roleName;
-        if (avatar && user.nombre) {
-          avatar.textContent = user.nombre.substring(0, 2).toUpperCase();
+    // Recuperar y actualizar el nombre del colaborador desde la sesión activa
+    function loadSessionData() {
+      const storedUser =
+        localStorage.getItem("stock_auth_user") ||
+        sessionStorage.getItem("stock_auth_user");
+      if (storedUser) {
+        try {
+          const user = JSON.parse(storedUser);
+          const welcomeName = document.getElementById("welcome-name");
+          const name = (user.name || user.nombre || (user.identifier ? user.identifier.split("@")[0] : "Carlos Mendoza")).trim();
+          const lastname = (user.lastname || user.apellido || "").trim();
+          const fullName = `${name} ${lastname}`.trim();
+          if (welcomeName) {
+            welcomeName.textContent = fullName || name;
+          }
+        } catch (e) {
+          console.error("Error al cargar sesión de usuario:", e);
         }
-      } catch (e) {
-        console.error("Error al cargar sesión de usuario:", e);
       }
     }
 
-    // Botón de Cerrar Sesión
-    const logoutBtn = document.getElementById("logout-btn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        localStorage.removeItem("stock_auth_user");
-        localStorage.removeItem("stock_auth_token");
-        sessionStorage.removeItem("stock_auth_user");
-        sessionStorage.removeItem("stock_auth_token");
-        window.location.href = "/";
+    // Filtros de tiempo: Hoy / Esta semana / Este mes
+    window.setTimeFilter = function(btn: HTMLElement, filter: string) {
+      document.querySelectorAll("#time-filter-group .time-tab").forEach((tab) => {
+        tab.classList.remove("active", "bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+        tab.classList.add("text-on-surface-variant");
       });
+      btn.classList.add("active", "bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+      btn.classList.remove("text-on-surface-variant");
+
+      // Datos demostrativos según filtro temporal
+      const kpiVentas = document.getElementById("kpi-ventas-val");
+      const kpiGastos = document.getElementById("kpi-gastos-val");
+      const kpiUtilidad = document.getElementById("kpi-utilidad-val");
+
+      if (filter === "hoy") {
+        if (kpiVentas) kpiVentas.textContent = "$3,420.00";
+        if (kpiGastos) kpiGastos.textContent = "$890.00";
+        if (kpiUtilidad) kpiUtilidad.textContent = "$2,530.00";
+      } else if (filter === "semana") {
+        if (kpiVentas) kpiVentas.textContent = "$18,650.00";
+        if (kpiGastos) kpiGastos.textContent = "$4,210.00";
+        if (kpiUtilidad) kpiUtilidad.textContent = "$14,440.00";
+      } else {
+        if (kpiVentas) kpiVentas.textContent = "$48,250.00";
+        if (kpiGastos) kpiGastos.textContent = "$14,820.00";
+        if (kpiUtilidad) kpiUtilidad.textContent = "$33,430.00";
+      }
+    };
+
+    // Pestañas del gráfico interactivo: Ventas / Gastos / Utilidad
+    window.switchChartTab = function(tab: string) {
+      document.querySelectorAll(".chart-tab").forEach((btn) => {
+        btn.classList.remove("bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+        btn.classList.add("text-on-surface-variant");
+      });
+      const activeBtn = document.getElementById(`tab-${tab}`);
+      if (activeBtn) {
+        activeBtn.classList.add("bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+        activeBtn.classList.remove("text-on-surface-variant");
+      }
+
+      // Variación demostrativa de curvas SVG
+      const salesArea = document.getElementById("chart-sales-area");
+      const salesLine = document.getElementById("chart-sales-line");
+      const maxLabel = document.getElementById("chart-max-label");
+
+      if (tab === "ventas") {
+        if (maxLabel) maxLabel.textContent = "$50k";
+        if (salesArea) salesArea.setAttribute("d", "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20 L 600,160 L 0,160 Z");
+        if (salesLine) salesLine.setAttribute("d", "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20");
+      } else if (tab === "gastos") {
+        if (maxLabel) maxLabel.textContent = "$20k";
+        if (salesArea) salesArea.setAttribute("d", "M 0,140 Q 80,110 160,120 T 320,90 T 460,105 T 600,75 L 600,160 L 0,160 Z");
+        if (salesLine) salesLine.setAttribute("d", "M 0,140 Q 80,110 160,120 T 320,90 T 460,105 T 600,75");
+      } else if (tab === "utilidad") {
+        if (maxLabel) maxLabel.textContent = "$40k";
+        if (salesArea) salesArea.setAttribute("d", "M 0,120 Q 80,50 160,65 T 320,30 T 460,40 T 600,15 L 600,160 L 0,160 Z");
+        if (salesLine) salesLine.setAttribute("d", "M 0,120 Q 80,50 160,65 T 320,30 T 460,40 T 600,15");
+      }
+    };
+
+    // Toast de pedido rápido
+    let toastTimeout: any;
+    window.quickRestock = function(sku: string, productName: string) {
+      const toast = document.getElementById("restock-toast");
+      const title = document.getElementById("toast-title");
+      const msg = document.getElementById("toast-msg");
+
+      if (!toast) return;
+
+      if (title) title.textContent = `Reorden: ${sku}`;
+      if (msg) msg.textContent = `Solicitud de pedido enviada para "${productName}".`;
+
+      toast.classList.remove("translate-y-24", "opacity-0", "pointer-events-none");
+      toast.classList.add("translate-y-0", "opacity-100");
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add("translate-y-24", "opacity-0", "pointer-events-none");
+        toast.classList.remove("translate-y-0", "opacity-100");
+      }, 3500);
+    };
+
+    // Filtro en tiempo real para la tabla de transacciones
+    const searchInput = document.getElementById("search-transactions-input") as HTMLInputElement | null;
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        const query = (e.target as HTMLInputElement).value.toLowerCase().trim();
+        const rows = document.querySelectorAll(".transaction-row");
+        let visibleCount = 0;
+
+        rows.forEach((row) => {
+          const text = (row as HTMLElement).textContent?.toLowerCase() || "";
+          if (text.includes(query)) {
+            (row as HTMLElement).style.display = "";
+            visibleCount++;
+          } else {
+            (row as HTMLElement).style.display = "none";
+          }
+        });
+
+        const summary = document.getElementById("table-summary-text");
+        if (summary) {
+          summary.textContent = `Mostrando ${visibleCount} transacciones encontradas`;
+        }
+      });
+    }
+
+    // Inicializar
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", loadSessionData);
+    } else {
+      loadSessionData();
     }
   </script>
 </Layout>
