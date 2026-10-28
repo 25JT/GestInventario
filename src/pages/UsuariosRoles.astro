@@ -3,6 +3,7 @@
 import Layout from "../layouts/Layout.astro";
 import SlideBar from "../components/SlideBar.astro";
 import NavBar from "../components/Nav.astro";
+import InvitacionToken from "../components/InvitacionToken.astro";
 ---
 
 <Layout title="Gestión de Usuarios y Roles - StockControl Enterprise JR">
@@ -36,6 +37,7 @@ import NavBar from "../components/Nav.astro";
               id="btn-new-user"
               class="h-[34px] px-4 bg-secondary-container hover:bg-secondary text-on-secondary rounded-xl text-[13px] font-semibold shadow-xs transition-all flex items-center gap-2 active:scale-95 cursor-pointer"
               type="button"
+              onclick="window.openUserModal && window.openUserModal()"
             >
               <span class="material-symbols-outlined text-[18px]">person_add</span>
               <span>+ Invitar / Nuevo Usuario</span>
@@ -838,120 +840,8 @@ import NavBar from "../components/Nav.astro";
     </div>
   </div>
 
-  {/* Modal de Invitar / Registrar Nuevo Usuario */}
-  <div id="userModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div id="userModalPanel" class="bg-surface-container-lowest rounded-2xl border border-surface-container/60 shadow-xl max-w-lg w-full p-6 space-y-5">
-      <div class="flex items-center justify-between pb-3 border-b border-surface-container/60">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-secondary-container/15 text-secondary flex items-center justify-center">
-            <span class="material-symbols-outlined text-[20px]">person_add</span>
-          </div>
-          <div>
-            <h2 class="text-[17px] font-bold text-on-surface">Invitar / Registrar Usuario</h2>
-            <p class="text-[12px] text-on-surface-variant">Configure las credenciales corporativas y el rol RBAC inicial.</p>
-          </div>
-        </div>
-        <button
-          id="btn-close-user-modal"
-          class="w-8 h-8 rounded-lg hover:bg-surface-container text-on-surface-variant flex items-center justify-center transition-colors cursor-pointer"
-          type="button"
-        >
-          <span class="material-symbols-outlined text-[20px]">close</span>
-        </button>
-      </div>
-
-      <form id="newUserForm" class="space-y-4" onsubmit="event.preventDefault(); window.saveNewUser();">
-        <div class="space-y-1">
-          <label class="text-[12px] font-semibold text-on-surface" for="newUserName">Nombre y Apellido *</label>
-          <input
-            id="newUserName"
-            type="text"
-            required
-            placeholder="ej. Valeria Rossi"
-            class="w-full h-10 px-3 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant border border-surface-container/60 focus:outline-none focus:bg-surface-container-low transition-colors"
-          />
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="space-y-1">
-            <label class="text-[12px] font-semibold text-on-surface" for="newUserEmail">Correo Corporativo *</label>
-            <input
-              id="newUserEmail"
-              type="email"
-              required
-              placeholder="v.rossi@stockcontrol.internal"
-              class="w-full h-10 px-3 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant border border-surface-container/60 focus:outline-none focus:bg-surface-container-low transition-colors font-mono"
-            />
-          </div>
-          <div class="space-y-1">
-            <label class="text-[12px] font-semibold text-on-surface" for="newUserId">ID / Username *</label>
-            <input
-              id="newUserId"
-              type="text"
-              required
-              placeholder="ID-00245"
-              class="w-full h-10 px-3 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant border border-surface-container/60 focus:outline-none focus:bg-surface-container-low transition-colors font-mono"
-            />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="space-y-1">
-            <label class="text-[12px] font-semibold text-on-surface" for="newUserRole">Rol Asignado (RBAC) *</label>
-            <select
-              id="newUserRole"
-              class="w-full h-10 px-3 bg-surface text-on-surface rounded-xl text-[13px] font-medium border border-surface-container/60 focus:outline-none cursor-pointer"
-            >
-              <option value="pos">Vendedor POS</option>
-              <option value="admin">Administrativo Operativo</option>
-              <option value="jefe">Jefe / SuperAdmin</option>
-            </select>
-          </div>
-          <div class="space-y-1">
-            <label class="text-[12px] font-semibold text-on-surface" for="newUserBranch">Sucursal de Operación *</label>
-            <select
-              id="newUserBranch"
-              class="w-full h-10 px-3 bg-surface text-on-surface rounded-xl text-[13px] font-medium border border-surface-container/60 focus:outline-none cursor-pointer"
-            >
-              <option value="Central Sucursal 01">Central Sucursal 01</option>
-              <option value="Punto Norte">Punto Norte</option>
-              <option value="Depósito Central">Depósito Central</option>
-              <option value="Sucursal Este">Sucursal Este</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="p-3 bg-surface-container-low rounded-xl flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-[18px] text-secondary">security</span>
-            <div class="flex flex-col">
-              <span class="text-[12px] font-semibold text-on-surface">Autenticación de 2 Factores (2FA)</span>
-              <span class="text-[11px] text-on-surface-variant">Requerir token TOTP en el primer inicio de sesión.</span>
-            </div>
-          </div>
-          <input type="checkbox" checked class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" />
-        </div>
-
-        <div class="flex items-center justify-end gap-3 pt-3 border-t border-surface-container/60">
-          <button
-            id="btn-cancel-user-modal"
-            type="button"
-            class="px-4 py-2 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container text-[13px] font-medium transition-colors cursor-pointer"
-          >
-            Cancelar
-          </button>
-          <button
-            id="btn-save-user"
-            type="submit"
-            class="px-5 py-2 rounded-xl bg-secondary-container hover:bg-secondary text-on-secondary text-[13px] font-semibold shadow-xs transition-colors cursor-pointer flex items-center gap-2"
-          >
-            <span class="material-symbols-outlined text-[18px]">send</span>
-            <span>Emitir Invitación</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
+  {/* Modal de Invitación RBAC y Alerta de Token */}
+  <InvitacionToken />
 
   {/* Notificación Toast */}
   <div id="userToast" class="fixed bottom-6 right-6 z-50 bg-primary text-on-primary px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 hidden pointer-events-none transition-all">
@@ -974,25 +864,13 @@ import NavBar from "../components/Nav.astro";
     (window as any).showUserToast = showUserToast;
     (window as any).filterRoleTab = filterRoleTab;
 
-    (window as any).saveNewUser = function() {
-      const nameInput = document.getElementById("newUserName") as HTMLInputElement | null;
-      const emailInput = document.getElementById("newUserEmail") as HTMLInputElement | null;
-      const roleSelect = document.getElementById("newUserRole") as HTMLSelectElement | null;
-
-      const name = nameInput?.value.trim();
-      const email = emailInput?.value.trim();
-      const role = roleSelect?.options[roleSelect.selectedIndex]?.text || "Vendedor POS";
-
-      if (!name || !email) {
-        showUserToast("Por favor complete el nombre y correo corporativo.", "warning");
-        return;
-      }
-
-      closeUserModal();
-      showUserToast(`Invitación enviada a ${name} (${role}) con token de seguridad.`);
-      if (nameInput) nameInput.value = "";
-      if (emailInput) emailInput.value = "";
-    };
+    if (!(window as any).saveNewUser) {
+      (window as any).saveNewUser = function() {
+        if ((window as any).submitGenerateToken) {
+          (window as any).submitGenerateToken();
+        }
+      };
+    }
 
     function setupUsuarios() {
       initUsuarios();

@@ -1,0 +1,722 @@
+---
+// InvitacionToken.astro - Modal de Generación de Invitación RBAC y Alerta de Token de Acceso
+---
+
+<!-- 1. OVERLAY / MODAL DE INVITACIÓN (Configuración de Sucursal y Rol) -->
+<div
+  class="fixed inset-0 z-50 bg-primary/45 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto hidden"
+  id="inviteUserModalOverlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="invite-modal-title"
+>
+  <!-- MODAL CONTAINER (800px max) -->
+  <div
+    class="w-full max-w-[800px] bg-surface-container-lowest rounded-2xl shadow-[0_20px_40px_-10px_rgba(9,20,38,0.22)] my-auto flex flex-col overflow-hidden border border-surface-container/70 max-h-[92vh]"
+    id="inviteUserModalContainer"
+  >
+    <!-- CABECERA DEL MODAL -->
+    <div class="px-5 sm:px-6 py-4 bg-surface-container-low flex items-start justify-between gap-4 border-b border-surface-container/60 shrink-0">
+      <div class="flex items-start gap-3.5">
+        <div class="w-11 h-11 rounded-xl bg-surface-container flex items-center justify-center shrink-0 text-secondary-container mt-0.5 shadow-xs">
+          <span class="material-symbols-outlined text-[24px]">admin_panel_settings</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h2 id="invite-modal-title" class="text-[17px] sm:text-[19px] font-bold text-primary tracking-tight">
+              Generar Invitación y Token de Acceso
+            </h2>
+            <span class="text-[11px] bg-surface-container text-secondary-container px-2 py-0.5 rounded-full font-semibold border border-secondary-container/20">
+              Credencial RBAC
+            </span>
+          </div>
+          <p class="text-[12px] sm:text-[13px] text-on-surface-variant mt-0.5 max-w-xl">
+            Seleccione la sucursal y asigne el rol operativo. El sistema generará una clave / token de primer acceso que deberá entregar al colaborador para que complete sus datos personales (nombre, correo y contraseña).
+          </p>
+        </div>
+      </div>
+      <button
+        class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container p-1.5 rounded-xl transition-colors shrink-0 cursor-pointer"
+        id="btnCloseInviteModal"
+        onclick="window.closeUserModal && window.closeUserModal()"
+        title="Cerrar modal (Esc)"
+        type="button"
+      >
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <!-- CUERPO PRINCIPAL DEL MODAL CON SCROLL ERGONÓMICO -->
+    <div class="px-5 sm:px-6 py-5 flex flex-col gap-5 overflow-y-auto">
+      
+      <!-- SECCIÓN 1: SUCURSAL Y DESTINO OPERATIVO -->
+      <div class="flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-surface-container text-primary font-bold text-[11px] flex items-center justify-center">1</span>
+            <h3 class="text-[13px] font-bold text-primary uppercase tracking-wide">Sucursal y Destino Operativo</h3>
+          </div>
+          <span class="text-[11px] text-on-surface-variant">* Obligatorio</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-0.5">
+          <!-- Asignación de Sucursal -->
+          <div class="sm:col-span-2 flex flex-col gap-1">
+            <label class="text-[12px] text-on-surface-variant font-medium flex items-center gap-1">
+              <span>Asignación de Sucursal / Terminal Almacén</span>
+              <span class="text-error font-bold">*</span>
+            </label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-secondary-container text-[18px]">store</span>
+              <select
+                id="inviteBranchSelect"
+                class="w-full h-[38px] pl-9 pr-8 bg-surface rounded-xl text-[13px] text-on-surface appearance-none border border-surface-container/70 focus:outline-none focus:bg-surface-container-lowest focus:border-secondary shadow-2xs transition-all cursor-pointer"
+              >
+                <option selected value="Central Sucursal 01">Central Sucursal 01 - Salón de Ventas &amp; POS (Almacén Principal)</option>
+                <option value="Sucursal Norte 02">Sucursal Norte 02 - Distribución &amp; Logística</option>
+                <option value="Sucursal Express 03">Sucursal Express 03 - Mostrador Rápido</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+            </div>
+          </div>
+
+          <!-- Identificador / Alias del Puesto -->
+          <div class="sm:col-span-2 flex flex-col gap-1">
+            <label class="text-[12px] text-on-surface-variant font-medium flex items-center justify-between">
+              <span>Identificador / Alias del Puesto (Opcional)</span>
+              <span class="text-[11px] text-on-surface-variant">Para control interno</span>
+            </label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">terminal</span>
+              <input
+                id="inviteTerminalAlias"
+                class="w-full h-[38px] pl-9 pr-3 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant/70 border border-surface-container/70 focus:outline-none focus:bg-surface-container-lowest focus:border-secondary shadow-2xs transition-all"
+                placeholder="Ej. Terminal Caja 03 - Turno Tarde"
+                type="text"
+                value="Terminal POS - Mostrador Principal"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 2: ASIGNACIÓN DE ROLES OPERATIVOS -->
+      <div class="flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-surface-container text-primary font-bold text-[11px] flex items-center justify-center">2</span>
+            <h3 class="text-[13px] font-bold text-primary uppercase tracking-wide">Asignación de Rol Operativo</h3>
+          </div>
+          <span class="text-[11px] text-secondary-container bg-surface-container px-2 py-0.5 rounded-md font-medium border border-secondary-container/20">
+            Matriz de Permisos RBAC
+          </span>
+        </div>
+        <p class="text-[12px] text-on-surface-variant">
+          Seleccione las facultades que tendrá el colaborador una vez que active su credencial con el token generado.
+        </p>
+
+        <div class="grid grid-cols-1 gap-2.5 mt-0.5" id="rolesSelectionGroup">
+          <!-- ROL 1: VENDEDOR POS -->
+          <label
+            class="role-card cursor-pointer group flex items-start gap-3.5 p-3.5 rounded-xl bg-surface-container-low hover:bg-surface-container border-2 border-secondary-container transition-all"
+            data-role="pos"
+            data-role-name="Vendedor POS / Mostrador"
+            data-role-code="POS"
+          >
+            <div class="pt-0.5">
+              <input
+                checked
+                name="userRoleRadio"
+                class="w-4 h-4 rounded text-secondary-container accent-secondary-container focus:ring-0 cursor-pointer"
+                type="radio"
+                value="pos"
+              />
+            </div>
+            <div class="flex-1 flex flex-col gap-1">
+              <div class="flex items-center justify-between flex-wrap gap-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-[13px] font-bold text-primary">Vendedor POS / Mostrador</span>
+                  <span class="role-badge text-[11px] bg-secondary-container text-on-secondary px-2 py-0.2 rounded-full font-semibold">
+                    Activo Asignado
+                  </span>
+                </div>
+                <span class="text-[11px] text-on-surface-variant font-medium">Nivel: Operativo Base</span>
+              </div>
+              <p class="text-[12px] text-on-surface leading-relaxed">
+                Acceso restringido únicamente al módulo 'Registro de Ventas' y cobro de mostrador. Consulta de inventario en modo catálogo (solo lectura de stock y precio de venta, sin costos).
+              </p>
+              <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                <span class="text-[11px] bg-surface-container-lowest text-secondary-container px-2 py-0.5 rounded-lg font-medium flex items-center gap-1 border border-surface-container/60 shadow-2xs">
+                  <span class="material-symbols-outlined text-[14px]">point_of_sale</span>+ Registro de Ventas
+                </span>
+                <span class="text-[11px] bg-surface-container-lowest text-secondary-container px-2 py-0.5 rounded-lg font-medium flex items-center gap-1 border border-surface-container/60 shadow-2xs">
+                  <span class="material-symbols-outlined text-[14px]">inventory_2</span>+ Consulta Catálogo y Stock
+                </span>
+                <span class="text-[11px] bg-surface-container-lowest text-on-surface-variant px-2 py-0.5 rounded-lg font-medium flex items-center gap-1 border border-surface-container/60 shadow-2xs">
+                  <span class="material-symbols-outlined text-[14px]">block</span>Sin acceso a costos ni gastos
+                </span>
+              </div>
+            </div>
+          </label>
+
+          <!-- ROL 2: ADMINISTRATIVO OPERATIVO -->
+          <label
+            class="role-card cursor-pointer group flex items-start gap-3.5 p-3.5 rounded-xl bg-surface-container-low hover:bg-surface-container border-2 border-transparent transition-all"
+            data-role="admin"
+            data-role-name="Administrativo Operativo"
+            data-role-code="ADM"
+          >
+            <div class="pt-0.5">
+              <input
+                name="userRoleRadio"
+                class="w-4 h-4 rounded text-secondary-container accent-secondary-container focus:ring-0 cursor-pointer"
+                type="radio"
+                value="admin"
+              />
+            </div>
+            <div class="flex-1 flex flex-col gap-1">
+              <div class="flex items-center justify-between flex-wrap gap-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-[13px] font-bold text-primary">Administrativo Operativo</span>
+                  <span class="role-badge text-[11px] bg-surface-container text-on-surface-variant px-2 py-0.2 rounded-full font-medium">
+                    Gestión Intermedia
+                  </span>
+                </div>
+                <span class="text-[11px] text-on-surface-variant font-medium">Nivel: Control Operacional</span>
+              </div>
+              <p class="text-[12px] text-on-surface-variant leading-relaxed">
+                Gestión integral de stock, altas de productos y variantes, registro de egresos operativos ('Gastos') y administración del módulo 'Servicios'. Restringido: no puede crear usuarios.
+              </p>
+              <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                <span class="text-[11px] bg-surface-container-lowest text-on-surface-variant px-2 py-0.5 rounded-lg font-medium flex items-center gap-1 border border-surface-container/60 shadow-2xs">
+                  <span class="material-symbols-outlined text-[14px]">add_box</span>+ CRUD Inventario
+                </span>
+                <span class="text-[11px] bg-surface-container-lowest text-on-surface-variant px-2 py-0.5 rounded-lg font-medium flex items-center gap-1 border border-surface-container/60 shadow-2xs">
+                  <span class="material-symbols-outlined text-[14px]">receipt_long</span>+ CRUD Gastos Operativos
+                </span>
+                <span class="text-[11px] bg-surface-container-lowest text-on-surface-variant px-2 py-0.5 rounded-lg font-medium flex items-center gap-1 border border-surface-container/60 shadow-2xs">
+                  <span class="material-symbols-outlined text-[14px]">construction</span>+ CRUD Servicios
+                </span>
+                <span class="text-[11px] bg-surface-container-lowest text-error px-2 py-0.5 rounded-lg font-medium flex items-center gap-1 border border-surface-container/60 shadow-2xs">
+                  <span class="material-symbols-outlined text-[14px]">lock</span>Restricción: No crea usuarios
+                </span>
+              </div>
+            </div>
+          </label>
+
+          <!-- ROL 3: JEFE / SUPERADMINISTRADOR -->
+          <label
+            class="role-card cursor-pointer group flex items-start gap-3.5 p-3.5 rounded-xl bg-surface-container-low hover:bg-surface-container border-2 border-transparent transition-all"
+            data-role="jefe"
+            data-role-name="Jefe / SuperAdministrador"
+            data-role-code="SUP"
+          >
+            <div class="pt-0.5">
+              <input
+                name="userRoleRadio"
+                class="w-4 h-4 rounded text-secondary-container accent-secondary-container focus:ring-0 cursor-pointer"
+                type="radio"
+                value="jefe"
+              />
+            </div>
+            <div class="flex-1 flex flex-col gap-1">
+              <div class="flex items-center justify-between flex-wrap gap-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-[13px] font-bold text-primary">Jefe / SuperAdministrador</span>
+                  <span class="role-badge text-[11px] bg-error-container text-on-error-container px-2 py-0.2 rounded-full font-bold">
+                    Máxima Jerarquía
+                  </span>
+                </div>
+                <span class="text-[11px] text-on-surface-variant font-medium">Nivel: Gobernanza Total</span>
+              </div>
+              <p class="text-[12px] text-on-surface-variant leading-relaxed">
+                Gobernanza completa del ERP, auditoría de transacciones, configuración de parámetros del sistema, alta/baja de usuarios y emisión de credenciales criptográficas.
+              </p>
+              <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                <span class="text-[11px] bg-surface-container-lowest text-primary font-semibold px-2 py-0.5 rounded-lg flex items-center gap-1 border border-surface-container/60 shadow-2xs">
+                  <span class="material-symbols-outlined text-[14px]">security</span>+ Control Total ERP
+                </span>
+                <span class="text-[11px] bg-surface-container-lowest text-primary font-semibold px-2 py-0.5 rounded-lg flex items-center gap-1 border border-surface-container/60 shadow-2xs">
+                  <span class="material-symbols-outlined text-[14px]">vpn_key</span>+ Asignación Roles RBAC
+                </span>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PIE DEL MODAL (FOOTER DE ACCIONES CORPORATIVAS) -->
+    <div class="px-5 sm:px-6 py-3.5 bg-surface-container-lowest flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-surface-container/60 shrink-0">
+      <div class="flex items-center gap-2 text-on-surface-variant text-[12px]">
+        <span class="material-symbols-outlined text-[16px] text-secondary">verified</span>
+        <span>Firma digital: <strong class="text-on-surface font-semibold">Carlos Mendoza (Jefe/Admin)</strong></span>
+      </div>
+      <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+        <button
+          class="h-[36px] px-4 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-xl text-[12px] font-medium transition-colors cursor-pointer"
+          id="btnCancelInviteModal"
+          onclick="window.closeUserModal && window.closeUserModal()"
+          type="button"
+        >
+          Cancelar
+        </button>
+        <button
+          class="h-[36px] px-5 bg-secondary-container hover:bg-secondary text-on-secondary rounded-xl text-[12px] font-bold flex items-center gap-2 shadow-xs transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+          id="btnGenerateTokenSubmit"
+          onclick="window.submitGenerateToken && window.submitGenerateToken()"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[18px]">key</span>
+          <span>Generar Token y Asignar Credencial</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. OVERLAY / ALERTA DE TOKEN GENERADO CON ÉXITO (Flotante Centrada) -->
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-primary/45 backdrop-blur-[6px] transition-opacity duration-200 hidden"
+  id="tokenModalOverlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="token-success-title"
+>
+  <div
+    class="relative w-full max-w-xl bg-surface-container-lowest rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-surface-container/70 max-h-[92vh]"
+    id="tokenModalContainer"
+  >
+    <!-- Barra de Acento Superior -->
+    <div class="h-1.5 w-full bg-gradient-to-r from-secondary via-secondary-container to-tertiary-fixed"></div>
+
+    <!-- Cabecera de la Ventana Modal -->
+    <div class="p-5 sm:p-6 pb-3 flex items-start justify-between gap-4">
+      <div class="flex items-start gap-3.5">
+        <!-- Icono de Llave Criptográfica -->
+        <div class="w-11 h-11 rounded-xl bg-surface-container-low flex items-center justify-center text-secondary-container shrink-0 shadow-xs border border-surface-container/60">
+          <span class="material-symbols-outlined text-[24px]">key</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <h2 id="token-success-title" class="text-[17px] sm:text-[19px] font-bold text-primary tracking-tight">
+              ¡Token de Acceso Generado con Éxito!
+            </h2>
+          </div>
+          <p class="text-[12px] sm:text-[13px] text-on-surface-variant mt-0.5 leading-relaxed">
+            Entrega este token único al nuevo colaborador para que configure su cuenta y datos personales (nombre, correo, teléfono y contraseña) en su <span class="text-primary font-semibold">Primer Acceso</span>.
+          </p>
+        </div>
+      </div>
+      <!-- Botón de Cerrar Modal -->
+      <button
+        class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low p-1.5 rounded-lg transition-colors shrink-0 cursor-pointer"
+        onclick="window.dismissTokenModal && window.dismissTokenModal()"
+        title="Cerrar ventana (Esc)"
+        type="button"
+      >
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <!-- Cuerpo del Modal -->
+    <div class="px-5 sm:px-6 py-3 flex flex-col gap-4 overflow-y-auto">
+      
+      <!-- 1. Resumen de la Asignación Previa -->
+      <div class="bg-surface-container-low/70 rounded-xl p-3.5 flex flex-col gap-1.5 border border-surface-container/60">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold">Perfil Pre-configurado</span>
+          <span class="inline-flex items-center gap-1 text-[11px] text-on-tertiary-container font-semibold bg-surface-container-lowest px-2 py-0.5 rounded-full shadow-2xs border border-surface-container/60">
+            <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            Listo para alta
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+          <!-- Rol y Permisos -->
+          <div class="flex flex-col">
+            <span class="text-[11px] text-on-surface-variant">Rol Asignado:</span>
+            <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+              <span class="text-[12px] font-semibold text-secondary-container bg-surface-container-lowest px-2 py-0.5 rounded-lg shadow-2xs border border-surface-container/60" id="tokenAssignedRoleBadge">
+                Vendedor POS / Mostrador
+              </span>
+              <span class="text-[10px] text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded">Caja</span>
+              <span class="text-[10px] text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded">Stock Local</span>
+            </div>
+          </div>
+
+          <!-- Sucursal y Vigencia -->
+          <div class="flex flex-col">
+            <span class="text-[11px] text-on-surface-variant">Sucursal &amp; Validez:</span>
+            <div class="flex flex-col mt-0.5">
+              <span class="text-[12px] text-primary font-semibold truncate flex items-center gap-1" id="tokenAssignedBranch">
+                <span class="material-symbols-outlined text-[15px] text-on-surface-variant">store</span>
+                Central Sucursal 01
+              </span>
+              <span class="text-[11px] text-on-surface-variant flex items-center gap-1 mt-0.5">
+                <span class="material-symbols-outlined text-[13px] text-error">timer</span>
+                Válido por 72 horas • 1 solo uso
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Caja Destacada del Token -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] text-on-surface-variant font-semibold uppercase tracking-wider flex items-center justify-between">
+          <span>Credencial de Activación Única</span>
+          <span class="text-secondary font-mono text-[11px] lowercase tracking-normal">sha256-encrypted</span>
+        </label>
+        <div class="bg-surface-container-high/40 rounded-xl p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-inner border border-surface-container">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-surface-container-lowest rounded-xl shadow-xs text-secondary-container border border-surface-container/60">
+              <span class="material-symbols-outlined text-[22px]">password</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="font-mono text-[20px] sm:text-[22px] tracking-wider font-bold text-primary select-all" id="tokenText">
+                STK-9482-POS-2024
+              </span>
+              <span class="text-[11px] text-on-surface-variant">Identificador criptográfico de un solo uso</span>
+            </div>
+          </div>
+
+          <!-- Botón de Copiar Token -->
+          <div class="flex items-center gap-2">
+            <button
+              class="h-9 px-3.5 bg-secondary-container hover:bg-secondary text-on-secondary rounded-xl text-[12px] font-semibold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer"
+              id="btnCopyToken"
+              onclick="window.copyTokenToClipboard && window.copyTokenToClipboard()"
+              type="button"
+            >
+              <span class="material-symbols-outlined text-[18px]" id="copyIcon">content_copy</span>
+              <span id="copyText">Copiar Token</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acciones Secundarias Rápidas -->
+      <div class="flex items-center justify-between gap-2 pt-0.5 flex-wrap">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button
+            class="h-8 px-2.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer border border-surface-container/60"
+            onclick="window.shareViaWhatsApp && window.shareViaWhatsApp()"
+            type="button"
+          >
+            <span class="material-symbols-outlined text-[16px] text-on-tertiary-container">chat</span>
+            <span>Enviar por WhatsApp</span>
+          </button>
+          <button
+            class="h-8 px-2.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer border border-surface-container/60"
+            onclick="window.downloadTokenCard && window.downloadTokenCard()"
+            type="button"
+          >
+            <span class="material-symbols-outlined text-[16px] text-on-surface-variant">qr_code_2</span>
+            <span>Descargar Ficha / QR</span>
+          </button>
+        </div>
+        <span class="hidden text-secondary text-[11px] font-semibold flex items-center gap-1" id="copyFeedback">
+          <span class="material-symbols-outlined text-[15px]">check_circle</span>
+          ¡Copiado con éxito!
+        </span>
+      </div>
+
+      <!-- 3. Instrucciones Rápidas para el Trabajador -->
+      <div class="bg-surface-container-lowest p-3 rounded-xl flex items-start gap-2.5 border border-surface-container/60">
+        <span class="material-symbols-outlined text-[18px] text-secondary-container mt-0.5 shrink-0">info</span>
+        <p class="text-[12px] text-on-surface-variant leading-relaxed">
+          El colaborador debe ingresar a: <strong class="text-primary font-mono select-all">stockcontrol.internal/primer-acceso</strong> e introducir este código para crear su PIN de firma y contraseña personal.
+        </p>
+      </div>
+    </div>
+
+    <!-- 4. Pie de la Ventana Modal Flotante -->
+    <div class="p-5 sm:p-6 pt-3 bg-surface-container-low/50 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 border-t border-surface-container/60 mt-1">
+      <a
+        class="text-[11px] text-on-surface-variant hover:text-secondary flex items-center gap-1 transition-colors"
+        href="#"
+        onclick="event.preventDefault(); window.showUserToast && window.showUserToast('Guía de primer acceso: stockcontrol.internal/docs/primer-acceso', 'info')"
+      >
+        <span class="material-symbols-outlined text-[15px]">help_outline</span>
+        <span>¿Cómo funciona el primer acceso guiado?</span>
+      </a>
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <button
+          class="h-[36px] px-3.5 bg-surface-container-lowest hover:bg-surface-container text-on-surface rounded-xl text-[12px] font-medium transition-colors shadow-xs border border-surface-container/60 w-full sm:w-auto cursor-pointer"
+          onclick="window.copyAndDismiss && window.copyAndDismiss()"
+          type="button"
+        >
+          Copiar y Cerrar
+        </button>
+        <button
+          class="h-[36px] px-4 bg-primary hover:bg-primary-container text-on-primary rounded-xl text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-xs w-full sm:w-auto cursor-pointer active:scale-95"
+          onclick="window.dismissTokenModal && window.dismissTokenModal()"
+          type="button"
+        >
+          <span>Listo, Volver a Usuarios</span>
+          <span class="material-symbols-outlined text-[17px]">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LÓGICA DE CONTROL, GSAP Y EVENTOS -->
+<script>
+  import gsap from "gsap";
+
+  // Estado del rol seleccionado
+  let selectedRoleName = "Vendedor POS / Mostrador";
+  let selectedRoleCode = "POS";
+
+  // 1. Apertura y Cierre del Modal de Invitación
+  (window as any).openUserModal = function () {
+    const modal = document.getElementById("inviteUserModalOverlay");
+    const container = document.getElementById("inviteUserModalContainer");
+    if (!modal || !container) return;
+
+    modal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+
+    gsap.killTweensOf([modal, container]);
+    gsap.fromTo(modal, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" });
+    gsap.fromTo(
+      container,
+      { scale: 0.94, y: 16, opacity: 0 },
+      { scale: 1, y: 0, opacity: 1, duration: 0.25, ease: "power2.out" }
+    );
+  };
+
+  (window as any).closeUserModal = function () {
+    const modal = document.getElementById("inviteUserModalOverlay");
+    const container = document.getElementById("inviteUserModalContainer");
+    if (!modal || !container) return;
+
+    document.body.style.overflow = "";
+
+    gsap.killTweensOf([modal, container]);
+    gsap.to(container, {
+      scale: 0.96,
+      opacity: 0,
+      duration: 0.16,
+      ease: "power2.in",
+    });
+    gsap.to(modal, {
+      opacity: 0,
+      duration: 0.18,
+      ease: "power2.in",
+      onComplete: () => {
+        modal.classList.add("hidden");
+      },
+    });
+  };
+
+  // 2. Generar Token y Asignar Credencial (Cierra invitación y abre alerta)
+  (window as any).submitGenerateToken = function () {
+    const branchSelect = document.getElementById("inviteBranchSelect") as HTMLSelectElement | null;
+    const branchName = branchSelect?.value || "Central Sucursal 01";
+
+    // Generar token dinámico único
+    const randNum = Math.floor(1000 + Math.random() * 9000);
+    const generatedToken = `STK-${randNum}-${selectedRoleCode}-2024`;
+
+    // Sincronizar datos con el modal de alerta
+    const tokenTextEl = document.getElementById("tokenText");
+    const roleBadgeEl = document.getElementById("tokenAssignedRoleBadge");
+    const branchTextEl = document.getElementById("tokenAssignedBranch");
+
+    if (tokenTextEl) tokenTextEl.textContent = generatedToken;
+    if (roleBadgeEl) roleBadgeEl.textContent = selectedRoleName;
+    if (branchTextEl) {
+      branchTextEl.innerHTML = `<span class="material-symbols-outlined text-[15px] text-on-surface-variant">store</span> ${branchName}`;
+    }
+
+    // Cerrar modal de invitación
+    (window as any).closeUserModal();
+
+    // Abrir modal de token con animación tras breve transición
+    setTimeout(() => {
+      (window as any).openTokenModal();
+      if ((window as any).showUserToast) {
+        (window as any).showUserToast(`Token ${generatedToken} emitido con éxito.`, "success");
+      }
+    }, 220);
+  };
+
+  // 3. Control del Modal Flotante de Token
+  (window as any).openTokenModal = function () {
+    const modal = document.getElementById("tokenModalOverlay");
+    const container = document.getElementById("tokenModalContainer");
+    if (!modal || !container) return;
+
+    modal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+
+    gsap.killTweensOf([modal, container]);
+    gsap.fromTo(modal, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" });
+    gsap.fromTo(
+      container,
+      { scale: 0.94, y: 16, opacity: 0 },
+      { scale: 1, y: 0, opacity: 1, duration: 0.25, ease: "power2.out" }
+    );
+  };
+
+  (window as any).dismissTokenModal = function () {
+    const modal = document.getElementById("tokenModalOverlay");
+    const container = document.getElementById("tokenModalContainer");
+    if (!modal || !container) return;
+
+    document.body.style.overflow = "";
+
+    gsap.killTweensOf([modal, container]);
+    gsap.to(container, {
+      scale: 0.96,
+      opacity: 0,
+      duration: 0.16,
+      ease: "power2.in",
+    });
+    gsap.to(modal, {
+      opacity: 0,
+      duration: 0.18,
+      ease: "power2.in",
+      onComplete: () => {
+        modal.classList.add("hidden");
+      },
+    });
+  };
+
+  // 4. Copiar al Portapapeles
+  (window as any).copyTokenToClipboard = function () {
+    const token = document.getElementById("tokenText")?.textContent?.trim() || "";
+    if (!token) return;
+
+    navigator.clipboard.writeText(token).then(() => {
+      showCopyFeedback();
+    }).catch(() => {
+      showCopyFeedback();
+    });
+  };
+
+  function showCopyFeedback() {
+    const copyIcon = document.getElementById("copyIcon");
+    const copyText = document.getElementById("copyText");
+    const feedback = document.getElementById("copyFeedback");
+    const btn = document.getElementById("btnCopyToken");
+
+    if (copyIcon && copyText) {
+      copyIcon.textContent = "check";
+      copyText.textContent = "¡Copiado!";
+    }
+    if (btn) {
+      btn.classList.remove("bg-secondary-container", "hover:bg-secondary");
+      btn.classList.add("bg-secondary", "text-on-secondary");
+    }
+    if (feedback) feedback.classList.remove("hidden");
+
+    setTimeout(() => {
+      if (copyIcon && copyText) {
+        copyIcon.textContent = "content_copy";
+        copyText.textContent = "Copiar Token";
+      }
+      if (btn) {
+        btn.classList.add("bg-secondary-container", "hover:bg-secondary");
+        btn.classList.remove("bg-secondary", "text-on-secondary");
+      }
+      if (feedback) feedback.classList.add("hidden");
+    }, 2500);
+  }
+
+  (window as any).copyAndDismiss = function () {
+    (window as any).copyTokenToClipboard();
+    setTimeout(() => {
+      (window as any).dismissTokenModal();
+    }, 450);
+  };
+
+  (window as any).shareViaWhatsApp = function () {
+    const token = document.getElementById("tokenText")?.textContent?.trim() || "";
+    const message = encodeURIComponent(
+      `Hola, aquí tienes tu Token de Activación para StockControl ERP: ${token}. Ingresa en https://stockcontrol.internal/primer-acceso para configurar tu usuario.`
+    );
+    window.open(`https://api.whatsapp.com/send?text=${message}`, "_blank");
+  };
+
+  (window as any).downloadTokenCard = function () {
+    if ((window as any).showUserToast) {
+      (window as any).showUserToast("Generando credencial de acceso PDF con código QR institucional...", "info");
+    }
+  };
+
+  // 5. Configurar Selección Interactiva de Roles
+  function setupRoleCards() {
+    const cards = document.querySelectorAll(".role-card");
+    cards.forEach((card) => {
+      const radio = card.querySelector('input[type="radio"]') as HTMLInputElement | null;
+      card.addEventListener("click", () => {
+        cards.forEach((c) => {
+          c.classList.remove("border-secondary-container");
+          c.classList.add("border-transparent");
+        });
+        card.classList.remove("border-transparent");
+        card.classList.add("border-secondary-container");
+
+        if (radio) radio.checked = true;
+
+        selectedRoleName = card.getAttribute("data-role-name") || "Vendedor POS / Mostrador";
+        selectedRoleCode = card.getAttribute("data-role-code") || "POS";
+      });
+    });
+  }
+
+  // 6. Atajo de Teclado Escape
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const tokenModal = document.getElementById("tokenModalOverlay");
+      const inviteModal = document.getElementById("inviteUserModalOverlay");
+
+      if (tokenModal && !tokenModal.classList.contains("hidden")) {
+        (window as any).dismissTokenModal();
+      } else if (inviteModal && !inviteModal.classList.contains("hidden")) {
+        (window as any).closeUserModal();
+      }
+    }
+  });
+
+  // 7. Cierre por clic en backdrop exterior
+  function setupBackdropClicks() {
+    const inviteOverlay = document.getElementById("inviteUserModalOverlay");
+    if (inviteOverlay) {
+      inviteOverlay.addEventListener("click", (e) => {
+        if (e.target === inviteOverlay) {
+          (window as any).closeUserModal();
+        }
+      });
+    }
+
+    const tokenOverlay = document.getElementById("tokenModalOverlay");
+    if (tokenOverlay) {
+      tokenOverlay.addEventListener("click", (e) => {
+        if (e.target === tokenOverlay) {
+          (window as any).dismissTokenModal();
+        }
+      });
+    }
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    setupRoleCards();
+    setupBackdropClicks();
+  });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      setupRoleCards();
+      setupBackdropClicks();
+    });
+  } else {
+    setupRoleCards();
+    setupBackdropClicks();
+  }
+</script>

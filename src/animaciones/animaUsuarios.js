@@ -4,32 +4,34 @@ import gsap from "gsap";
  * Control del Modal de Invitar / Registrar Usuario
  */
 export function openUserModal() {
-  const modal = document.getElementById("userModal");
-  const panel = document.getElementById("userModalPanel");
+  const modal = document.getElementById("inviteUserModalOverlay") || document.getElementById("userModal");
+  const panel = document.getElementById("inviteUserModalContainer") || document.getElementById("userModalPanel");
   if (!modal || !panel) return;
 
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
 
+  gsap.killTweensOf([modal, panel]);
   gsap.fromTo(modal, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" });
   gsap.fromTo(
     panel,
-    { scale: 0.92, y: 16, opacity: 0 },
+    { scale: 0.94, y: 16, opacity: 0 },
     { scale: 1, y: 0, opacity: 1, duration: 0.25, ease: "power2.out" }
   );
 }
 
 export function closeUserModal() {
-  const modal = document.getElementById("userModal");
-  const panel = document.getElementById("userModalPanel");
+  const modal = document.getElementById("inviteUserModalOverlay") || document.getElementById("userModal");
+  const panel = document.getElementById("inviteUserModalContainer") || document.getElementById("userModalPanel");
   if (!modal || !panel) return;
 
   document.body.style.overflow = "";
 
+  gsap.killTweensOf([modal, panel]);
   gsap.to(panel, {
-    scale: 0.95,
+    scale: 0.96,
     opacity: 0,
-    duration: 0.18,
+    duration: 0.16,
     ease: "power2.in",
   });
 
@@ -195,9 +197,9 @@ export function initUsuarios() {
 
   // 3. Modal de nuevo usuario
   const btnNewUser = document.getElementById("btn-new-user");
-  const btnCloseModal = document.getElementById("btn-close-user-modal");
-  const btnCancelModal = document.getElementById("btn-cancel-user-modal");
-  const modalBackdrop = document.getElementById("userModal");
+  const btnCloseModal = document.getElementById("btnCloseInviteModal") || document.getElementById("btn-close-user-modal");
+  const btnCancelModal = document.getElementById("btnCancelInviteModal") || document.getElementById("btn-cancel-user-modal");
+  const modalBackdrop = document.getElementById("inviteUserModalOverlay") || document.getElementById("userModal");
 
   if (btnNewUser) btnNewUser.addEventListener("click", openUserModal);
   if (btnCloseModal) btnCloseModal.addEventListener("click", closeUserModal);
@@ -214,7 +216,7 @@ export function initUsuarios() {
   // Atajo de escape para cerrar modal
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      const modal = document.getElementById("userModal");
+      const modal = document.getElementById("inviteUserModalOverlay") || document.getElementById("userModal");
       if (modal && !modal.classList.contains("hidden")) {
         closeUserModal();
       }
