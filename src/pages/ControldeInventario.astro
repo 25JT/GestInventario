@@ -4,6 +4,7 @@ import Layout from "../layouts/Layout.astro";
 import SlideBar from "../components/SlideBar.astro";
 import NavBar from "../components/Nav.astro";
 import AggCategoria from "../components/AggCategoria.astro";
+import CarMasivaProductos from "../components/CarMasivaProductos.astro";
 ---
 
 <Layout title="Control de Inventario - StockControl Enterprise JR">
@@ -35,11 +36,12 @@ import AggCategoria from "../components/AggCategoria.astro";
 
           <!-- Quick Action Controls -->
           <div class="flex flex-wrap items-center gap-2.5">
-            {/* 1. Botón Carga Masiva (preparado para modal o drawer posterior) */}
+            {/* 1. Botón Carga Masiva (abre componente modal CarMasivaProductos) */}
             <button
               id="btn-bulk-upload"
               class="h-[38px] px-3.5 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface rounded-xl font-label-md text-[13px] font-medium border border-surface-container/70 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
               type="button"
+              onclick="window.openBulkUploadModal && window.openBulkUploadModal()"
               title="Importar catálogo masivo vía CSV o Excel"
             >
               <span class="material-symbols-outlined text-[18px] text-on-surface-variant">upload_file</span>
@@ -1047,6 +1049,9 @@ import AggCategoria from "../components/AggCategoria.astro";
   <!-- Componente Modal de Gestión y Creación de Categorías -->
   <AggCategoria />
 
+  <!-- Componente Modal de Carga Masiva de Productos -->
+  <CarMasivaProductos />
+
   <script>
     import {
       initInventoryAnimations,
@@ -1064,6 +1069,13 @@ import AggCategoria from "../components/AggCategoria.astro";
     (window as any).onOpenCategoryModal = function() {
       if (typeof (window as any).openCategoryModal === "function") {
         (window as any).openCategoryModal();
+      }
+    };
+
+    // Vincular apertura del modal de carga masiva
+    (window as any).onOpenBulkUploadModal = function() {
+      if (typeof (window as any).openBulkUploadModal === "function") {
+        (window as any).openBulkUploadModal();
       }
     };
 
