@@ -880,14 +880,16 @@ import NavBar from "../components/Nav.astro";
     }
 
     // Inicializar carga de datos y animaciones GSAP
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
-        loadSessionData();
-        initDashboardAnimations();
-      });
-    } else {
+    function setupDash() {
       loadSessionData();
       initDashboardAnimations();
+    }
+
+    document.addEventListener("astro:page-load", setupDash);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setupDash);
+    } else {
+      setupDash();
     }
   </script>
 </Layout>

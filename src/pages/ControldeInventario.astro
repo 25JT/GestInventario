@@ -1068,12 +1068,15 @@ import AggCategoria from "../components/AggCategoria.astro";
     };
 
     // Inicializar eventos y micro-interacciones de inventario
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
-        initInventoryAnimations();
-      });
-    } else {
+    function setupInventory() {
       initInventoryAnimations();
+    }
+
+    document.addEventListener("astro:page-load", setupInventory);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setupInventory);
+    } else {
+      setupInventory();
     }
   </script>
 </Layout>

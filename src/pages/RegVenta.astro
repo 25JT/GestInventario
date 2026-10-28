@@ -1178,22 +1178,20 @@ import NavBar from "../components/Nav.astro";
     }
 
     // Inicializar eventos de teclado y componentes
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
-        loadCashierSession();
-        initVentas();
-        const searchInput = document.getElementById("productSearch");
-        if (searchInput) {
-          searchInput.addEventListener("input", filterProductsLive);
-        }
-      });
-    } else {
+    function setupSales() {
       loadCashierSession();
       initVentas();
       const searchInput = document.getElementById("productSearch");
       if (searchInput) {
         searchInput.addEventListener("input", filterProductsLive);
       }
+    }
+
+    document.addEventListener("astro:page-load", setupSales);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setupSales);
+    } else {
+      setupSales();
     }
   </script>
 </Layout>

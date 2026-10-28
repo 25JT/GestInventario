@@ -904,12 +904,15 @@ import NavBar from "../components/Nav.astro";
       showServiceToast(`Servicio "${name}" incorporado al catálogo exitosamente.`);
     };
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
-        initServicios();
-      });
-    } else {
+    function setupServicios() {
       initServicios();
+    }
+
+    document.addEventListener("astro:page-load", setupServicios);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setupServicios);
+    } else {
+      setupServicios();
     }
   </script>
 </Layout>

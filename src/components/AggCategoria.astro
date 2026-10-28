@@ -18,19 +18,26 @@
       <div class="flex flex-col gap-2">
         <!-- Migas de pan y botón de cierre -->
         <div class="flex items-center justify-between">
-          <nav class="flex items-center gap-1.5 text-on-surface-variant text-[12px] font-medium">
+          <nav
+            class="flex items-center gap-1.5 text-on-surface-variant text-[12px] font-medium"
+          >
             <button
               type="button"
               onclick="window.closeCategoryModal()"
               class="hover:text-primary transition-colors flex items-center gap-1 cursor-pointer"
             >
-              <span class="material-symbols-outlined text-[15px]">inventory_2</span>
+              <span class="material-symbols-outlined text-[15px]"
+                >inventory_2</span
+              >
               <span>Control de Inventario</span>
             </button>
-            <span class="material-symbols-outlined text-[13px] text-outline-variant">chevron_right</span>
-            <span class="text-on-surface-variant">Catálogo Maestro</span>
-            <span class="material-symbols-outlined text-[13px] text-outline-variant">chevron_right</span>
-            <span class="text-primary font-semibold">Gestión de Categorías</span>
+
+            <span
+              class="material-symbols-outlined text-[13px] text-outline-variant"
+              >chevron_right</span
+            >
+            <span class="text-primary font-semibold">Gestión de Categorías</span
+            >
           </nav>
 
           <button
@@ -44,13 +51,22 @@
         </div>
 
         <!-- Barra de Título y Acciones -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-1">
+        <div
+          class="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-1"
+        >
           <div class="flex flex-col max-w-2xl">
-            <h1 id="modal-category-title" class="text-[22px] sm:text-[26px] font-bold text-primary tracking-tight">
+            <h1
+              id="modal-category-title"
+              class="text-[22px] sm:text-[26px] font-bold text-primary tracking-tight"
+            >
               Gestión de Categorías de Inventario
             </h1>
-            <p class="text-[13px] sm:text-[14px] text-on-surface-variant mt-0.5">
-              Define, organiza y personaliza las familias del catálogo maestro. Las categorías activas se reflejarán instantáneamente en el alta de productos, transferencias y filtros de punto de venta.
+            <p
+              class="text-[13px] sm:text-[14px] text-on-surface-variant mt-0.5"
+            >
+              Define, organiza y personaliza las familias del catálogo maestro.
+              Las categorías activas se reflejarán instantáneamente en el alta
+              de productos, transferencias y filtros de punto de venta.
             </p>
           </div>
           <div class="flex items-center gap-2 shrink-0 flex-wrap">
@@ -59,7 +75,9 @@
               class="h-[34px] px-3.5 bg-surface-container-lowest text-on-surface text-[13px] font-medium rounded-xl hover:bg-surface-container border border-surface-container/60 shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
               type="button"
             >
-              <span class="material-symbols-outlined text-[17px]">arrow_back</span>
+              <span class="material-symbols-outlined text-[17px]"
+                >arrow_back</span
+              >
               <span>Volver a Inventario</span>
             </button>
             <button
@@ -68,7 +86,9 @@
               title="Exportar taxonomía"
               type="button"
             >
-              <span class="material-symbols-outlined text-[17px]">file_download</span>
+              <span class="material-symbols-outlined text-[17px]"
+                >file_download</span
+              >
               <span>Exportar</span>
             </button>
             <button
@@ -76,7 +96,9 @@
               class="h-[34px] px-3.5 bg-secondary-container hover:bg-secondary text-on-secondary text-[13px] font-semibold rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
               type="button"
             >
-              <span class="material-symbols-outlined text-[18px]">add_circle</span>
+              <span class="material-symbols-outlined text-[18px]"
+                >add_circle</span
+              >
               <span>Nueva Categoría</span>
             </button>
           </div>
@@ -86,35 +108,65 @@
       <!-- Métricas Rápidas / KPIs Operativos -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Card 1 -->
-        <div class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 border border-surface-container/60 shadow-xs flex flex-col justify-between">
+        <div
+          class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 border border-surface-container/60 shadow-xs flex flex-col justify-between"
+        >
           <div class="flex items-center justify-between">
-            <span class="text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold">Categorías Activas</span>
-            <span class="px-2 py-0.5 rounded-lg bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container animate-pulse"></span>
+            <span
+              class="text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold"
+              >Categorías Activas</span
+            >
+            <span
+              class="px-2 py-0.5 rounded-lg bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold flex items-center gap-1"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container animate-pulse"
+              ></span>
               Sincronizado
             </span>
           </div>
           <div class="my-2 flex items-baseline gap-2">
-            <span id="cat-count-active" class="text-[28px] text-primary font-bold tracking-tight">8</span>
-            <span class="text-[12px] text-on-surface-variant">familias maestras</span>
+            <span
+              id="cat-count-active"
+              class="text-[28px] text-primary font-bold tracking-tight">8</span
+            >
+            <span class="text-[12px] text-on-surface-variant"
+              >familias maestras</span
+            >
           </div>
-          <div class="text-[12px] text-on-surface-variant flex items-center gap-1">
-            <span class="material-symbols-outlined text-[15px] text-secondary">sync_alt</span>
+          <div
+            class="text-[12px] text-on-surface-variant flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-[15px] text-secondary"
+              >sync_alt</span
+            >
             <span>Disponibles en módulo POS y Compras</span>
           </div>
         </div>
 
         <!-- Card 2 -->
-        <div class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 border border-surface-container/60 shadow-xs flex flex-col justify-between">
+        <div
+          class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 border border-surface-container/60 shadow-xs flex flex-col justify-between"
+        >
           <div class="flex items-center justify-between">
-            <span class="text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold">Artículos Vinculados</span>
-            <div class="w-7 h-7 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary">
-              <span class="material-symbols-outlined text-[17px]">category</span>
+            <span
+              class="text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold"
+              >Artículos Vinculados</span
+            >
+            <div
+              class="w-7 h-7 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary"
+            >
+              <span class="material-symbols-outlined text-[17px]">category</span
+              >
             </div>
           </div>
           <div class="my-2 flex items-baseline gap-2">
-            <span class="text-[28px] text-primary font-bold tracking-tight">852</span>
-            <span class="text-[12px] text-on-tertiary-container font-semibold">100% clasificado</span>
+            <span class="text-[28px] text-primary font-bold tracking-tight"
+              >852</span
+            >
+            <span class="text-[12px] text-on-tertiary-container font-semibold"
+              >100% clasificado</span
+            >
           </div>
           <div class="text-[12px] text-on-surface-variant">
             <span>Sin ítems huérfanos en catálogo actual</span>
@@ -122,36 +174,70 @@
         </div>
 
         <!-- Card 3 -->
-        <div class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 border border-surface-container/60 shadow-xs flex flex-col justify-between">
+        <div
+          class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 border border-surface-container/60 shadow-xs flex flex-col justify-between"
+        >
           <div class="flex items-center justify-between">
-            <span class="text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold">Líder en Valorización</span>
-            <span class="px-2 py-0.5 rounded-lg bg-surface-container text-on-surface text-[11px] font-semibold">Top #1</span>
+            <span
+              class="text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold"
+              >Líder en Valorización</span
+            >
+            <span
+              class="px-2 py-0.5 rounded-lg bg-surface-container text-on-surface text-[11px] font-semibold"
+              >Top #1</span
+            >
           </div>
           <div class="my-2 flex flex-col">
-            <span class="text-[16px] text-primary font-bold truncate">Electrónicos &amp; Sensores</span>
-            <div class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant text-[11px]">
+            <span class="text-[16px] text-primary font-bold truncate"
+              >Electrónicos &amp; Sensores</span
+            >
+            <div
+              class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant text-[11px]"
+            >
               <span>310 unidades</span>
               <span>•</span>
-              <span class="font-semibold text-primary font-mono">$48,200.00 USD</span>
+              <span class="font-semibold text-primary font-mono"
+                >$48,200.00 USD</span
+              >
             </div>
           </div>
-          <div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden mt-1">
-            <div class="bg-secondary h-full rounded-full" style="width: 48%"></div>
+          <div
+            class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden mt-1"
+          >
+            <div class="bg-secondary h-full rounded-full" style="width: 48%">
+            </div>
           </div>
         </div>
 
         <!-- Card 4 -->
-        <div class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 border border-surface-container/60 shadow-xs flex flex-col justify-between">
+        <div
+          class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 border border-surface-container/60 shadow-xs flex flex-col justify-between"
+        >
           <div class="flex items-center justify-between">
-            <span class="text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold">Disponibles / Vacías</span>
-            <span class="px-2 py-0.5 rounded-lg bg-surface-container-low text-secondary text-[11px] font-semibold">Preparadas</span>
+            <span
+              class="text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold"
+              >Disponibles / Vacías</span
+            >
+            <span
+              class="px-2 py-0.5 rounded-lg bg-surface-container-low text-secondary text-[11px] font-semibold"
+              >Preparadas</span
+            >
           </div>
           <div class="my-2 flex items-baseline gap-2">
-            <span class="text-[28px] text-primary font-bold tracking-tight">1</span>
-            <span class="text-[12px] text-on-surface-variant">nueva categoría lista</span>
+            <span class="text-[28px] text-primary font-bold tracking-tight"
+              >1</span
+            >
+            <span class="text-[12px] text-on-surface-variant"
+              >nueva categoría lista</span
+            >
           </div>
-          <div class="text-[12px] text-on-surface-variant flex items-center gap-1">
-            <span class="material-symbols-outlined text-[15px] text-on-tertiary-container">check_circle</span>
+          <div
+            class="text-[12px] text-on-surface-variant flex items-center gap-1"
+          >
+            <span
+              class="material-symbols-outlined text-[15px] text-on-tertiary-container"
+              >check_circle</span
+            >
             <span>Apta para carga masiva y SKU</span>
           </div>
         </div>
@@ -160,18 +246,32 @@
       <!-- Layout Principal de 2 Columnas -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <!-- COLUMNA IZQUIERDA: Formulario de Creación / Edición Dinámica -->
-        <div class="lg:col-span-4 bg-surface-container-lowest rounded-2xl border border-surface-container/60 shadow-xs p-5 sm:p-6 flex flex-col gap-4">
-          <div class="flex items-center justify-between pb-2 border-b border-surface-container/60">
+        <div
+          class="lg:col-span-4 bg-surface-container-lowest rounded-2xl border border-surface-container/60 shadow-xs p-5 sm:p-6 flex flex-col gap-4"
+        >
+          <div
+            class="flex items-center justify-between pb-2 border-b border-surface-container/60"
+          >
             <div class="flex items-center gap-2.5">
               <div
                 class="w-9 h-9 rounded-xl bg-secondary-container text-on-secondary flex items-center justify-center shadow-xs"
                 id="form-icon-preview"
               >
-                <span class="material-symbols-outlined text-[20px]" id="preview-icon-symbol">bolt</span>
+                <span
+                  class="material-symbols-outlined text-[20px]"
+                  id="preview-icon-symbol">bolt</span
+                >
               </div>
               <div>
-                <h2 class="text-[16px] text-primary font-bold" id="form-heading">Nueva Categoría</h2>
-                <p class="text-[11px] text-on-surface-variant">Configura prefijo, visuales y reglas</p>
+                <h2
+                  class="text-[16px] text-primary font-bold"
+                  id="form-heading"
+                >
+                  Nueva Categoría
+                </h2>
+                <p class="text-[11px] text-on-surface-variant">
+                  Configura prefijo, visuales y reglas
+                </p>
               </div>
             </div>
             <button
@@ -180,16 +280,29 @@
               title="Restablecer formulario"
               type="button"
             >
-              <span class="material-symbols-outlined text-[18px]">restart_alt</span>
+              <span class="material-symbols-outlined text-[18px]"
+                >restart_alt</span
+              >
             </button>
           </div>
 
-          <form class="flex flex-col gap-4" id="category-form" onsubmit="window.handleCategoryFormSubmit(event)">
+          <form
+            class="flex flex-col gap-4"
+            id="category-form"
+            onsubmit="window.handleCategoryFormSubmit(event)"
+          >
             <!-- Campo: Nombre -->
             <div class="flex flex-col gap-1">
-              <label class="text-[12px] text-primary font-semibold flex items-center justify-between" for="cat-name">
-                <span>Nombre de Categoría <span class="text-error">*</span></span>
-                <span class="text-[11px] text-on-surface-variant font-normal">Obligatorio</span>
+              <label
+                class="text-[12px] text-primary font-semibold flex items-center justify-between"
+                for="cat-name"
+              >
+                <span
+                  >Nombre de Categoría <span class="text-error">*</span></span
+                >
+                <span class="text-[11px] text-on-surface-variant font-normal"
+                  >Obligatorio</span
+                >
               </label>
               <input
                 class="w-full h-10 px-3 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant/70 border border-surface-container/60 focus:outline-none focus:bg-surface-container-lowest transition-all"
@@ -205,8 +318,13 @@
             <!-- Campo: Código / Prefijo SKU sugerido -->
             <div class="flex flex-col gap-1">
               <div class="flex items-center justify-between">
-                <label class="text-[12px] text-primary font-semibold" for="cat-prefix">Prefijo SKU Sugerido</label>
-                <span class="text-[11px] text-secondary font-medium">Autogenerado</span>
+                <label
+                  class="text-[12px] text-primary font-semibold"
+                  for="cat-prefix">Prefijo SKU Sugerido</label
+                >
+                <span class="text-[11px] text-secondary font-medium"
+                  >Autogenerado</span
+                >
               </div>
               <div class="relative flex items-center">
                 <input
@@ -217,16 +335,23 @@
                   placeholder="ELEC"
                   type="text"
                 />
-                <div class="absolute right-2 px-2 py-0.5 rounded bg-surface-container text-on-surface-variant text-[11px] font-mono font-semibold">
+                <div
+                  class="absolute right-2 px-2 py-0.5 rounded bg-surface-container text-on-surface-variant text-[11px] font-mono font-semibold"
+                >
                   -XXXX
                 </div>
               </div>
-              <span class="text-[11px] text-on-surface-variant">Se antepondrá como formato estándar para nuevos artículos vinculados.</span>
+              <span class="text-[11px] text-on-surface-variant"
+                >Se antepondrá como formato estándar para nuevos artículos
+                vinculados.</span
+              >
             </div>
 
             <!-- Selector de Color e Icono -->
             <div class="flex flex-col gap-2">
-              <label class="text-[12px] text-primary font-semibold">Color de Etiqueta &amp; Identificador</label>
+              <label class="text-[12px] text-primary font-semibold"
+                >Color de Etiqueta &amp; Identificador</label
+              >
               <!-- Paleta de colores de diseño -->
               <div class="grid grid-cols-6 gap-2" id="color-palette-group">
                 <button
@@ -234,54 +359,74 @@
                   onclick="window.selectColorBadge('blue', '#316bf3', this)"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-white text-[16px]">check</span>
+                  <span class="material-symbols-outlined text-white text-[16px]"
+                    >check</span
+                  >
                 </button>
                 <button
                   class="color-badge-opt h-8 rounded-xl bg-on-tertiary-container flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
                   onclick="window.selectColorBadge('emerald', '#00a472', this)"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-white text-[16px] hidden">check</span>
+                  <span
+                    class="material-symbols-outlined text-white text-[16px] hidden"
+                    >check</span
+                  >
                 </button>
                 <button
                   class="color-badge-opt h-8 rounded-xl bg-secondary flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
                   onclick="window.selectColorBadge('indigo', '#0051d5', this)"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-white text-[16px] hidden">check</span>
+                  <span
+                    class="material-symbols-outlined text-white text-[16px] hidden"
+                    >check</span
+                  >
                 </button>
                 <button
                   class="color-badge-opt h-8 rounded-xl bg-amber-600 flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
                   onclick="window.selectColorBadge('amber', '#d97706', this)"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-white text-[16px] hidden">check</span>
+                  <span
+                    class="material-symbols-outlined text-white text-[16px] hidden"
+                    >check</span
+                  >
                 </button>
                 <button
                   class="color-badge-opt h-8 rounded-xl bg-primary flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
                   onclick="window.selectColorBadge('dark', '#091426', this)"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-white text-[16px] hidden">check</span>
+                  <span
+                    class="material-symbols-outlined text-white text-[16px] hidden"
+                    >check</span
+                  >
                 </button>
                 <button
                   class="color-badge-opt h-8 rounded-xl bg-error flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
                   onclick="window.selectColorBadge('rose', '#ba1a1a', this)"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-white text-[16px] hidden">check</span>
+                  <span
+                    class="material-symbols-outlined text-white text-[16px] hidden"
+                    >check</span
+                  >
                 </button>
               </div>
 
               <!-- Selector de Icono Rápido -->
-              <div class="mt-1 flex items-center justify-between gap-1 overflow-x-auto py-1">
+              <div
+                class="mt-1 flex items-center justify-between gap-1 overflow-x-auto py-1"
+              >
                 <button
                   class="icon-opt p-1.5 rounded-lg bg-surface-container text-primary hover:bg-surface-container-high transition-colors cursor-pointer"
                   onclick="window.selectIconSymbol('bolt', this)"
                   title="Eléctrico"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-[18px]">bolt</span>
+                  <span class="material-symbols-outlined text-[18px]">bolt</span
+                  >
                 </button>
                 <button
                   class="icon-opt p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
@@ -289,7 +434,9 @@
                   title="Dispositivos"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-[18px]">devices</span>
+                  <span class="material-symbols-outlined text-[18px]"
+                    >devices</span
+                  >
                 </button>
                 <button
                   class="icon-opt p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
@@ -297,7 +444,9 @@
                   title="Herramientas"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-[18px]">handyman</span>
+                  <span class="material-symbols-outlined text-[18px]"
+                    >handyman</span
+                  >
                 </button>
                 <button
                   class="icon-opt p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
@@ -305,7 +454,9 @@
                   title="Químicos"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-[18px]">science</span>
+                  <span class="material-symbols-outlined text-[18px]"
+                    >science</span
+                  >
                 </button>
                 <button
                   class="icon-opt p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
@@ -313,7 +464,9 @@
                   title="Repuestos"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-[18px]">settings</span>
+                  <span class="material-symbols-outlined text-[18px]"
+                    >settings</span
+                  >
                 </button>
                 <button
                   class="icon-opt p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
@@ -321,7 +474,9 @@
                   title="Electrodomésticos"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-[18px]">kitchen</span>
+                  <span class="material-symbols-outlined text-[18px]"
+                    >kitchen</span
+                  >
                 </button>
                 <button
                   class="icon-opt p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
@@ -329,48 +484,79 @@
                   title="Periféricos"
                   type="button"
                 >
-                  <span class="material-symbols-outlined text-[18px]">print</span>
+                  <span class="material-symbols-outlined text-[18px]"
+                    >print</span
+                  >
                 </button>
               </div>
             </div>
 
             <!-- Campo: Descripción / Notas -->
             <div class="flex flex-col gap-1">
-              <label class="text-[12px] text-primary font-semibold" for="cat-desc">Descripción y Criterios Operativos</label>
+              <label
+                class="text-[12px] text-primary font-semibold"
+                for="cat-desc">Descripción y Criterios Operativos</label
+              >
               <textarea
                 class="w-full p-2.5 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant/70 border border-surface-container/60 focus:outline-none focus:bg-surface-container-lowest resize-none transition-all"
                 id="cat-desc"
                 name="description"
                 placeholder="Aparatos para cocina, limpieza y climatización del hogar..."
-                rows="2"
-              ></textarea>
+                rows="2"></textarea>
             </div>
 
             <!-- Select: Estado de la Categoría -->
             <div class="flex flex-col gap-1">
-              <label class="text-[12px] text-primary font-semibold" for="cat-status">Visibilidad en Catálogo</label>
+              <label
+                class="text-[12px] text-primary font-semibold"
+                for="cat-status">Visibilidad en Catálogo</label
+              >
               <select
                 class="w-full h-10 px-3 bg-surface rounded-xl text-[13px] text-on-surface border border-surface-container/60 focus:outline-none focus:bg-surface-container-lowest transition-all cursor-pointer"
                 id="cat-status"
                 name="status"
               >
-                <option selected value="active">Activa (Visible en formularios de nuevo producto)</option>
-                <option value="inactive">Inactiva / Oculta (No seleccionable temporalmente)</option>
+                <option selected value="active"
+                  >Activa (Visible en formularios de nuevo producto)</option
+                >
+                <option value="inactive"
+                  >Inactiva / Oculta (No seleccionable temporalmente)</option
+                >
               </select>
             </div>
 
             <!-- Conmutador: Trazabilidad / Número de serie -->
-            <div class="p-3 bg-surface-container-low rounded-xl flex items-start justify-between gap-3 border border-surface-container/40">
+            <div
+              class="p-3 bg-surface-container-low rounded-xl flex items-start justify-between gap-3 border border-surface-container/40"
+            >
               <div class="flex flex-col">
-                <span class="text-[12px] text-on-surface font-semibold flex items-center gap-1">
+                <span
+                  class="text-[12px] text-on-surface font-semibold flex items-center gap-1"
+                >
                   <span>Trazabilidad por Serial (S/N)</span>
-                  <span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+                  <span
+                    class="material-symbols-outlined text-[15px] text-secondary"
+                    >verified_user</span
+                  >
                 </span>
-                <span class="text-[11px] text-on-surface-variant">Obliga a registrar número de serie en cada recepción de compra.</span>
+                <span class="text-[11px] text-on-surface-variant"
+                  >Obliga a registrar número de serie en cada recepción de
+                  compra.</span
+                >
               </div>
-              <label class="relative inline-flex items-center cursor-pointer mt-0.5 shrink-0">
-                <input checked class="sr-only peer" id="cat-trace" type="checkbox" />
-                <div class="w-9 h-5 bg-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary-container"></div>
+              <label
+                class="relative inline-flex items-center cursor-pointer mt-0.5 shrink-0"
+              >
+                <input
+                  checked
+                  class="sr-only peer"
+                  id="cat-trace"
+                  type="checkbox"
+                />
+                <div
+                  class="w-9 h-5 bg-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary-container"
+                >
+                </div>
               </label>
             </div>
 
@@ -397,10 +583,15 @@
         <!-- COLUMNA DERECHA: Matriz de Categorías & Búsqueda -->
         <div class="lg:col-span-8 flex flex-col gap-4">
           <!-- Barra de Filtros, Búsqueda y Herramientas -->
-          <div class="bg-surface-container-lowest rounded-2xl p-4 border border-surface-container/60 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div
+            class="bg-surface-container-lowest rounded-2xl p-4 border border-surface-container/60 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3"
+          >
             <!-- Input de Búsqueda Dinámica -->
             <div class="relative w-full sm:w-80">
-              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+              <span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]"
+                >search</span
+              >
               <input
                 class="w-full h-9 pl-9 pr-8 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant/70 border border-surface-container/60 focus:outline-none focus:bg-surface-container-lowest transition-all"
                 id="search-category-input"
@@ -419,7 +610,9 @@
             </div>
 
             <!-- Filtros Rápidos de Estado -->
-            <div class="flex items-center gap-1.5 self-stretch sm:self-auto overflow-x-auto">
+            <div
+              class="flex items-center gap-1.5 self-stretch sm:self-auto overflow-x-auto"
+            >
               <button
                 class="status-filter-tab px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-primary text-on-primary shadow-xs transition-all cursor-pointer"
                 onclick="window.filterCategoriesByStatus('all', this)"
@@ -441,24 +634,33 @@
               >
                 Inactivas (1)
               </button>
-              <div class="w-px h-5 bg-surface-container mx-1 hidden sm:block"></div>
+              <div class="w-px h-5 bg-surface-container mx-1 hidden sm:block">
+              </div>
               <button
                 class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
                 onclick="window.showCategoryToast('Ordenamiento por nombre alfabético aplicado.', 'info')"
                 title="Ordenar columnas"
                 type="button"
               >
-                <span class="material-symbols-outlined text-[18px]">sort_by_alpha</span>
+                <span class="material-symbols-outlined text-[18px]"
+                  >sort_by_alpha</span
+                >
               </button>
             </div>
           </div>
 
           <!-- Tabla de Datos Maestro -->
-          <div class="bg-surface-container-lowest rounded-2xl border border-surface-container/60 shadow-xs overflow-hidden flex flex-col">
+          <div
+            class="bg-surface-container-lowest rounded-2xl border border-surface-container/60 shadow-xs overflow-hidden flex flex-col"
+          >
             <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse text-[13px] min-w-[700px]">
+              <table
+                class="w-full text-left border-collapse text-[13px] min-w-[700px]"
+              >
                 <thead>
-                  <tr class="bg-surface-container-low h-10 text-on-surface-variant text-[11px] uppercase tracking-wider font-semibold border-b border-surface-container/60">
+                  <tr
+                    class="bg-surface-container-low h-10 text-on-surface-variant text-[11px] uppercase tracking-wider font-semibold border-b border-surface-container/60"
+                  >
                     <th class="px-4 py-2 w-12 text-center">Ident.</th>
                     <th class="px-4 py-2">Categoría &amp; Prefijo</th>
                     <th class="px-4 py-2">Descripción</th>
@@ -468,418 +670,687 @@
                     <th class="px-4 py-2 text-right w-24">Acciones</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-surface-container/40" id="categories-table-body">
+                <tbody
+                  class="divide-y divide-surface-container/40"
+                  id="categories-table-body"
+                >
                   <!-- Fila 1: Electrónicos -->
-                  <tr class="hover:bg-surface-container-low/50 transition-colors group" data-id="1" data-status="active">
+                  <tr
+                    class="hover:bg-surface-container-low/50 transition-colors group"
+                    data-id="1"
+                    data-status="active"
+                  >
                     <td class="px-4 py-3 text-center">
-                      <div class="w-8 h-8 mx-auto rounded-lg bg-secondary-container text-on-secondary flex items-center justify-center shadow-xs">
-                        <span class="material-symbols-outlined text-[18px]">bolt</span>
+                      <div
+                        class="w-8 h-8 mx-auto rounded-lg bg-secondary-container text-on-secondary flex items-center justify-center shadow-xs"
+                      >
+                        <span class="material-symbols-outlined text-[18px]"
+                          >bolt</span
+                        >
                       </div>
                     </td>
                     <td class="px-4 py-3">
                       <div class="flex flex-col">
-                        <span class="font-semibold text-primary group-hover:text-secondary transition-colors">Electrónicos &amp; Sensores</span>
-                        <span class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider">SKU: <span class="text-secondary font-bold">EL-XXXX</span></span>
+                        <span
+                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
+                          >Electrónicos &amp; Sensores</span
+                        >
+                        <span
+                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
+                          >SKU: <span class="text-secondary font-bold"
+                            >EL-XXXX</span
+                          ></span
+                        >
                       </div>
                     </td>
-                    <td class="px-4 py-3 max-w-xs text-on-surface-variant truncate">
-                      Sensores IoT, placas, conectores de precisión y módulos SMD.
+                    <td
+                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
+                    >
+                      Sensores IoT, placas, conectores de precisión y módulos
+                      SMD.
                     </td>
                     <td class="px-4 py-3 text-right font-mono">
-                      <span class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors" title="Ver 310 productos">
+                      <span
+                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
+                        title="Ver 310 productos"
+                      >
                         310 ítems
                       </span>
                     </td>
-                    <td class="px-4 py-3 text-right font-mono text-primary font-semibold">
+                    <td
+                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
+                    >
                       $48,200.00
                     </td>
                     <td class="px-4 py-3 text-center">
-                      <span class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                      <span
+                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
+                      >
+                        <span
+                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
+                        ></span>
                         Activa
                       </span>
                     </td>
                     <td class="px-4 py-3 text-right">
-                      <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <div
+                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
+                      >
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(1, 'Electrónicos &amp; Sensores', 'EL', 'Sensores IoT, placas, conectores de precisión y módulos SMD.', 'bolt', 'blue', true)"
+                          onclick="window.editCategory(1, 'Electrónicos & Sensores', 'EL', 'Sensores IoT, placas, conectores de precisión y módulos SMD.', 'bolt', 'blue', true)"
                           title="Editar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">edit</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >edit</span
+                          >
                         </button>
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(1, 'Electrónicos &amp; Sensores', 310)"
+                          onclick="window.deleteCategory(1, 'Electrónicos & Sensores', 310)"
                           title="Eliminar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">delete</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >delete</span
+                          >
                         </button>
                       </div>
                     </td>
                   </tr>
 
                   <!-- Fila 2: Electrodomésticos -->
-                  <tr class="hover:bg-surface-container-low/50 transition-colors group" data-id="2" data-status="active">
+                  <tr
+                    class="hover:bg-surface-container-low/50 transition-colors group"
+                    data-id="2"
+                    data-status="active"
+                  >
                     <td class="px-4 py-3 text-center">
-                      <div class="w-8 h-8 mx-auto rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs">
-                        <span class="material-symbols-outlined text-[18px]">kitchen</span>
+                      <div
+                        class="w-8 h-8 mx-auto rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs"
+                      >
+                        <span class="material-symbols-outlined text-[18px]"
+                          >kitchen</span
+                        >
                       </div>
                     </td>
                     <td class="px-4 py-3">
                       <div class="flex flex-col">
-                        <span class="font-semibold text-primary group-hover:text-secondary transition-colors">Electrodomésticos &amp; Hogar</span>
-                        <span class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider">SKU: <span class="text-amber-600 font-bold">HOG-XXXX</span></span>
+                        <span
+                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
+                          >Electrodomésticos &amp; Hogar</span
+                        >
+                        <span
+                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
+                          >SKU: <span class="text-amber-600 font-bold"
+                            >HOG-XXXX</span
+                          ></span
+                        >
                       </div>
                     </td>
-                    <td class="px-4 py-3 max-w-xs text-on-surface-variant truncate">
-                      Línea menor de cocina, licuadoras, microondas y ventilación.
+                    <td
+                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
+                    >
+                      Línea menor de cocina, licuadoras, microondas y
+                      ventilación.
                     </td>
                     <td class="px-4 py-3 text-right font-mono">
-                      <span class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors" title="Ver 85 productos">
+                      <span
+                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
+                        title="Ver 85 productos"
+                      >
                         85 ítems
                       </span>
                     </td>
-                    <td class="px-4 py-3 text-right font-mono text-primary font-semibold">
+                    <td
+                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
+                    >
                       $18,900.00
                     </td>
                     <td class="px-4 py-3 text-center">
-                      <span class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                      <span
+                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
+                      >
+                        <span
+                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
+                        ></span>
                         Activa
                       </span>
                     </td>
                     <td class="px-4 py-3 text-right">
-                      <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <div
+                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
+                      >
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(2, 'Electrodomésticos &amp; Hogar', 'HOG', 'Línea menor de cocina, licuadoras, microondas y ventilación.', 'kitchen', 'amber', true)"
+                          onclick="window.editCategory(2, 'Electrodomésticos & Hogar', 'HOG', 'Línea menor de cocina, licuadoras, microondas y ventilación.', 'kitchen', 'amber', true)"
                           title="Editar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">edit</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >edit</span
+                          >
                         </button>
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(2, 'Electrodomésticos &amp; Hogar', 85)"
+                          onclick="window.deleteCategory(2, 'Electrodomésticos & Hogar', 85)"
                           title="Eliminar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">delete</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >delete</span
+                          >
                         </button>
                       </div>
                     </td>
                   </tr>
 
                   <!-- Fila 3: Repuestos & Rodamientos -->
-                  <tr class="hover:bg-surface-container-low/50 transition-colors group" data-id="3" data-status="active">
+                  <tr
+                    class="hover:bg-surface-container-low/50 transition-colors group"
+                    data-id="3"
+                    data-status="active"
+                  >
                     <td class="px-4 py-3 text-center">
-                      <div class="w-8 h-8 mx-auto rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-xs">
-                        <span class="material-symbols-outlined text-[18px]">settings</span>
+                      <div
+                        class="w-8 h-8 mx-auto rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-xs"
+                      >
+                        <span class="material-symbols-outlined text-[18px]"
+                          >settings</span
+                        >
                       </div>
                     </td>
                     <td class="px-4 py-3">
                       <div class="flex flex-col">
-                        <span class="font-semibold text-primary group-hover:text-secondary transition-colors">Repuestos &amp; Rodamientos</span>
-                        <span class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider">SKU: <span class="text-primary font-bold">RP-XXXX</span></span>
+                        <span
+                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
+                          >Repuestos &amp; Rodamientos</span
+                        >
+                        <span
+                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
+                          >SKU: <span class="text-primary font-bold"
+                            >RP-XXXX</span
+                          ></span
+                        >
                       </div>
                     </td>
-                    <td class="px-4 py-3 max-w-xs text-on-surface-variant truncate">
-                      Piezas mecánicas, rodamientos sellados y engranes industriales.
+                    <td
+                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
+                    >
+                      Piezas mecánicas, rodamientos sellados y engranes
+                      industriales.
                     </td>
                     <td class="px-4 py-3 text-right font-mono">
-                      <span class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors" title="Ver 124 productos">
+                      <span
+                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
+                        title="Ver 124 productos"
+                      >
                         124 ítems
                       </span>
                     </td>
-                    <td class="px-4 py-3 text-right font-mono text-primary font-semibold">
+                    <td
+                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
+                    >
                       $14,200.00
                     </td>
                     <td class="px-4 py-3 text-center">
-                      <span class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                      <span
+                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
+                      >
+                        <span
+                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
+                        ></span>
                         Activa
                       </span>
                     </td>
                     <td class="px-4 py-3 text-right">
-                      <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <div
+                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
+                      >
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(3, 'Repuestos &amp; Rodamientos', 'RP', 'Piezas mecánicas, rodamientos sellados y engranes industriales.', 'settings', 'dark', false)"
+                          onclick="window.editCategory(3, 'Repuestos & Rodamientos', 'RP', 'Piezas mecánicas, rodamientos sellados y engranes industriales.', 'settings', 'dark', false)"
                           title="Editar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">edit</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >edit</span
+                          >
                         </button>
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(3, 'Repuestos &amp; Rodamientos', 124)"
+                          onclick="window.deleteCategory(3, 'Repuestos & Rodamientos', 124)"
                           title="Eliminar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">delete</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >delete</span
+                          >
                         </button>
                       </div>
                     </td>
                   </tr>
 
                   <!-- Fila 4: Consumibles & Químicos -->
-                  <tr class="hover:bg-surface-container-low/50 transition-colors group" data-id="4" data-status="active">
+                  <tr
+                    class="hover:bg-surface-container-low/50 transition-colors group"
+                    data-id="4"
+                    data-status="active"
+                  >
                     <td class="px-4 py-3 text-center">
-                      <div class="w-8 h-8 mx-auto rounded-lg bg-on-tertiary-container text-white flex items-center justify-center shadow-xs">
-                        <span class="material-symbols-outlined text-[18px]">science</span>
+                      <div
+                        class="w-8 h-8 mx-auto rounded-lg bg-on-tertiary-container text-white flex items-center justify-center shadow-xs"
+                      >
+                        <span class="material-symbols-outlined text-[18px]"
+                          >science</span
+                        >
                       </div>
                     </td>
                     <td class="px-4 py-3">
                       <div class="flex flex-col">
-                        <span class="font-semibold text-primary group-hover:text-secondary transition-colors">Consumibles &amp; Químicos</span>
-                        <span class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider">SKU: <span class="text-on-tertiary-container font-bold">CS-XXXX</span></span>
+                        <span
+                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
+                          >Consumibles &amp; Químicos</span
+                        >
+                        <span
+                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
+                          >SKU: <span
+                            class="text-on-tertiary-container font-bold"
+                            >CS-XXXX</span
+                          ></span
+                        >
                       </div>
                     </td>
-                    <td class="px-4 py-3 max-w-xs text-on-surface-variant truncate">
-                      Alcohol isopropílico, flux de soldadura, cintas térmicas y solventes.
+                    <td
+                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
+                    >
+                      Alcohol isopropílico, flux de soldadura, cintas térmicas y
+                      solventes.
                     </td>
                     <td class="px-4 py-3 text-right font-mono">
-                      <span class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors" title="Ver 98 productos">
+                      <span
+                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
+                        title="Ver 98 productos"
+                      >
                         98 ítems
                       </span>
                     </td>
-                    <td class="px-4 py-3 text-right font-mono text-primary font-semibold">
+                    <td
+                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
+                    >
                       $6,400.00
                     </td>
                     <td class="px-4 py-3 text-center">
-                      <span class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                      <span
+                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
+                      >
+                        <span
+                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
+                        ></span>
                         Activa
                       </span>
                     </td>
                     <td class="px-4 py-3 text-right">
-                      <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <div
+                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
+                      >
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(4, 'Consumibles &amp; Químicos', 'CS', 'Alcohol isopropílico, flux de soldadura, cintas térmicas y solventes.', 'science', 'emerald', false)"
+                          onclick="window.editCategory(4, 'Consumibles & Químicos', 'CS', 'Alcohol isopropílico, flux de soldadura, cintas térmicas y solventes.', 'science', 'emerald', false)"
                           title="Editar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">edit</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >edit</span
+                          >
                         </button>
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(4, 'Consumibles &amp; Químicos', 98)"
+                          onclick="window.deleteCategory(4, 'Consumibles & Químicos', 98)"
                           title="Eliminar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">delete</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >delete</span
+                          >
                         </button>
                       </div>
                     </td>
                   </tr>
 
                   <!-- Fila 5: Herramientas & Equipamiento -->
-                  <tr class="hover:bg-surface-container-low/50 transition-colors group" data-id="5" data-status="active">
+                  <tr
+                    class="hover:bg-surface-container-low/50 transition-colors group"
+                    data-id="5"
+                    data-status="active"
+                  >
                     <td class="px-4 py-3 text-center">
-                      <div class="w-8 h-8 mx-auto rounded-lg bg-secondary text-on-secondary flex items-center justify-center shadow-xs">
-                        <span class="material-symbols-outlined text-[18px]">handyman</span>
+                      <div
+                        class="w-8 h-8 mx-auto rounded-lg bg-secondary text-on-secondary flex items-center justify-center shadow-xs"
+                      >
+                        <span class="material-symbols-outlined text-[18px]"
+                          >handyman</span
+                        >
                       </div>
                     </td>
                     <td class="px-4 py-3">
                       <div class="flex flex-col">
-                        <span class="font-semibold text-primary group-hover:text-secondary transition-colors">Herramientas &amp; Equipamiento</span>
-                        <span class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider">SKU: <span class="text-secondary font-bold">HT-XXXX</span></span>
+                        <span
+                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
+                          >Herramientas &amp; Equipamiento</span
+                        >
+                        <span
+                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
+                          >SKU: <span class="text-secondary font-bold"
+                            >HT-XXXX</span
+                          ></span
+                        >
                       </div>
                     </td>
-                    <td class="px-4 py-3 max-w-xs text-on-surface-variant truncate">
-                      Estaciones de soldadura, multímetros digitales y prensas térmicas.
+                    <td
+                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
+                    >
+                      Estaciones de soldadura, multímetros digitales y prensas
+                      térmicas.
                     </td>
                     <td class="px-4 py-3 text-right font-mono">
-                      <span class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors" title="Ver 112 productos">
+                      <span
+                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
+                        title="Ver 112 productos"
+                      >
                         112 ítems
                       </span>
                     </td>
-                    <td class="px-4 py-3 text-right font-mono text-primary font-semibold">
+                    <td
+                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
+                    >
                       $21,300.00
                     </td>
                     <td class="px-4 py-3 text-center">
-                      <span class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                      <span
+                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
+                      >
+                        <span
+                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
+                        ></span>
                         Activa
                       </span>
                     </td>
                     <td class="px-4 py-3 text-right">
-                      <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <div
+                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
+                      >
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(5, 'Herramientas &amp; Equipamiento', 'HT', 'Estaciones de soldadura, multímetros digitales y prensas térmicas.', 'handyman', 'indigo', true)"
+                          onclick="window.editCategory(5, 'Herramientas & Equipamiento', 'HT', 'Estaciones de soldadura, multímetros digitales y prensas térmicas.', 'handyman', 'indigo', true)"
                           title="Editar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">edit</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >edit</span
+                          >
                         </button>
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(5, 'Herramientas &amp; Equipamiento', 112)"
+                          onclick="window.deleteCategory(5, 'Herramientas & Equipamiento', 112)"
                           title="Eliminar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">delete</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >delete</span
+                          >
                         </button>
                       </div>
                     </td>
                   </tr>
 
                   <!-- Fila 6: Periféricos & POS -->
-                  <tr class="hover:bg-surface-container-low/50 transition-colors group" data-id="6" data-status="active">
+                  <tr
+                    class="hover:bg-surface-container-low/50 transition-colors group"
+                    data-id="6"
+                    data-status="active"
+                  >
                     <td class="px-4 py-3 text-center">
-                      <div class="w-8 h-8 mx-auto rounded-lg bg-secondary-container text-on-secondary flex items-center justify-center shadow-xs">
-                        <span class="material-symbols-outlined text-[18px]">print</span>
+                      <div
+                        class="w-8 h-8 mx-auto rounded-lg bg-secondary-container text-on-secondary flex items-center justify-center shadow-xs"
+                      >
+                        <span class="material-symbols-outlined text-[18px]"
+                          >print</span
+                        >
                       </div>
                     </td>
                     <td class="px-4 py-3">
                       <div class="flex flex-col">
-                        <span class="font-semibold text-primary group-hover:text-secondary transition-colors">Periféricos &amp; POS</span>
-                        <span class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider">SKU: <span class="text-secondary-container font-bold">POS-XXXX</span></span>
+                        <span
+                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
+                          >Periféricos &amp; POS</span
+                        >
+                        <span
+                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
+                          >SKU: <span class="text-secondary-container font-bold"
+                            >POS-XXXX</span
+                          ></span
+                        >
                       </div>
                     </td>
-                    <td class="px-4 py-3 max-w-xs text-on-surface-variant truncate">
-                      Impresoras térmicas, lectores de código de barra y gavetas RJ11.
+                    <td
+                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
+                    >
+                      Impresoras térmicas, lectores de código de barra y gavetas
+                      RJ11.
                     </td>
                     <td class="px-4 py-3 text-right font-mono">
-                      <span class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors" title="Ver 75 productos">
+                      <span
+                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
+                        title="Ver 75 productos"
+                      >
                         75 ítems
                       </span>
                     </td>
-                    <td class="px-4 py-3 text-right font-mono text-primary font-semibold">
+                    <td
+                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
+                    >
                       $12,800.00
                     </td>
                     <td class="px-4 py-3 text-center">
-                      <span class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                      <span
+                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
+                      >
+                        <span
+                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
+                        ></span>
                         Activa
                       </span>
                     </td>
                     <td class="px-4 py-3 text-right">
-                      <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <div
+                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
+                      >
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(6, 'Periféricos &amp; POS', 'POS', 'Impresoras térmicas, lectores de código de barra y gavetas RJ11.', 'print', 'blue', true)"
+                          onclick="window.editCategory(6, 'Periféricos & POS', 'POS', 'Impresoras térmicas, lectores de código de barra y gavetas RJ11.', 'print', 'blue', true)"
                           title="Editar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">edit</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >edit</span
+                          >
                         </button>
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(6, 'Periféricos &amp; POS', 75)"
+                          onclick="window.deleteCategory(6, 'Periféricos & POS', 75)"
                           title="Eliminar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">delete</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >delete</span
+                          >
                         </button>
                       </div>
                     </td>
                   </tr>
 
                   <!-- Fila 7: Cómputo & Servidores -->
-                  <tr class="hover:bg-surface-container-low/50 transition-colors group" data-id="7" data-status="active">
+                  <tr
+                    class="hover:bg-surface-container-low/50 transition-colors group"
+                    data-id="7"
+                    data-status="active"
+                  >
                     <td class="px-4 py-3 text-center">
-                      <div class="w-8 h-8 mx-auto rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-xs">
-                        <span class="material-symbols-outlined text-[18px]">devices</span>
+                      <div
+                        class="w-8 h-8 mx-auto rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-xs"
+                      >
+                        <span class="material-symbols-outlined text-[18px]"
+                          >devices</span
+                        >
                       </div>
                     </td>
                     <td class="px-4 py-3">
                       <div class="flex flex-col">
-                        <span class="font-semibold text-primary group-hover:text-secondary transition-colors">Cómputo &amp; Servidores</span>
-                        <span class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider">SKU: <span class="text-primary font-bold">CMP-XXXX</span></span>
+                        <span
+                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
+                          >Cómputo &amp; Servidores</span
+                        >
+                        <span
+                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
+                          >SKU: <span class="text-primary font-bold"
+                            >CMP-XXXX</span
+                          ></span
+                        >
                       </div>
                     </td>
-                    <td class="px-4 py-3 max-w-xs text-on-surface-variant truncate">
+                    <td
+                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
+                    >
                       Mini PCs de caja, switches administrables y memorias ECC.
                     </td>
                     <td class="px-4 py-3 text-right font-mono">
-                      <span class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors" title="Ver 48 productos">
+                      <span
+                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
+                        title="Ver 48 productos"
+                      >
                         48 ítems
                       </span>
                     </td>
-                    <td class="px-4 py-3 text-right font-mono text-primary font-semibold">
+                    <td
+                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
+                    >
                       $2,700.00
                     </td>
                     <td class="px-4 py-3 text-center">
-                      <span class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                      <span
+                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
+                      >
+                        <span
+                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
+                        ></span>
                         Activa
                       </span>
                     </td>
                     <td class="px-4 py-3 text-right">
-                      <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <div
+                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
+                      >
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(7, 'Cómputo &amp; Servidores', 'CMP', 'Mini PCs de caja, switches administrables y memorias ECC.', 'devices', 'dark', true)"
+                          onclick="window.editCategory(7, 'Cómputo & Servidores', 'CMP', 'Mini PCs de caja, switches administrables y memorias ECC.', 'devices', 'dark', true)"
                           title="Editar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">edit</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >edit</span
+                          >
                         </button>
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(7, 'Cómputo &amp; Servidores', 48)"
+                          onclick="window.deleteCategory(7, 'Cómputo & Servidores', 48)"
                           title="Eliminar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">delete</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >delete</span
+                          >
                         </button>
                       </div>
                     </td>
                   </tr>
 
                   <!-- Fila 8: Categoría en Preparación / Inactiva -->
-                  <tr class="hover:bg-surface-container-low/50 transition-colors group bg-surface/40" data-id="8" data-status="inactive">
+                  <tr
+                    class="hover:bg-surface-container-low/50 transition-colors group bg-surface/40"
+                    data-id="8"
+                    data-status="inactive"
+                  >
                     <td class="px-4 py-3 text-center">
-                      <div class="w-8 h-8 mx-auto rounded-lg bg-surface-container text-on-surface-variant flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[18px]">folder_off</span>
+                      <div
+                        class="w-8 h-8 mx-auto rounded-lg bg-surface-container text-on-surface-variant flex items-center justify-center"
+                      >
+                        <span class="material-symbols-outlined text-[18px]"
+                          >folder_off</span
+                        >
                       </div>
                     </td>
                     <td class="px-4 py-3">
                       <div class="flex flex-col">
-                        <span class="font-semibold text-on-surface-variant">Embalaje &amp; Envíos (Piloto)</span>
-                        <span class="font-mono text-[11px] text-on-surface-variant">SKU: EMB-XXXX</span>
+                        <span class="font-semibold text-on-surface-variant"
+                          >Embalaje &amp; Envíos (Piloto)</span
+                        >
+                        <span
+                          class="font-mono text-[11px] text-on-surface-variant"
+                          >SKU: EMB-XXXX</span
+                        >
                       </div>
                     </td>
-                    <td class="px-4 py-3 max-w-xs text-on-surface-variant truncate">
+                    <td
+                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
+                    >
                       Cajas de cartón corrugado, burbuja protectora y precintos.
                     </td>
                     <td class="px-4 py-3 text-right font-mono">
-                      <span class="px-2 py-0.5 rounded-lg bg-surface-container-low text-on-surface-variant font-medium text-[12px]">
+                      <span
+                        class="px-2 py-0.5 rounded-lg bg-surface-container-low text-on-surface-variant font-medium text-[12px]"
+                      >
                         0 ítems
                       </span>
                     </td>
-                    <td class="px-4 py-3 text-right font-mono text-on-surface-variant">
+                    <td
+                      class="px-4 py-3 text-right font-mono text-on-surface-variant"
+                    >
                       $0.00
                     </td>
                     <td class="px-4 py-3 text-center">
-                      <span class="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-semibold inline-flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                      <span
+                        class="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-semibold inline-flex items-center gap-1"
+                      >
+                        <span class="w-1.5 h-1.5 rounded-full bg-outline"
+                        ></span>
                         Inactiva
                       </span>
                     </td>
                     <td class="px-4 py-3 text-right">
-                      <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <div
+                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
+                      >
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(8, 'Embalaje &amp; Envíos (Piloto)', 'EMB', 'Cajas de cartón corrugado, burbuja protectora y precintos.', 'folder_off', 'dark', false)"
+                          onclick="window.editCategory(8, 'Embalaje & Envíos (Piloto)', 'EMB', 'Cajas de cartón corrugado, burbuja protectora y precintos.', 'folder_off', 'dark', false)"
                           title="Editar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">edit</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >edit</span
+                          >
                         </button>
                         <button
                           class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(8, 'Embalaje &amp; Envíos (Piloto)', 0)"
+                          onclick="window.deleteCategory(8, 'Embalaje & Envíos (Piloto)', 0)"
                           title="Eliminar categoría"
                           type="button"
                         >
-                          <span class="material-symbols-outlined text-[17px]">delete</span>
+                          <span class="material-symbols-outlined text-[17px]"
+                            >delete</span
+                          >
                         </button>
                       </div>
                     </td>
@@ -889,15 +1360,34 @@
             </div>
 
             <!-- Pie de Tabla con Paginación Compacta -->
-            <div class="bg-surface-container-lowest px-4 py-3 flex items-center justify-between text-on-surface-variant text-[12px] border-t border-surface-container/60">
-              <span id="cat-table-summary">Mostrando 8 de 8 categorías registradas</span>
+            <div
+              class="bg-surface-container-lowest px-4 py-3 flex items-center justify-between text-on-surface-variant text-[12px] border-t border-surface-container/60"
+            >
+              <span id="cat-table-summary"
+                >Mostrando 8 de 8 categorías registradas</span
+              >
               <div class="flex items-center gap-1.5">
-                <button class="p-1 text-on-surface-variant/40 rounded cursor-not-allowed" disabled type="button">
-                  <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                <button
+                  class="p-1 text-on-surface-variant/40 rounded cursor-not-allowed"
+                  disabled
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[18px]"
+                    >chevron_left</span
+                  >
                 </button>
-                <span class="px-2.5 py-0.5 bg-surface-container rounded-lg font-semibold text-on-surface text-[11px]">Página 1</span>
-                <button class="p-1 text-on-surface-variant/40 rounded cursor-not-allowed" disabled type="button">
-                  <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                <span
+                  class="px-2.5 py-0.5 bg-surface-container rounded-lg font-semibold text-on-surface text-[11px]"
+                  >Página 1</span
+                >
+                <button
+                  class="p-1 text-on-surface-variant/40 rounded cursor-not-allowed"
+                  disabled
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[18px]"
+                    >chevron_right</span
+                  >
                 </button>
               </div>
             </div>
@@ -906,15 +1396,25 @@
       </div>
 
       <!-- Banner Informativo / Gobernanza de Catálogo -->
-      <div class="bg-surface-container-low rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-surface-container/60 shadow-2xs">
+      <div
+        class="bg-surface-container-low rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-surface-container/60 shadow-2xs"
+      >
         <div class="flex items-start sm:items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-secondary-container/15 text-secondary flex items-center justify-center shrink-0">
+          <div
+            class="w-9 h-9 rounded-xl bg-secondary-container/15 text-secondary flex items-center justify-center shrink-0"
+          >
             <span class="material-symbols-outlined text-[20px]">lightbulb</span>
           </div>
           <div class="flex flex-col">
-            <span class="text-[13px] text-primary font-semibold">Integración Inmediata en todo el ERP</span>
+            <span class="text-[13px] text-primary font-semibold"
+              >Integración Inmediata en todo el ERP</span
+            >
             <span class="text-[12px] text-on-surface-variant">
-              Las categorías creadas aquí estarán inmediatamente disponibles en el selector de <strong>"Agregar Producto"</strong>, plantillas de <strong>"Carga Masiva"</strong> y en la botonera táctil del <strong>Punto de Venta (POS)</strong>.
+              Las categorías creadas aquí estarán inmediatamente disponibles en
+              el selector de <strong>"Agregar Producto"</strong>, plantillas de <strong
+                >"Carga Masiva"</strong
+              > y en la botonera táctil del <strong>Punto de Venta (POS)</strong
+              >.
             </span>
           </div>
         </div>
@@ -925,7 +1425,9 @@
             onclick="window.showCategoryToast('Abriendo guía de taxonomía y mejores prácticas SKU...', 'info')"
           >
             <span>Guía de Taxonomía</span>
-            <span class="material-symbols-outlined text-[15px]">open_in_new</span>
+            <span class="material-symbols-outlined text-[15px]"
+              >open_in_new</span
+            >
           </button>
         </div>
       </div>
@@ -937,8 +1439,13 @@
     class="fixed bottom-6 right-6 hidden bg-primary text-on-primary px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 z-50 transition-all pointer-events-none"
     id="toast-category"
   >
-    <span class="material-symbols-outlined text-[20px] text-secondary-fixed" id="toast-category-icon">check_circle</span>
-    <span class="text-[13px] font-medium" id="toast-category-message">Categoría actualizada con éxito</span>
+    <span
+      class="material-symbols-outlined text-[20px] text-secondary-fixed"
+      id="toast-category-icon">check_circle</span
+    >
+    <span class="text-[13px] font-medium" id="toast-category-message"
+      >Categoría actualizada con éxito</span
+    >
   </div>
 </div>
 
@@ -959,11 +1466,15 @@
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
 
-    gsap.fromTo(modal, { opacity: 0 }, { opacity: 1, duration: 0.22, ease: "power2.out" });
+    gsap.fromTo(
+      modal,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.22, ease: "power2.out" },
+    );
     gsap.fromTo(
       container,
       { y: 30, scale: 0.96, opacity: 0 },
-      { y: 0, scale: 1, opacity: 1, duration: 0.28, ease: "back.out(1.2)" }
+      { y: 0, scale: 1, opacity: 1, duration: 0.28, ease: "back.out(1.2)" },
     );
   };
 
@@ -993,7 +1504,11 @@
   };
 
   // Selector de Color
-  (window as any).selectColorBadge = function (colorName: string, hex: string, btnElement?: HTMLElement) {
+  (window as any).selectColorBadge = function (
+    colorName: string,
+    hex: string,
+    btnElement?: HTMLElement,
+  ) {
     currentColor = colorName;
     const buttons = document.querySelectorAll(".color-badge-opt");
     buttons.forEach((btn) => {
@@ -1013,22 +1528,31 @@
     const previewBox = document.getElementById("form-icon-preview");
     if (previewBox) {
       if (colorName === "blue")
-        previewBox.className = "w-9 h-9 rounded-xl bg-secondary-container text-on-secondary flex items-center justify-center shadow-xs";
+        previewBox.className =
+          "w-9 h-9 rounded-xl bg-secondary-container text-on-secondary flex items-center justify-center shadow-xs";
       else if (colorName === "emerald")
-        previewBox.className = "w-9 h-9 rounded-xl bg-on-tertiary-container text-white flex items-center justify-center shadow-xs";
+        previewBox.className =
+          "w-9 h-9 rounded-xl bg-on-tertiary-container text-white flex items-center justify-center shadow-xs";
       else if (colorName === "indigo")
-        previewBox.className = "w-9 h-9 rounded-xl bg-secondary text-on-secondary flex items-center justify-center shadow-xs";
+        previewBox.className =
+          "w-9 h-9 rounded-xl bg-secondary text-on-secondary flex items-center justify-center shadow-xs";
       else if (colorName === "amber")
-        previewBox.className = "w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-xs";
+        previewBox.className =
+          "w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-xs";
       else if (colorName === "dark")
-        previewBox.className = "w-9 h-9 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-xs";
+        previewBox.className =
+          "w-9 h-9 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-xs";
       else if (colorName === "rose")
-        previewBox.className = "w-9 h-9 rounded-xl bg-error text-white flex items-center justify-center shadow-xs";
+        previewBox.className =
+          "w-9 h-9 rounded-xl bg-error text-white flex items-center justify-center shadow-xs";
     }
   };
 
   // Selector de Ícono
-  (window as any).selectIconSymbol = function (iconName: string, btnElement?: HTMLElement) {
+  (window as any).selectIconSymbol = function (
+    iconName: string,
+    btnElement?: HTMLElement,
+  ) {
     currentIcon = iconName;
     const buttons = document.querySelectorAll(".icon-opt");
     buttons.forEach((btn) => {
@@ -1049,7 +1573,9 @@
   // Generador de Prefijo
   (window as any).autoGeneratePrefix = function (val: string) {
     if (editingCategoryId) return;
-    const prefixInput = document.getElementById("cat-prefix") as HTMLInputElement | null;
+    const prefixInput = document.getElementById(
+      "cat-prefix",
+    ) as HTMLInputElement | null;
     if (!prefixInput) return;
 
     if (!val || val.trim().length === 0) {
@@ -1059,7 +1585,9 @@
 
     const words = val.trim().split(/\s+/);
     if (words.length >= 2) {
-      prefixInput.value = (words[0].substring(0, 2) + words[1].substring(0, 2)).toUpperCase();
+      prefixInput.value = (
+        words[0].substring(0, 2) + words[1].substring(0, 2)
+      ).toUpperCase();
     } else {
       prefixInput.value = val.substring(0, 3).toUpperCase();
     }
@@ -1067,7 +1595,9 @@
 
   (window as any).focusCategoryForm = function () {
     (window as any).resetCategoryForm();
-    const input = document.getElementById("cat-name") as HTMLInputElement | null;
+    const input = document.getElementById(
+      "cat-name",
+    ) as HTMLInputElement | null;
     if (input) {
       input.focus();
       input.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1076,7 +1606,9 @@
 
   (window as any).resetCategoryForm = function () {
     editingCategoryId = null;
-    const form = document.getElementById("category-form") as HTMLFormElement | null;
+    const form = document.getElementById(
+      "category-form",
+    ) as HTMLFormElement | null;
     if (form) form.reset();
 
     const heading = document.getElementById("form-heading");
@@ -1097,13 +1629,21 @@
     desc: string,
     icon: string,
     color: string,
-    hasSerial: boolean
+    hasSerial: boolean,
   ) {
     editingCategoryId = id;
-    const nameEl = document.getElementById("cat-name") as HTMLInputElement | null;
-    const prefixEl = document.getElementById("cat-prefix") as HTMLInputElement | null;
-    const descEl = document.getElementById("cat-desc") as HTMLTextAreaElement | null;
-    const traceEl = document.getElementById("cat-trace") as HTMLInputElement | null;
+    const nameEl = document.getElementById(
+      "cat-name",
+    ) as HTMLInputElement | null;
+    const prefixEl = document.getElementById(
+      "cat-prefix",
+    ) as HTMLInputElement | null;
+    const descEl = document.getElementById(
+      "cat-desc",
+    ) as HTMLTextAreaElement | null;
+    const traceEl = document.getElementById(
+      "cat-trace",
+    ) as HTMLInputElement | null;
 
     if (nameEl) nameEl.value = name;
     if (prefixEl) prefixEl.value = prefix;
@@ -1122,18 +1662,29 @@
       nameEl.focus();
       nameEl.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    (window as any).showCategoryToast('Modo edición activado para "' + name + '"', "info");
+    (window as any).showCategoryToast(
+      'Modo edición activado para "' + name + '"',
+      "info",
+    );
   };
 
-  (window as any).deleteCategory = function (id: number, name: string, productCount: number) {
+  (window as any).deleteCategory = function (
+    id: number,
+    name: string,
+    productCount: number,
+  ) {
     if (productCount > 0) {
       alert(
-        `⚠️ Acción Bloqueada:\nLa categoría "${name}" posee ${productCount} productos asociados en el inventario activo. Para eliminarla, reubica previamente los productos a otra familia.`
+        `⚠️ Acción Bloqueada:\nLa categoría "${name}" posee ${productCount} productos asociados en el inventario activo. Para eliminarla, reubica previamente los productos a otra familia.`,
       );
       return;
     }
 
-    if (confirm(`¿Estás seguro de eliminar la categoría "${name}"? Esta acción no se puede deshacer.`)) {
+    if (
+      confirm(
+        `¿Estás seguro de eliminar la categoría "${name}"? Esta acción no se puede deshacer.`,
+      )
+    ) {
       const row = document.querySelector(`tr[data-id="${id}"]`);
       if (row) {
         gsap.to(row, {
@@ -1142,7 +1693,9 @@
           duration: 0.2,
           onComplete: () => {
             row.remove();
-            (window as any).showCategoryToast(`Categoría "${name}" eliminada correctamente.`);
+            (window as any).showCategoryToast(
+              `Categoría "${name}" eliminada correctamente.`,
+            );
           },
         });
       }
@@ -1151,22 +1704,32 @@
 
   (window as any).handleCategoryFormSubmit = function (e: Event) {
     e.preventDefault();
-    const nameInput = document.getElementById("cat-name") as HTMLInputElement | null;
-    const prefixInput = document.getElementById("cat-prefix") as HTMLInputElement | null;
+    const nameInput = document.getElementById(
+      "cat-name",
+    ) as HTMLInputElement | null;
+    const prefixInput = document.getElementById(
+      "cat-prefix",
+    ) as HTMLInputElement | null;
     const name = nameInput?.value || "Nueva Categoría";
     const prefix = prefixInput?.value || "GEN";
 
     if (editingCategoryId) {
-      (window as any).showCategoryToast(`Categoría "${name}" (${prefix}) actualizada con éxito.`);
+      (window as any).showCategoryToast(
+        `Categoría "${name}" (${prefix}) actualizada con éxito.`,
+      );
       (window as any).resetCategoryForm();
     } else {
-      (window as any).showCategoryToast(`Categoría "${name}" agregada al catálogo.`);
+      (window as any).showCategoryToast(
+        `Categoría "${name}" agregada al catálogo.`,
+      );
       (window as any).resetCategoryForm();
     }
   };
 
   (window as any).filterCategoryTable = function () {
-    const searchInput = document.getElementById("search-category-input") as HTMLInputElement | null;
+    const searchInput = document.getElementById(
+      "search-category-input",
+    ) as HTMLInputElement | null;
     const term = (searchInput?.value || "").toLowerCase().trim();
     const rows = document.querySelectorAll("#categories-table-body tr");
     rows.forEach((row) => {
@@ -1176,12 +1739,17 @@
   };
 
   (window as any).clearCategorySearch = function () {
-    const input = document.getElementById("search-category-input") as HTMLInputElement | null;
+    const input = document.getElementById(
+      "search-category-input",
+    ) as HTMLInputElement | null;
     if (input) input.value = "";
     (window as any).filterCategoryTable();
   };
 
-  (window as any).filterCategoriesByStatus = function (status: string, trigger: HTMLElement) {
+  (window as any).filterCategoriesByStatus = function (
+    status: string,
+    trigger: HTMLElement,
+  ) {
     const tabs = document.querySelectorAll(".status-filter-tab");
     tabs.forEach((t) => {
       t.className =
@@ -1226,7 +1794,7 @@
     gsap.fromTo(
       toast,
       { y: 30, opacity: 0, scale: 0.9 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.25, ease: "back.out(1.5)" }
+      { y: 0, opacity: 1, scale: 1, duration: 0.25, ease: "back.out(1.5)" },
     );
 
     toastTimer = setTimeout(() => {

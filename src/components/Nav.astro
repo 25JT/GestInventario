@@ -13,6 +13,7 @@ const {
 
 <header
   id="top-header"
+  transition:persist="top-header"
   class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-30 shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-surface-container/60 px-4 sm:px-6 flex items-center justify-between gap-4 transition-all duration-300"
 >
   {/* Sección Izquierda: Botón Menú + Buscador */}
@@ -91,15 +92,17 @@ const {
 <script>
   import { initNavSlide } from "../animaciones/animaNavSlide.js";
 
-  // Inicializar animaciones GSAP y eventos de navegación
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      initNavSlide();
-      updateDate();
-    });
-  } else {
+  function setupNav() {
     initNavSlide();
     updateDate();
+  }
+
+  // Soporte para transiciones entre pestañas y carga inicial
+  document.addEventListener("astro:page-load", setupNav);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupNav);
+  } else {
+    setupNav();
   }
 
   function updateDate() {

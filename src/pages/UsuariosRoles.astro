@@ -994,12 +994,15 @@ import NavBar from "../components/Nav.astro";
       if (emailInput) emailInput.value = "";
     };
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
-        initUsuarios();
-      });
-    } else {
+    function setupUsuarios() {
       initUsuarios();
+    }
+
+    document.addEventListener("astro:page-load", setupUsuarios);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setupUsuarios);
+    } else {
+      setupUsuarios();
     }
   </script>
 </Layout>

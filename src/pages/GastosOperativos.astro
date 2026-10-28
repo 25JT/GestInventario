@@ -902,12 +902,15 @@ import NavBar from "../components/Nav.astro";
       showExpenseToast(`Gasto por $${amount} asentado en libros correctamente.`);
     };
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
-        initGastos();
-      });
-    } else {
+    function setupGastos() {
       initGastos();
+    }
+
+    document.addEventListener("astro:page-load", setupGastos);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setupGastos);
+    } else {
+      setupGastos();
     }
   </script>
 </Layout>
