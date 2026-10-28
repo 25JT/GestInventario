@@ -123,7 +123,7 @@ export function markActiveNavLink() {
 }
 
 /**
- * Alterna el sidebar en dispositivos móviles (off-canvas con backdrop)
+ * Alterna el sidebar en dispositivos móviles (off-canvas con backdrop y bloqueo de scroll)
  */
 export function toggleMobileSidebar(open) {
   const sidebar = document.getElementById("main-sidebar");
@@ -134,6 +134,15 @@ export function toggleMobileSidebar(open) {
   isAnimating = true;
 
   if (shouldOpen) {
+    // 1. Bloquear desplazamiento del fondo en móviles
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+
+    // 2. Hacer visible e interactivo el sidebar
+    sidebar.classList.remove("pointer-events-none", "invisible");
+    sidebar.setAttribute("aria-hidden", "false");
+
+    // 3. Animar backdrop
     if (backdrop) {
       backdrop.classList.remove("hidden");
       gsap.fromTo(
@@ -143,6 +152,7 @@ export function toggleMobileSidebar(open) {
       );
     }
 
+    // 4. Animar entrada del sidebar
     gsap.fromTo(
       sidebar,
       { x: "-100%" },
@@ -157,6 +167,13 @@ export function toggleMobileSidebar(open) {
       }
     );
   } else {
+    // 1. Restaurar desplazamiento del fondo
+    document.body.style.overflow = "";
+    document.body.style.touchAction = "";
+
+    sidebar.setAttribute("aria-hidden", "true");
+
+    // 2. Animar salida del backdrop
     if (backdrop) {
       gsap.to(backdrop, {
         opacity: 0,
@@ -166,6 +183,7 @@ export function toggleMobileSidebar(open) {
       });
     }
 
+    // 3. Animar salida del sidebar
     gsap.to(sidebar, {
       x: "-100%",
       duration: 0.3,
@@ -173,6 +191,7 @@ export function toggleMobileSidebar(open) {
       onComplete: () => {
         isSidebarOpenMobile = false;
         isAnimating = false;
+        sidebar.classList.add("pointer-events-none", "invisible");
       },
     });
   }
@@ -228,6 +247,7 @@ export function toggleSidebar() {
  * Animación de entrada inicial para la barra superior y enlaces del sidebar
  */
 export function animateNavEntrance() {
+  const isDesktop = window.innerWidth >= 1024;
   const header = document.getElementById("top-header");
   const navItems = document.querySelectorAll("#main-sidebar nav a");
   const profileCard = document.getElementById("sidebar-user-card");
@@ -240,20 +260,24 @@ export function animateNavEntrance() {
     );
   }
 
-  if (navItems.length > 0) {
-    gsap.fromTo(
-      navItems,
-      { x: -16, opacity: 0 },
-      { x: 0, opacity: 1, duration: 0.4, stagger: 0.04, ease: "power2.out", delay: 0.1 }
-    );
-  }
+  // En móvil NO animamos los elementos del menú lateral al cargar la página
+  // para evitar que aparezca o parpadee en pantalla
+  if (isDesktop) {
+    if (navItems.length > 0) {
+      gsap.fromTo(
+        navItems,
+        { x: -16, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.4, stagger: 0.04, ease: "power2.out", delay: 0.1 }
+      );
+    }
 
-  if (profileCard) {
-    gsap.fromTo(
-      profileCard,
-      { y: 15, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.45, ease: "power2.out", delay: 0.25 }
-    );
+    if (profileCard) {
+      gsap.fromTo(
+        profileCard,
+        { y: 15, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.45, ease: "power2.out", delay: 0.25 }
+      );
+    }
   }
 }
 
@@ -262,6 +286,24 @@ export function animateNavEntrance() {
  */
 export function initNavSlide() {
   if (typeof window === "undefined") return;
+
+  const isDesktop = window.innerWidth >= 1024;
+  const sidebar = document.getElementById("main-sidebar");
+
+  // Configurar estado inicial estricto para móvil vs escritorio
+  if (!isDesktop && sidebar) {
+    sidebar.classList.add("pointer-events-none", "invisible");
+    sidebar.setAttribute("aria-hidden", "true");
+    gsap.set(sidebar, { x: "-100%" });
+    document.body.style.overflow = "";
+    document.body.style.touchAction = "";
+    isSidebarOpenMobile = false;
+  } else if (isDesktop && sidebar) {
+    sidebar.classList.remove("pointer-events-none", "invisible");
+    sidebar.setAttribute("aria-hidden", "false");
+    gsap.set(sidebar, { x: 0 });
+    isSidebarOpenDesktop = true;
+  }
 
   // Hidratar datos de sesión
   hydrateUserSession();
@@ -302,6 +344,16 @@ export function initNavSlide() {
     });
   }
 
+  // Cerrar sidebar en móvil al hacer clic en cualquier enlace de navegación
+  const navLinks = document.querySelectorAll("#main-sidebar nav a");
+  navLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      if (window.innerWidth < 1024) {
+        toggleMobileSidebar(false);
+      }
+    });
+  });
+
   // Cerrar sesión
   const logoutBtns = document.querySelectorAll(
     "#logout-btn, [data-action='logout']"
@@ -319,20 +371,36 @@ export function initNavSlide() {
 
   // Escuchar redimensionamiento de pantalla para resetear transformaciones si cambia de móvil a desktop
   window.addEventListener("resize", () => {
-    const isDesktop = window.innerWidth >= 1024;
-    const sidebar = document.getElementById("main-sidebar");
+    const isNowDesktop = window.innerWidth >= 1024;
+    const currentSidebar = document.getElementById("main-sidebar");
     const header = document.getElementById("top-header");
     const appContent = document.getElementById("app-content");
     const backdropEl = document.getElementById("sidebar-backdrop");
 
-    if (isDesktop) {
+    if (isNowDesktop) {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
       if (backdropEl) backdropEl.classList.add("hidden");
       isSidebarOpenMobile = false;
-      if (sidebar) gsap.set(sidebar, { x: isSidebarOpenDesktop ? 0 : -256 });
+      if (currentSidebar) {
+        currentSidebar.classList.remove("pointer-events-none", "invisible");
+        currentSidebar.setAttribute("aria-hidden", "false");
+        gsap.set(currentSidebar, { x: isSidebarOpenDesktop ? 0 : -256 });
+      }
       if (header) gsap.set(header, { left: isSidebarOpenDesktop ? "16rem" : "0rem" });
       if (appContent) gsap.set(appContent, { paddingLeft: isSidebarOpenDesktop ? "16rem" : "0rem" });
     } else {
-      if (sidebar) gsap.set(sidebar, { x: isSidebarOpenMobile ? "0%" : "-100%" });
+      if (currentSidebar) {
+        if (!isSidebarOpenMobile) {
+          currentSidebar.classList.add("pointer-events-none", "invisible");
+          currentSidebar.setAttribute("aria-hidden", "true");
+          gsap.set(currentSidebar, { x: "-100%" });
+        } else {
+          currentSidebar.classList.remove("pointer-events-none", "invisible");
+          currentSidebar.setAttribute("aria-hidden", "false");
+          gsap.set(currentSidebar, { x: "0%" });
+        }
+      }
       if (header) gsap.set(header, { left: "0rem" });
       if (appContent) gsap.set(appContent, { paddingLeft: "0rem" });
     }

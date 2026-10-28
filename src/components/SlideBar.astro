@@ -7,18 +7,19 @@ interface Props {
 const { currentPath = "principal" } = Astro.props;
 ---
 
-{/* Backdrop sombreado para dispositivos móviles */}
+{/* Backdrop sombreado para dispositivos móviles con bloqueo de interacción táctil */}
 <div
   id="sidebar-backdrop"
-  class="fixed inset-0 bg-primary/40 backdrop-blur-xs z-40 hidden lg:hidden transition-opacity cursor-pointer"
+  class="fixed inset-0 bg-primary/50 backdrop-blur-xs z-40 hidden lg:hidden transition-opacity cursor-pointer touch-none"
   aria-hidden="true"
 ></div>
 
-{/* Sidebar principal */}
+{/* Sidebar principal: En móviles inicia invisible y fuera de pantalla sin transición CSS para evitar FOUC */}
 <aside
   id="main-sidebar"
-  class="fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.06)] border-r border-surface-container -translate-x-full lg:translate-x-0 transition-transform duration-300"
+  class="fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.06)] border-r border-surface-container pointer-events-none invisible lg:pointer-events-auto lg:visible -translate-x-full lg:translate-x-0"
   aria-label="Navegación principal"
+  aria-hidden="true"
 >
   {/* Cabecera del Sidebar: Marca & Botón cerrar en móvil */}
   <div class="h-16 px-4 flex items-center justify-between border-b border-surface-container/60 shrink-0">
