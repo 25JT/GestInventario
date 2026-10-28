@@ -262,34 +262,34 @@
           <!-- Precio Base Venta -->
           <div class="col-span-12 md:col-span-4 flex flex-col gap-1.5">
             <label class="text-[12px] text-on-surface font-semibold" for="price-sale">
-              Precio de Venta Base (USD) *
+              Precio de Venta Base (COP) *
             </label>
             <div class="relative">
               <span class="font-mono text-[17px] font-bold text-secondary absolute left-3 top-1/2 -translate-y-1/2">$</span>
               <input
                 class="w-full h-11 pl-9 pr-3 bg-surface-container-lowest rounded-xl font-mono text-[18px] font-bold text-primary focus:outline-none border border-surface-container/70 focus:border-secondary shadow-xs transition-all"
                 id="price-sale"
-                step="0.50"
+                step="500"
                 type="number"
-                value="95.00"
+                value="95000"
               />
             </div>
-            <span class="text-[11px] text-on-surface-variant">Tarifa al cliente sin impuestos adicionales.</span>
+            <span class="text-[11px] text-on-surface-variant">Tarifa al cliente sin impuestos adicionales (Pesos COP).</span>
           </div>
 
           <!-- Costo Interno Estimado -->
           <div class="col-span-12 md:col-span-4 flex flex-col gap-1.5">
             <label class="text-[12px] text-on-surface font-semibold" for="price-cost">
-              Costo Interno (Mano de Obra) *
+              Costo Interno (Mano de Obra COP) *
             </label>
             <div class="relative">
               <span class="font-mono text-[17px] font-bold text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2">$</span>
               <input
                 class="w-full h-11 pl-9 pr-3 bg-surface-container-lowest rounded-xl font-mono text-[18px] font-bold text-on-surface focus:outline-none border border-surface-container/70 focus:border-secondary shadow-xs transition-all"
                 id="price-cost"
-                step="0.50"
+                step="500"
                 type="number"
-                value="35.00"
+                value="35000"
               />
             </div>
             <span class="text-[11px] text-on-surface-variant">Asignación al técnico o costo base estimado.</span>
@@ -300,7 +300,7 @@
             <div class="h-11 bg-surface-container-lowest rounded-xl px-3 flex items-center justify-between shadow-xs border border-surface-container/70">
               <div class="flex flex-col">
                 <span class="text-[11px] text-on-surface-variant">Margen Neto Estimado</span>
-                <span class="font-mono text-[13px] text-primary font-bold" id="label-profit">$60.00 de ganancia</span>
+                <span class="font-mono text-[13px] text-primary font-bold" id="label-profit">$60.000 COP de ganancia</span>
               </div>
               <div class="bg-tertiary-fixed text-on-tertiary text-[12px] px-2.5 py-1 rounded-lg font-bold flex items-center gap-1" id="badge-margin">
                 <span class="material-symbols-outlined text-[16px] text-tertiary-container">trending_up</span>
@@ -469,7 +469,7 @@
           onclick="window.saveNewService && window.saveNewService(false)"
         >
           <span class="material-symbols-outlined text-[18px]">check_circle</span>
-          <span id="btn-submit-label">Registrar Servicio ($95.00)</span>
+          <span id="btn-submit-label">Registrar Servicio ($95.000 COP)</span>
         </button>
       </div>
     </div>
@@ -539,9 +539,12 @@
       const profit = sale - cost;
       const margin = sale > 0 ? ((profit / sale) * 100).toFixed(1) : "0.0";
 
-      if (labelProfit) labelProfit.textContent = `$${profit.toFixed(2)} de ganancia`;
+      const formattedProfit = Math.round(profit).toLocaleString("es-CO");
+      const formattedSale = Math.round(sale).toLocaleString("es-CO");
+
+      if (labelProfit) labelProfit.textContent = `$${formattedProfit} COP de ganancia`;
       if (marginValue) marginValue.textContent = `${parseFloat(margin) >= 0 ? "+" : ""}${margin}% Margen`;
-      if (btnSubmitLabel) btnSubmitLabel.textContent = `Registrar Servicio ($${sale.toFixed(2)})`;
+      if (btnSubmitLabel) btnSubmitLabel.textContent = `Registrar Servicio ($${formattedSale} COP)`;
     }
 
     if (priceSaleInput) priceSaleInput.addEventListener("input", updateCalculations);
@@ -587,7 +590,8 @@
   (window as any).saveNewService = function (repeat = false) {
     const sku = (document.getElementById("service-sku") as HTMLInputElement | null)?.value.trim() || "SRV-MNT-06";
     const name = (document.getElementById("service-name") as HTMLInputElement | null)?.value.trim() || "";
-    const sale = (document.getElementById("price-sale") as HTMLInputElement | null)?.value.trim() || "95.00";
+    const sale = (document.getElementById("price-sale") as HTMLInputElement | null)?.value.trim() || "95000";
+    const formattedSale = Math.round(parseFloat(sale) || 0).toLocaleString("es-CO");
 
     if (!name) {
       if ((window as any).showServiceToast) {
@@ -597,7 +601,7 @@
     }
 
     if ((window as any).showServiceToast) {
-      (window as any).showServiceToast(`Servicio "${name}" [${sku}] por $${sale} incorporado exitosamente.`);
+      (window as any).showServiceToast(`Servicio "${name}" [${sku}] por $${formattedSale} COP incorporado exitosamente.`);
     }
 
     if (!repeat) {

@@ -99,10 +99,10 @@ import NavBar from "../components/Nav.astro";
             <div class="flex items-start justify-between">
               <div class="flex flex-col">
                 <span class="text-[12px] text-on-surface-variant uppercase tracking-wider font-semibold">
-                  Ventas Totales (Mes)
+                  Ventas Totales (COP Mes)
                 </span>
                 <span id="kpi-ventas-val" class="text-[24px] sm:text-[26px] text-on-surface tracking-tight mt-1 font-bold">
-                  $48,250.00
+                  $48.250.000
                 </span>
               </div>
               <div class="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-on-tertiary-container shrink-0">
@@ -124,10 +124,10 @@ import NavBar from "../components/Nav.astro";
             <div class="flex items-start justify-between">
               <div class="flex flex-col">
                 <span class="text-[12px] text-on-surface-variant uppercase tracking-wider font-semibold">
-                  Gastos Operativos
+                  Gastos Operativos (COP)
                 </span>
                 <span id="kpi-gastos-val" class="text-[24px] sm:text-[26px] text-on-surface tracking-tight mt-1 font-bold">
-                  $14,820.00
+                  $14.820.000
                 </span>
               </div>
               <div class="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-secondary-container shrink-0">
@@ -149,10 +149,10 @@ import NavBar from "../components/Nav.astro";
             <div class="flex items-start justify-between">
               <div class="flex flex-col">
                 <span class="text-[12px] text-on-surface-variant uppercase tracking-wider font-semibold">
-                  DINERO TOTAL
+                  DINERO TOTAL (COP)
                 </span>
                 <span id="kpi-utilidad-val" class="text-[24px] sm:text-[26px] text-on-surface tracking-tight mt-1 font-bold">
-                  $33,430.00
+                  $33.430.000
                 </span>
               </div>
               <div class="w-10 h-10 rounded-xl bg-tertiary-container text-on-tertiary-container flex items-center justify-center shrink-0">
@@ -166,7 +166,7 @@ import NavBar from "../components/Nav.astro";
                 </span>
               </div>
               <span class="text-[12px] text-on-surface-variant font-bold text-on-tertiary-container">
-                +$5,120
+                +$5.120.000
               </span>
             </div>
           </div>
@@ -820,17 +820,17 @@ import NavBar from "../components/Nav.astro";
       const kpiUtilidad = document.getElementById("kpi-utilidad-val");
 
       if (filter === "hoy") {
-        if (kpiVentas) kpiVentas.textContent = "$3,420.00";
-        if (kpiGastos) kpiGastos.textContent = "$890.00";
-        if (kpiUtilidad) kpiUtilidad.textContent = "$2,530.00";
+        if (kpiVentas) kpiVentas.textContent = "$3.420.000";
+        if (kpiGastos) kpiGastos.textContent = "$890.000";
+        if (kpiUtilidad) kpiUtilidad.textContent = "$2.530.000";
       } else if (filter === "semana") {
-        if (kpiVentas) kpiVentas.textContent = "$18,650.00";
-        if (kpiGastos) kpiGastos.textContent = "$4,210.00";
-        if (kpiUtilidad) kpiUtilidad.textContent = "$14,440.00";
+        if (kpiVentas) kpiVentas.textContent = "$18.650.000";
+        if (kpiGastos) kpiGastos.textContent = "$4.210.000";
+        if (kpiUtilidad) kpiUtilidad.textContent = "$14.440.000";
       } else {
-        if (kpiVentas) kpiVentas.textContent = "$48,250.00";
-        if (kpiGastos) kpiGastos.textContent = "$14,820.00";
-        if (kpiUtilidad) kpiUtilidad.textContent = "$33,430.00";
+        if (kpiVentas) kpiVentas.textContent = "$48.250.000";
+        if (kpiGastos) kpiGastos.textContent = "$14.820.000";
+        if (kpiUtilidad) kpiUtilidad.textContent = "$33.430.000";
       }
     };
 
