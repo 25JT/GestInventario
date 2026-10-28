@@ -3,9 +3,11 @@
  * Se encarga de enviar las credenciales al backend y gestionar el almacenamiento de la sesión.
  */
 
-// URL base del backend configurable mediante variable de entorno o fallback local
-export const API_BASE_URL =
-  import.meta.env.PUBLIC_API_URL || "http://localhost:3000/api";
+import { Ruta } from "./apiConfig.js";
+
+// Exportamos Ruta y API_BASE_URL para compatibilidad
+export { Ruta };
+export const API_BASE_URL = Ruta;
 
 /**
  * Inicia sesión con el identificador corporativo y contraseña.
