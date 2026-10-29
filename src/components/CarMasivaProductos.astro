@@ -1921,19 +1921,79 @@
     }
   });
 
-  // Guardar por lote (Mockup Front-end)
+  // Guardar por lote (Conexión Real con la BD MySQL vía Express)
   const saveBatchBtn = document.getElementById("btn-save-batch");
   if (saveBatchBtn) {
-    saveBatchBtn.addEventListener("click", () => {
-      const count = document.querySelectorAll("#inventory-rows tr").length;
-      if (count === 0) {
+    saveBatchBtn.addEventListener("click", async () => {
+      const rows = document.querySelectorAll("#inventory-rows tr");
+      if (rows.length === 0) {
         alert("No hay productos en la matriz para registrar.");
         return;
       }
-      alert(
-        `¡Éxito! Se han registrado correctamente ${count} productos en el Catálogo de Inventario.`,
-      );
-      (window as any).closeBulkUploadModal();
+
+      const productos: any[] = [];
+      rows.forEach((row) => {
+        const inputs = row.querySelectorAll("input");
+        const selects = row.querySelectorAll("select");
+
+        // inputs: [0: checkbox, 1: sku, 2: barcode, 3: name, 4: cost, 5: price, 6: stock, 7: min, 8: location]
+        const sku = inputs[1]?.value.trim() || `SKU-${Math.floor(1000 + Math.random() * 9000)}`;
+        const codigo_barras = inputs[2]?.value.trim() || "";
+        const nombre = inputs[3]?.value.trim() || "";
+        const categoria = selects[0]?.value.trim() || "General";
+        const precio_compra = parseCOP(inputs[4]?.value || "0");
+        const precio_venta = parseCOP(inputs[5]?.value || "0");
+        const stock_inicial = Number(inputs[6]?.value) || 0;
+        const stock_minimo = Number(inputs[7]?.value) || 5;
+        const ubicacion = inputs[8]?.value.trim() || "Bodega Central";
+
+        if (nombre) {
+          productos.push({
+            sku,
+            codigo_barras,
+            nombre,
+            categoria,
+            precio_compra,
+            precio_venta,
+            stock_inicial,
+            stock_minimo,
+            ubicacion,
+          });
+        }
+      });
+
+      if (productos.length === 0) {
+        alert("Por favor ingrese al menos un producto con nombre válido.");
+        return;
+      }
+
+      try {
+        saveBatchBtn.setAttribute("disabled", "true");
+        const originalText = saveBatchBtn.innerHTML;
+        saveBatchBtn.innerHTML = `<span class="material-symbols-outlined text-[17px] animate-spin">sync</span><span>Guardando lote...</span>`;
+
+        const res = await fetch("http://localhost:3000/api/inventario/carga-masiva", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productos }),
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          alert(`¡Éxito! Se han importado correctamente ${json.data.total_importados} productos a la base de datos.`);
+          (window as any).closeBulkUploadModal();
+          window.dispatchEvent(new CustomEvent("inventarioActualizado"));
+          window.dispatchEvent(new CustomEvent("categoriaActualizada"));
+        } else {
+          alert(json.error || "No se pudo completar la carga masiva.");
+        }
+        saveBatchBtn.removeAttribute("disabled");
+        saveBatchBtn.innerHTML = originalText;
+      } catch (err) {
+        console.error("Error en carga masiva:", err);
+        alert("Error al conectar con el servidor.");
+        saveBatchBtn.removeAttribute("disabled");
+      }
     });
   }
 

@@ -5,6 +5,46 @@ import SlideBar from "../components/SlideBar.astro";
 import NavBar from "../components/Nav.astro";
 import AggCategoria from "../components/AggCategoria.astro";
 import CarMasivaProductos from "../components/CarMasivaProductos.astro";
+
+// Carga inicial SSR desde la API local de Node/Express
+let initialKpis: any = {
+  total_skus: 0,
+  valorizacion_total: 0,
+  valorizacion_formato: "$ 0",
+  en_alerta: 0,
+  agotados: 0,
+  unidades_totales: 0,
+  rotacion_dias: 0,
+};
+
+let initialProducts: any[] = [];
+let initialCategories: any[] = [];
+let totalItemsCount = 0;
+
+try {
+  const [resKpis, resInv, resCat] = await Promise.all([
+    fetch("http://localhost:3000/api/inventario/kpis", { signal: AbortSignal.timeout(2000) }),
+    fetch("http://localhost:3000/api/inventario?limit=50", { signal: AbortSignal.timeout(2000) }),
+    fetch("http://localhost:3000/api/categorias", { signal: AbortSignal.timeout(2000) }),
+  ]);
+  if (resKpis.ok) {
+    const jsonK = await resKpis.json();
+    if (jsonK.success) initialKpis = jsonK.data;
+  }
+  if (resInv.ok) {
+    const jsonI = await resInv.json();
+    if (jsonI.success) {
+      initialProducts = jsonI.data.items || [];
+      totalItemsCount = jsonI.data.total || 0;
+    }
+  }
+  if (resCat.ok) {
+    const jsonC = await resCat.json();
+    if (jsonC.success) initialCategories = jsonC.data.categorias || [];
+  }
+} catch (e) {
+  // Manejo silencioso si el backend está reiniciando
+}
 ---
 
 <Layout title="Control de Inventario - StockControl Enterprise JR">
@@ -81,11 +121,13 @@ import CarMasivaProductos from "../components/CarMasivaProductos.astro";
                 Catálogo Total SKUs
               </span>
               <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] font-semibold text-secondary-container">
-                +14 este mes
+                Activos
               </span>
             </div>
             <div class="mt-3 flex items-baseline gap-2">
-              <span class="text-[26px] sm:text-[28px] text-primary font-bold tracking-tight">852</span>
+              <span id="kpi-total-skus" class="text-[26px] sm:text-[28px] text-primary font-bold tracking-tight">
+                {initialKpis.total_skus}
+              </span>
               <span class="text-[12px] text-on-surface-variant">ítems registrados</span>
             </div>
             <div class="w-full bg-surface-container h-1.5 rounded-full mt-3 overflow-hidden">
@@ -100,11 +142,13 @@ import CarMasivaProductos from "../components/CarMasivaProductos.astro";
                 Valorización de Activos
               </span>
               <span class="px-2 py-0.5 rounded-lg bg-surface-container-high text-[11px] font-semibold text-on-tertiary-container">
-                +6.2% vs prev
+                Valuación Costo
               </span>
             </div>
             <div class="mt-3 flex items-baseline gap-2">
-              <span class="text-[26px] sm:text-[28px] text-primary font-bold tracking-tight">$124.500.000</span>
+              <span id="kpi-valorizacion" class="text-[26px] sm:text-[28px] text-primary font-bold tracking-tight">
+                {initialKpis.valorizacion_formato}
+              </span>
               <span class="text-[12px] text-on-surface-variant font-medium">COP costo repo.</span>
             </div>
             <div class="w-full bg-surface-container h-1.5 rounded-full mt-3 overflow-hidden">
@@ -119,11 +163,13 @@ import CarMasivaProductos from "../components/CarMasivaProductos.astro";
                 Stock en Umbral Crítico
               </span>
               <span class="px-2 py-0.5 rounded-lg bg-error-container text-error text-[11px] font-bold animate-pulse">
-                18 en alerta
+                Alerta
               </span>
             </div>
             <div class="mt-3 flex items-baseline gap-2">
-              <span class="text-[26px] sm:text-[28px] text-error font-bold tracking-tight">18</span>
+              <span id="kpi-alerta-count" class="text-[26px] sm:text-[28px] text-error font-bold tracking-tight">
+                {initialKpis.en_alerta}
+              </span>
               <span class="text-[12px] text-on-surface-variant">requieren reabastecimiento</span>
             </div>
             <div class="w-full bg-surface-container h-1.5 rounded-full mt-3 overflow-hidden">
@@ -142,7 +188,9 @@ import CarMasivaProductos from "../components/CarMasivaProductos.astro";
               </span>
             </div>
             <div class="mt-3 flex items-baseline gap-2">
-              <span class="text-[26px] sm:text-[28px] text-primary font-bold tracking-tight">21.4</span>
+              <span id="kpi-rotacion" class="text-[26px] sm:text-[28px] text-primary font-bold tracking-tight">
+                {initialKpis.rotacion_dias}
+              </span>
               <span class="text-[12px] text-on-surface-variant">días de permanencia</span>
             </div>
             <div class="w-full bg-surface-container h-1.5 rounded-full mt-3 overflow-hidden">
@@ -178,10 +226,9 @@ import CarMasivaProductos from "../components/CarMasivaProductos.astro";
                 class="h-9 pl-3 pr-7 bg-surface hover:bg-surface-container-low text-on-surface rounded-xl text-[12px] font-medium appearance-none cursor-pointer border border-transparent hover:border-surface-container focus:outline-none focus:bg-surface-container-lowest transition-all"
               >
                 <option value="">Categoría: Todas</option>
-                <option value="electrónicos">Electrónicos</option>
-                <option value="repuestos">Repuestos & Refacciones</option>
-                <option value="consumibles">Consumibles</option>
-                <option value="herramientas">Herramientas Pro</option>
+                {initialCategories.map((c: any) => (
+                  <option value={c.id}>{c.nombre} ({c.prefijo || "GEN"})</option>
+                ))}
               </select>
               <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant">
                 expand_more
@@ -251,522 +298,83 @@ import CarMasivaProductos from "../components/CarMasivaProductos.astro";
                   <th class="px-4 py-2 font-semibold text-right min-w-[120px]">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-surface-container/40">
-                <!-- Row 1: Healthy Stock -->
-                <tr
-                  class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
-                  data-category="electrónicos"
-                  data-status="opt"
-                >
-                  <td class="px-3 py-2 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-3 py-2 font-semibold text-primary">
-                    SKU-7729-EL
-                    <div class="text-[11px] text-on-surface-variant font-normal">75010098231</div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 overflow-hidden">
-                        <img
-                          class="w-full h-full object-cover"
-                          alt="Sensor Óptico Láser HD-40"
-                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeRpQVoH8yEXmbMjCMUDpNZ43WSPGlOaufpUL07WZtovK_FXzCjGrYwk97NCa2jnrPeYRToZGepHekMze9DYc2-1e-L9HA0jFCqxUaJvKJiHJvndDzF7TgiaERWHLK0WA02FGWb71MmLdCbjpcfyNuQ0aHeo-riPXEeKW3-l-Wd6hULuGlVGU7mI5V22B34WVLh2zI14e5DMdixNNZy0yQj-Z2cDLhq_KtBpPaGlDND7Jbzi83PcX50w"
-                        />
-                      </div>
-                      <div class="flex flex-col min-w-0">
-                        <span class="font-semibold text-on-surface truncate">Sensor Óptico Láser HD-40</span>
-                        <span class="text-[11px] text-on-surface-variant truncate">Rango dinámico 120m con calibración digital</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
-                      Electrónicos
-                    </span>
-                  </td>
-                  <td class="px-3 py-2 text-right text-on-surface-variant font-medium">$42.50</td>
-                  <td class="px-3 py-2 text-right text-on-surface font-bold">$89.00</td>
-                  <td class="px-3 py-2 text-right">
-                    <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
-                      +52.2%
-                    </span>
-                  </td>
-                  <td class="px-3 py-2 text-center">
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-surface-container-high text-on-tertiary-container text-[11px] font-semibold">
-                      <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
-                      <span>142 unid.</span>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2 text-[12px] text-on-surface-variant">Pasillo B · Est. 04</td>
-                  <td class="px-4 py-2 text-right">
-                    <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Ajustar Stock Rápido"
-                        type="button"
-                        data-action="quick-adjust"
-                        data-sku="SKU-7729-EL"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">tune</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Editar Producto"
-                        type="button"
-                        onclick="window.openProductDrawer && window.openProductDrawer()"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Historial Kárdex"
-                        type="button"
-                        data-action="kardex"
-                        data-sku="SKU-7729-EL"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">history</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
-                        title="Eliminar"
-                        type="button"
-                        data-action="delete-item"
-                        data-sku="SKU-7729-EL"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Row 2: Low Stock Warning -->
-                <tr
-                  class="inventory-row h-12 bg-surface-container-low/30 hover:bg-surface-container-low transition-colors group"
-                  data-category="repuestos"
-                  data-status="low"
-                >
-                  <td class="px-3 py-2 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-3 py-2 font-semibold text-primary">
-                    SKU-9104-RP
-                    <div class="text-[11px] text-on-surface-variant font-normal">75099304128</div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 overflow-hidden">
-                        <img
-                          class="w-full h-full object-cover"
-                          alt="Kit Rodamientos Blindados 608-2RS"
-                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPtXaqTJSW1Q4eIfMfN41VYosfpOlM98t9s6MhrMhNULclcz4pSY1t9DA2lQaFJ1qydOml9pC5hCoVzFgpfLRKAj4bPqO7m0AbVrpgxpji7Gyni_xg70j9ouYeKgmy1MBpekahdsymp8H36ru0M-KoiFv3zYjbmF7R9X7KECo3zKSFjlfvC8p99UgPfbLJVU2w71IB8iCXCth1DaUm9XwdyobbVQ0sdNfGOgO60fj5U6s7Pu6InwYSTg"
-                        />
-                      </div>
-                      <div class="flex flex-col min-w-0">
-                        <span class="font-semibold text-on-surface truncate">Kit Rodamientos Blindados 608-2RS</span>
-                        <span class="text-[11px] text-on-surface-variant truncate">Acero al cromo alta fricción para transmisiones</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
-                      Repuestos
-                    </span>
-                  </td>
-                  <td class="px-3 py-2 text-right text-on-surface-variant font-medium">$11.20</td>
-                  <td class="px-3 py-2 text-right text-on-surface font-bold">$24.00</td>
-                  <td class="px-3 py-2 text-right">
-                    <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
-                      +53.3%
-                    </span>
-                  </td>
-                  <td class="px-3 py-2 text-center">
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-error-container/60 text-error text-[11px] font-bold">
-                      <span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span>
-                      <span>4 unid. (Mín: 15)</span>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2 text-[12px] text-on-surface-variant">Rack E · Cajón 12</td>
-                  <td class="px-4 py-2 text-right">
-                    <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Ajustar Stock"
-                        type="button"
-                        data-action="quick-adjust"
-                        data-sku="SKU-9104-RP"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">tune</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Editar Producto"
-                        type="button"
-                        onclick="window.openProductDrawer && window.openProductDrawer()"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Historial Kárdex"
-                        type="button"
-                        data-action="kardex"
-                        data-sku="SKU-9104-RP"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">history</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
-                        title="Eliminar"
-                        type="button"
-                        data-action="delete-item"
-                        data-sku="SKU-9104-RP"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Row 3: Out of Stock (Zero) -->
-                <tr
-                  class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
-                  data-category="consumibles"
-                  data-status="zero"
-                >
-                  <td class="px-3 py-2 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-3 py-2 font-semibold text-primary">
-                    SKU-3312-CS
-                    <div class="text-[11px] text-on-surface-variant font-normal">75038472911</div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 overflow-hidden">
-                        <img
-                          class="w-full h-full object-cover"
-                          alt="Lubricante Sintético Dieléctrico 400ml"
-                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3hqpnpNk5OqGMBo7L6E9pMUZx5iR35ZNFkfPTRyqPcV49lArSkNFi7bFKaESAplPs5QV5-dp-S6mpVVbqFEW0Un9fk3gGX4AhL5lQMxefv1Nzq26RtKtFFVnvamo47PHbFN7UQKpR0wW2ReNLPq0eHbYa_SjBVz7d3JXB9X8_ndRJihW8d4W-z6IJCGcdh7E70Qi3umzg-Rm6vIWMINuKdu4hgEyMN3VNIusRvcAHsbUefNRGxKUnDg"
-                        />
-                      </div>
-                      <div class="flex flex-col min-w-0">
-                        <span class="font-semibold text-on-surface truncate">Lubricante Sintético Dieléctrico 400ml</span>
-                        <span class="text-[11px] text-on-surface-variant truncate">Aerosol repelente humedad para contactores</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
-                      Consumibles
-                    </span>
-                  </td>
-                  <td class="px-3 py-2 text-right text-on-surface-variant font-medium">$6.50</td>
-                  <td class="px-3 py-2 text-right text-on-surface font-bold">$14.50</td>
-                  <td class="px-3 py-2 text-right">
-                    <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
-                      +55.1%
-                    </span>
-                  </td>
-                  <td class="px-3 py-2 text-center">
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-error-container text-error text-[11px] font-bold">
-                      <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
-                      <span>Agotado (0)</span>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2 text-[12px] text-on-surface-variant">Pasillo A · Bahía 01</td>
-                  <td class="px-4 py-2 text-right">
-                    <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Ajustar Stock"
-                        type="button"
-                        data-action="quick-adjust"
-                        data-sku="SKU-3312-CS"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">tune</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Editar Producto"
-                        type="button"
-                        onclick="window.openProductDrawer && window.openProductDrawer()"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Historial Kárdex"
-                        type="button"
-                        data-action="kardex"
-                        data-sku="SKU-3312-CS"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">history</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
-                        title="Eliminar"
-                        type="button"
-                        data-action="delete-item"
-                        data-sku="SKU-3312-CS"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Row 4: Tools Pro -->
-                <tr
-                  class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
-                  data-category="herramientas"
-                  data-status="opt"
-                >
-                  <td class="px-3 py-2 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-3 py-2 font-semibold text-primary">
-                    SKU-5541-HT
-                    <div class="text-[11px] text-on-surface-variant font-normal">75088219450</div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant">
-                        <span class="material-symbols-outlined text-[20px]">handyman</span>
-                      </div>
-                      <div class="flex flex-col min-w-0">
-                        <span class="font-semibold text-on-surface truncate">Pinza Crimpadora Hexagonal 6-50mm²</span>
-                        <span class="text-[11px] text-on-surface-variant truncate">Cuerpo reforzado con mangos aislados 1000V</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
-                      Herramientas
-                    </span>
-                  </td>
-                  <td class="px-3 py-2 text-right text-on-surface-variant font-medium">$38.00</td>
-                  <td class="px-3 py-2 text-right text-on-surface font-bold">$68.50</td>
-                  <td class="px-3 py-2 text-right">
-                    <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
-                      +44.5%
-                    </span>
-                  </td>
-                  <td class="px-3 py-2 text-center">
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-surface-container-high text-on-tertiary-container text-[11px] font-semibold">
-                      <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
-                      <span>28 unid.</span>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2 text-[12px] text-on-surface-variant">Zona C · Armario 02</td>
-                  <td class="px-4 py-2 text-right">
-                    <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Ajustar Stock"
-                        type="button"
-                        data-action="quick-adjust"
-                        data-sku="SKU-5541-HT"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">tune</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Editar Producto"
-                        type="button"
-                        onclick="window.openProductDrawer && window.openProductDrawer()"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Historial Kárdex"
-                        type="button"
-                        data-action="kardex"
-                        data-sku="SKU-5541-HT"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">history</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
-                        title="Eliminar"
-                        type="button"
-                        data-action="delete-item"
-                        data-sku="SKU-5541-HT"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Row 5: Electronic Module -->
-                <tr
-                  class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
-                  data-category="electrónicos"
-                  data-status="opt"
-                >
-                  <td class="px-3 py-2 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-3 py-2 font-semibold text-primary">
-                    SKU-1088-EL
-                    <div class="text-[11px] text-on-surface-variant font-normal">75099182341</div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant">
-                        <span class="material-symbols-outlined text-[20px]">memory</span>
-                      </div>
-                      <div class="flex flex-col min-w-0">
-                        <span class="font-semibold text-on-surface truncate">Microcontrolador ESP32-WROOM-32D</span>
-                        <span class="text-[11px] text-on-surface-variant truncate">Módulo Wi-Fi & BLE dual-core 240MHz</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
-                      Electrónicos
-                    </span>
-                  </td>
-                  <td class="px-3 py-2 text-right text-on-surface-variant font-medium">$3.20</td>
-                  <td class="px-3 py-2 text-right text-on-surface font-bold">$7.50</td>
-                  <td class="px-3 py-2 text-right">
-                    <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
-                      +57.3%
-                    </span>
-                  </td>
-                  <td class="px-3 py-2 text-center">
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-surface-container-high text-on-tertiary-container text-[11px] font-semibold">
-                      <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
-                      <span>310 unid.</span>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2 text-[12px] text-on-surface-variant">Pasillo B · Gaveta 09</td>
-                  <td class="px-4 py-2 text-right">
-                    <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Ajustar Stock"
-                        type="button"
-                        data-action="quick-adjust"
-                        data-sku="SKU-1088-EL"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">tune</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Editar Producto"
-                        type="button"
-                        onclick="window.openProductDrawer && window.openProductDrawer()"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Historial Kárdex"
-                        type="button"
-                        data-action="kardex"
-                        data-sku="SKU-1088-EL"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">history</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
-                        title="Eliminar"
-                        type="button"
-                        data-action="delete-item"
-                        data-sku="SKU-1088-EL"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Row 6: Healthy Stock -->
-                <tr
-                  class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
-                  data-category="repuestos"
-                  data-status="opt"
-                >
-                  <td class="px-3 py-2 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-3 py-2 font-semibold text-primary">
-                    SKU-8920-RP
-                    <div class="text-[11px] text-on-surface-variant font-normal">75066491028</div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant">
-                        <span class="material-symbols-outlined text-[20px]">settings_input_component</span>
-                      </div>
-                      <div class="flex flex-col min-w-0">
-                        <span class="font-semibold text-on-surface truncate">Válvula Solenoide Neumática 24V DC</span>
-                        <span class="text-[11px] text-on-surface-variant truncate">Conector DIN 43650 con indicador LED</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2">
-                    <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
-                      Repuestos
-                    </span>
-                  </td>
-                  <td class="px-3 py-2 text-right text-on-surface-variant font-medium">$22.40</td>
-                  <td class="px-3 py-2 text-right text-on-surface font-bold">$45.00</td>
-                  <td class="px-3 py-2 text-right">
-                    <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
-                      +50.2%
-                    </span>
-                  </td>
-                  <td class="px-3 py-2 text-center">
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-surface-container-high text-on-tertiary-container text-[11px] font-semibold">
-                      <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
-                      <span>65 unid.</span>
-                    </div>
-                  </td>
-                  <td class="px-3 py-2 text-[12px] text-on-surface-variant">Pasillo E · Est. 01</td>
-                  <td class="px-4 py-2 text-right">
-                    <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Ajustar Stock"
-                        type="button"
-                        data-action="quick-adjust"
-                        data-sku="SKU-8920-RP"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">tune</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Editar Producto"
-                        type="button"
-                        onclick="window.openProductDrawer && window.openProductDrawer()"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg cursor-pointer"
-                        title="Historial Kárdex"
-                        type="button"
-                        data-action="kardex"
-                        data-sku="SKU-8920-RP"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">history</span>
-                      </button>
-                      <button
-                        class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
-                        title="Eliminar"
-                        type="button"
-                        data-action="delete-item"
-                        data-sku="SKU-8920-RP"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+              <tbody id="inventory-table-body" class="divide-y divide-surface-container/40">
+                {initialProducts.length > 0 ? (
+                  initialProducts.map((item: any) => (
+                    <tr
+                      class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
+                      data-id={item.id}
+                      data-category={item.categoria_id}
+                      data-status={item.salud_status}
+                    >
+                      <td class="px-3 py-2 text-center">
+                        <input class="row-checkbox w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" value={item.id} />
+                      </td>
+                      <td class="px-3 py-2 font-semibold text-primary">
+                        {item.sku}
+                        <div class="text-[11px] text-on-surface-variant font-normal">{item.codigo_barras || "S/C"}</div>
+                      </td>
+                      <td class="px-3 py-2">
+                        <div class="flex items-center gap-2.5">
+                          <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant">
+                            <span class="material-symbols-outlined text-[19px]">
+                              {item.tipo === "FISICO" ? "inventory_2" : item.tipo === "CONSUMIBLE" ? "format_paint" : "build"}
+                            </span>
+                          </div>
+                          <div class="flex flex-col min-w-0">
+                            <span class="font-semibold text-on-surface truncate">{item.nombre}</span>
+                            <span class="text-[11px] text-on-surface-variant truncate">{item.tipo || "Producto físico"}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-3 py-2">
+                        <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
+                          {item.categoria || "General"}
+                        </span>
+                      </td>
+                      <td class="px-3 py-2 text-right text-on-surface-variant font-medium">{item.precio_compra_formato}</td>
+                      <td class="px-3 py-2 text-right text-on-surface font-bold">{item.precio_venta_formato}</td>
+                      <td class="px-3 py-2 text-right">
+                        <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
+                          {item.margen_porcentaje}
+                        </span>
+                      </td>
+                      <td class="px-3 py-2 text-center">
+                        <div class={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] ${item.badge_class}`}>
+                          <span class={`w-1.5 h-1.5 rounded-full ${item.dot_class}`}></span>
+                          <span>{item.salud_label}</span>
+                        </div>
+                      </td>
+                      <td class="px-3 py-2 text-[12px] text-on-surface-variant">{item.ubicacion || "Bodega Central"}</td>
+                      <td class="px-4 py-2 text-right">
+                        <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                          <button
+                            class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
+                            title="Ajustar Stock Rápido"
+                            type="button"
+                            onclick={`window.quickAdjustStock && window.quickAdjustStock('${item.id}', '${item.sku}', ${item.stock_actual})`}
+                          >
+                            <span class="material-symbols-outlined text-[18px]">tune</span>
+                          </button>
+                          <button
+                            class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
+                            title="Eliminar producto"
+                            type="button"
+                            onclick={`window.deleteProductItem && window.deleteProductItem('${item.id}', '${item.nombre}')`}
+                          >
+                            <span class="material-symbols-outlined text-[18px]">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colspan="10" class="px-4 py-12 text-center text-on-surface-variant">
+                      No hay productos registrados en el inventario. Haz clic en "Agregar Producto" o "Carga Masiva".
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -775,7 +383,7 @@ import CarMasivaProductos from "../components/CarMasivaProductos.astro";
           <div class="p-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-surface-container/60">
             <div class="flex items-center gap-4 text-[12px] text-on-surface-variant">
               <span>
-                Mostrando <span id="inventory-visible-count" class="text-on-surface font-semibold">6</span> de <span class="text-on-surface font-semibold">852</span> artículos
+                Mostrando <span id="inventory-visible-count" class="text-on-surface font-semibold">{initialProducts.length}</span> de <span id="inventory-total-count" class="text-on-surface font-semibold">{totalItemsCount}</span> artículos
               </span>
               <div class="flex items-center gap-1.5">
                 <span>Filas:</span>
@@ -902,10 +510,9 @@ import CarMasivaProductos from "../components/CarMasivaProductos.astro";
               class="w-full h-9 px-3 bg-surface text-on-surface rounded-xl text-[13px] border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary focus:bg-surface-container-lowest"
             >
               <option value="">Seleccione categoría...</option>
-              <option value="electrónicos">Electrónicos</option>
-              <option value="repuestos">Repuestos & Refacciones</option>
-              <option value="consumibles">Consumibles</option>
-              <option value="herramientas">Herramientas Pro</option>
+              {initialCategories.map((c: any) => (
+                <option value={c.id}>{c.nombre} ({c.prefijo || "GEN"})</option>
+              ))}
             </select>
           </div>
           <div class="space-y-1">
@@ -1060,6 +667,8 @@ import CarMasivaProductos from "../components/CarMasivaProductos.astro";
       showInventoryToast,
     } from "../animaciones/animaInventario.js";
 
+    const API_BASE = "http://localhost:3000/api";
+
     // Exponer funciones necesarias al scope global
     (window as any).openProductDrawer = openProductDrawer;
     (window as any).closeProductDrawer = closeProductDrawer;
@@ -1079,10 +688,408 @@ import CarMasivaProductos from "../components/CarMasivaProductos.astro";
       }
     };
 
+    // Formatear COP en el cliente
+    function formatCOP(val: number | string) {
+      const num = Number(val) || 0;
+      return new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        maximumFractionDigits: 0,
+      }).format(num);
+    }
+
+    // 1. Cargar productos desde la base de datos
+    async function fetchInventory(search = "", category = "", status = "") {
+      try {
+        const params = new URLSearchParams();
+        if (search) params.append("q", search);
+        if (category) params.append("categoria", category);
+        if (status) params.append("salud", status);
+        params.append("limit", "100");
+
+        const res = await fetch(`${API_BASE}/inventario?${params.toString()}`);
+        if (!res.ok) throw new Error("HTTP error " + res.status);
+        const json = await res.json();
+        if (json.success && json.data) {
+          renderTableRows(json.data.items || []);
+          const visibleCountEl = document.getElementById("inventory-visible-count");
+          const totalCountEl = document.getElementById("inventory-total-count");
+          if (visibleCountEl) visibleCountEl.textContent = String(json.data.items?.length || 0);
+          if (totalCountEl) totalCountEl.textContent = String(json.data.total || 0);
+        }
+      } catch (err) {
+        console.error("Error al cargar inventario:", err);
+      }
+    }
+
+    // 2. Cargar KPIs desde la base de datos
+    async function fetchKpis() {
+      try {
+        const res = await fetch(`${API_BASE}/inventario/kpis`);
+        if (!res.ok) throw new Error("HTTP error " + res.status);
+        const json = await res.json();
+        if (json.success && json.data) {
+          const k = json.data;
+          const totalSkusEl = document.getElementById("kpi-total-skus");
+          const valEl = document.getElementById("kpi-valorizacion");
+          const alertaEl = document.getElementById("kpi-alerta-count");
+          const rotEl = document.getElementById("kpi-rotacion");
+
+          if (totalSkusEl) totalSkusEl.textContent = String(k.total_skus || 0);
+          if (valEl) valEl.textContent = k.valorizacion_formato || "$ 0";
+          if (alertaEl) alertaEl.textContent = String(k.en_alerta || 0);
+          if (rotEl) rotEl.textContent = String(k.rotacion_dias || 0);
+        }
+      } catch (err) {
+        console.error("Error al cargar KPIs:", err);
+      }
+    }
+
+    // 3. Cargar categorías dinámicas en los selectores
+    async function fetchCategories() {
+      try {
+        const res = await fetch(`${API_BASE}/categorias`);
+        if (!res.ok) throw new Error("HTTP error " + res.status);
+        const json = await res.json();
+        if (json.success && json.data && Array.isArray(json.data.categorias)) {
+          const cats = json.data.categorias;
+
+          // Selector de filtro de tabla
+          const filterCat = document.getElementById("filter-category") as HTMLSelectElement | null;
+          if (filterCat) {
+            const currentVal = filterCat.value;
+            filterCat.innerHTML = `<option value="">Categoría: Todas</option>` +
+              cats.map((c: any) => `<option value="${c.id}" ${currentVal === c.id ? "selected" : ""}>${c.nombre} (${c.prefijo || "GEN"})</option>`).join("");
+          }
+
+          // Selector del Drawer
+          const drawerCat = document.getElementById("drawer-category") as HTMLSelectElement | null;
+          if (drawerCat) {
+            drawerCat.innerHTML = `<option value="">Seleccione categoría...</option>` +
+              cats.map((c: any) => `<option value="${c.id}">${c.nombre} (${c.prefijo || "GEN"})</option>`).join("");
+          }
+        }
+      } catch (err) {
+        console.error("Error al cargar categorías:", err);
+      }
+    }
+
+    // Renderizar filas de la tabla de inventario
+    function renderTableRows(items: any[]) {
+      const tbody = document.getElementById("inventory-table-body");
+      if (!tbody) return;
+
+      if (!items || items.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="10" class="px-4 py-12 text-center text-on-surface-variant">
+              No se encontraron productos que coincidan con los filtros aplicados.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = items
+        .map((item) => {
+          const icon = item.tipo === "FISICO" ? "inventory_2" : item.tipo === "CONSUMIBLE" ? "format_paint" : "build";
+          return `
+            <tr
+              class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
+              data-id="${item.id}"
+              data-category="${item.categoria_id}"
+              data-status="${item.salud_status}"
+            >
+              <td class="px-3 py-2 text-center">
+                <input class="row-checkbox w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" value="${item.id}" />
+              </td>
+              <td class="px-3 py-2 font-semibold text-primary">
+                ${item.sku}
+                <div class="text-[11px] text-on-surface-variant font-normal">${item.codigo_barras || "S/C"}</div>
+              </td>
+              <td class="px-3 py-2">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-[19px]">${icon}</span>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <span class="font-semibold text-on-surface truncate">${item.nombre}</span>
+                    <span class="text-[11px] text-on-surface-variant truncate">${item.tipo || "Producto físico"}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="px-3 py-2">
+                <span class="px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface font-medium">
+                  ${item.categoria || "General"}
+                </span>
+              </td>
+              <td class="px-3 py-2 text-right text-on-surface-variant font-medium">${item.precio_compra_formato}</td>
+              <td class="px-3 py-2 text-right text-on-surface font-bold">${item.precio_venta_formato}</td>
+              <td class="px-3 py-2 text-right">
+                <span class="text-[11px] text-on-tertiary-container font-semibold bg-surface-container-high px-1.5 py-0.5 rounded-lg">
+                  ${item.margen_porcentaje}
+                </span>
+              </td>
+              <td class="px-3 py-2 text-center">
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] ${item.badge_class}">
+                  <span class="w-1.5 h-1.5 rounded-full ${item.dot_class}"></span>
+                  <span>${item.salud_label}</span>
+                </div>
+              </td>
+              <td class="px-3 py-2 text-[12px] text-on-surface-variant">${item.ubicacion || "Bodega Central"}</td>
+              <td class="px-4 py-2 text-right">
+                <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                  <button
+                    class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
+                    title="Ajustar Stock Rápido"
+                    type="button"
+                    onclick="window.quickAdjustStock && window.quickAdjustStock('${item.id}', '${item.sku}', ${item.stock_actual})"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">tune</span>
+                  </button>
+                  <button
+                    class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
+                    title="Eliminar producto"
+                    type="button"
+                    onclick="window.deleteProductItem && window.deleteProductItem('${item.id}', '${item.nombre}')"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    // 4. Ajuste rápido de stock vía PATCH
+    (window as any).quickAdjustStock = async function(id: string, sku: string, currentStock: number) {
+      const input = prompt(`Ajustar stock para ${sku} (Stock actual: ${currentStock}):\nIngrese la nueva cantidad:`, String(currentStock));
+      if (input === null) return;
+      const nuevaCantidad = parseInt(input.trim(), 10);
+      if (isNaN(nuevaCantidad) || nuevaCantidad < 0) {
+        alert("Por favor ingrese un número entero válido mayor o igual a 0.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/inventario/producto/${id}/stock`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cantidad: nuevaCantidad,
+            motivo: "Ajuste manual desde panel de control",
+          }),
+        });
+        const json = await res.json();
+        if (json.success) {
+          showInventoryToast(`Stock de ${sku} actualizado a ${nuevaCantidad} unidades.`);
+          fetchInventory(
+            (document.getElementById("inventory-search") as HTMLInputElement)?.value || "",
+            (document.getElementById("filter-category") as HTMLSelectElement)?.value || "",
+            (document.getElementById("filter-status") as HTMLSelectElement)?.value || ""
+          );
+          fetchKpis();
+        } else {
+          alert(json.error || "No se pudo actualizar el stock.");
+        }
+      } catch (err) {
+        console.error("Error al actualizar stock:", err);
+        alert("Error de conexión con el servidor.");
+      }
+    };
+
+    // 5. Eliminar producto vía DELETE
+    (window as any).deleteProductItem = async function(id: string, name: string) {
+      if (!confirm(`¿Estás seguro de eliminar el producto "${name}" del catálogo?`)) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/inventario/producto/${id}`, {
+          method: "DELETE",
+        });
+        const json = await res.json();
+        if (json.success) {
+          showInventoryToast(`Producto "${name}" eliminado del catálogo.`);
+          fetchInventory(
+            (document.getElementById("inventory-search") as HTMLInputElement)?.value || "",
+            (document.getElementById("filter-category") as HTMLSelectElement)?.value || "",
+            (document.getElementById("filter-status") as HTMLSelectElement)?.value || ""
+          );
+          fetchKpis();
+          fetchCategories();
+        } else {
+          alert(json.error || "No se pudo eliminar el producto.");
+        }
+      } catch (err) {
+        console.error("Error al eliminar producto:", err);
+        alert("Error de conexión con el servidor.");
+      }
+    };
+
+    // 6. Guardar nuevo producto desde el Drawer
+    function setupDrawerForm() {
+      const btnSave = document.getElementById("btn-save-drawer");
+      const costInput = document.getElementById("drawer-cost") as HTMLInputElement | null;
+      const priceInput = document.getElementById("drawer-price") as HTMLInputElement | null;
+      const marginEl = document.getElementById("drawer-margin");
+
+      // Cálculo de margen en tiempo real en el Drawer
+      const updateMargin = () => {
+        const cost = Number(costInput?.value) || 0;
+        const price = Number(priceInput?.value) || 0;
+        if (price > 0 && cost > 0) {
+          const margin = (((price - cost) / price) * 100).toFixed(1);
+          if (marginEl) marginEl.textContent = `+${margin}%`;
+        } else {
+          if (marginEl) marginEl.textContent = "0.0%";
+        }
+      };
+
+      costInput?.addEventListener("input", updateMargin);
+      priceInput?.addEventListener("input", updateMargin);
+
+      if (btnSave) {
+        btnSave.addEventListener("click", async () => {
+          const nameInput = document.getElementById("drawer-name") as HTMLInputElement | null;
+          const skuInput = document.getElementById("drawer-sku") as HTMLInputElement | null;
+          const eanInput = document.getElementById("drawer-ean") as HTMLInputElement | null;
+          const catSelect = document.getElementById("drawer-category") as HTMLSelectElement | null;
+          const locInput = document.getElementById("drawer-location") as HTMLInputElement | null;
+          const stockInput = document.getElementById("drawer-stock-initial") as HTMLInputElement | null;
+          const minInput = document.getElementById("drawer-stock-min") as HTMLInputElement | null;
+
+          const nombre = nameInput?.value.trim();
+          const sku = skuInput?.value.trim();
+          const categoria_id = catSelect?.value;
+          const precio_compra = Number(costInput?.value) || 0;
+          const precio_venta = Number(priceInput?.value) || 0;
+          const stock_inicial = Number(stockInput?.value) || 0;
+          const stock_minimo = Number(minInput?.value) || 5;
+          const ubicacion = locInput?.value.trim() || "";
+          const codigo_barras = eanInput?.value.trim() || "";
+
+          if (!nombre) {
+            alert("Por favor ingrese el nombre del producto.");
+            nameInput?.focus();
+            return;
+          }
+          if (!sku) {
+            alert("Por favor ingrese un SKU.");
+            skuInput?.focus();
+            return;
+          }
+          if (!categoria_id) {
+            alert("Por favor seleccione una categoría.");
+            catSelect?.focus();
+            return;
+          }
+
+          try {
+            btnSave.setAttribute("disabled", "true");
+            btnSave.innerHTML = `<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Guardando...</span>`;
+
+            const res = await fetch(`${API_BASE}/inventario/producto`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                nombre,
+                sku,
+                categoria_id,
+                precio_compra,
+                precio_venta,
+                stock_inicial,
+                stock_minimo,
+                ubicacion,
+                codigo_barras,
+              }),
+            });
+
+            const json = await res.json();
+            if (json.success) {
+              showInventoryToast(`Producto "${nombre}" registrado con éxito.`);
+              closeProductDrawer();
+              // Limpiar formulario
+              if (nameInput) nameInput.value = "";
+              if (skuInput) skuInput.value = "SKU-";
+              if (eanInput) eanInput.value = "";
+              if (costInput) costInput.value = "";
+              if (priceInput) priceInput.value = "";
+              if (locInput) locInput.value = "";
+              // Refrescar inventario y métricas
+              fetchInventory();
+              fetchKpis();
+              fetchCategories();
+            } else {
+              alert(json.error || "No se pudo registrar el producto.");
+            }
+          } catch (err) {
+            console.error("Error al registrar producto:", err);
+            alert("Error al conectar con el servidor.");
+          } finally {
+            btnSave.removeAttribute("disabled");
+            btnSave.innerHTML = `<span class="material-symbols-outlined text-[18px]">save</span><span>Guardar Producto</span>`;
+          }
+        });
+      }
+    }
+
+    // 7. Configuración de filtros reactivos
+    function setupFilters() {
+      const searchInput = document.getElementById("inventory-search") as HTMLInputElement | null;
+      const catSelect = document.getElementById("filter-category") as HTMLSelectElement | null;
+      const statusSelect = document.getElementById("filter-status") as HTMLSelectElement | null;
+      const btnReset = document.getElementById("btn-reset-filters");
+
+      let debounceTimer: any = null;
+
+      const triggerFilter = () => {
+        const q = searchInput?.value.trim() || "";
+        const c = catSelect?.value || "";
+        const s = statusSelect?.value || "";
+        fetchInventory(q, c, s);
+      };
+
+      searchInput?.addEventListener("input", () => {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(triggerFilter, 250);
+      });
+
+      catSelect?.addEventListener("change", triggerFilter);
+      statusSelect?.addEventListener("change", triggerFilter);
+
+      btnReset?.addEventListener("click", () => {
+        if (searchInput) searchInput.value = "";
+        if (catSelect) catSelect.value = "";
+        if (statusSelect) statusSelect.value = "";
+        triggerFilter();
+      });
+    }
+
     // Inicializar eventos y micro-interacciones de inventario
     function setupInventory() {
       initInventoryAnimations();
+      setupDrawerForm();
+      setupFilters();
+
+      // Cargar datos en vivo
+      fetchInventory();
+      fetchKpis();
+      fetchCategories();
     }
+
+    // Escuchar eventos globales de actualización
+    window.addEventListener("categoriaActualizada", () => {
+      fetchCategories();
+      fetchInventory();
+      fetchKpis();
+    });
+
+    window.addEventListener("inventarioActualizado", () => {
+      fetchInventory();
+      fetchKpis();
+      fetchCategories();
+    });
 
     document.addEventListener("astro:page-load", setupInventory);
     if (document.readyState === "loading") {
