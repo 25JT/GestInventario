@@ -161,8 +161,8 @@
             </div>
           </div>
           <div class="my-2 flex items-baseline gap-2">
-            <span class="text-[28px] text-primary font-bold tracking-tight"
-              >852</span
+            <span id="cat-total-prods" class="text-[28px] text-primary font-bold tracking-tight"
+              >0</span
             >
             <span class="text-[12px] text-on-tertiary-container font-semibold"
               >100% clasificado</span
@@ -188,23 +188,23 @@
             >
           </div>
           <div class="my-2 flex flex-col">
-            <span class="text-[16px] text-primary font-bold truncate"
-              >Electrónicos &amp; Sensores</span
+            <span id="cat-leader-name" class="text-[16px] text-primary font-bold truncate"
+              >Ninguna</span
             >
             <div
               class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant text-[11px]"
             >
-              <span>310 unidades</span>
+              <span id="cat-leader-units">0 unidades</span>
               <span>•</span>
-              <span class="font-semibold text-primary font-mono"
-                >$48.200.000 COP</span
+              <span id="cat-leader-val" class="font-semibold text-primary font-mono"
+                >$ 0 COP</span
               >
             </div>
           </div>
           <div
             class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden mt-1"
           >
-            <div class="bg-secondary h-full rounded-full" style="width: 48%">
+            <div id="cat-leader-bar" class="bg-secondary h-full rounded-full" style="width: 0%">
             </div>
           </div>
         </div>
@@ -224,11 +224,11 @@
             >
           </div>
           <div class="my-2 flex items-baseline gap-2">
-            <span class="text-[28px] text-primary font-bold tracking-tight"
-              >1</span
+            <span id="cat-empty-count" class="text-[28px] text-primary font-bold tracking-tight"
+              >0</span
             >
             <span class="text-[12px] text-on-surface-variant"
-              >nueva categoría lista</span
+              >categorías sin productos</span
             >
           </div>
           <div
@@ -356,6 +356,7 @@
               <div class="grid grid-cols-6 gap-2" id="color-palette-group">
                 <button
                   class="color-badge-opt h-8 rounded-xl bg-secondary-container flex items-center justify-center transition-all active:scale-95 shadow-xs ring-2 ring-primary cursor-pointer"
+                  data-color="blue"
                   onclick="window.selectColorBadge('blue', '#316bf3', this)"
                   type="button"
                 >
@@ -365,6 +366,7 @@
                 </button>
                 <button
                   class="color-badge-opt h-8 rounded-xl bg-on-tertiary-container flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
+                  data-color="emerald"
                   onclick="window.selectColorBadge('emerald', '#00a472', this)"
                   type="button"
                 >
@@ -375,6 +377,7 @@
                 </button>
                 <button
                   class="color-badge-opt h-8 rounded-xl bg-secondary flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
+                  data-color="indigo"
                   onclick="window.selectColorBadge('indigo', '#0051d5', this)"
                   type="button"
                 >
@@ -385,6 +388,7 @@
                 </button>
                 <button
                   class="color-badge-opt h-8 rounded-xl bg-amber-600 flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
+                  data-color="amber"
                   onclick="window.selectColorBadge('amber', '#d97706', this)"
                   type="button"
                 >
@@ -395,6 +399,7 @@
                 </button>
                 <button
                   class="color-badge-opt h-8 rounded-xl bg-primary flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
+                  data-color="dark"
                   onclick="window.selectColorBadge('dark', '#091426', this)"
                   type="button"
                 >
@@ -405,6 +410,7 @@
                 </button>
                 <button
                   class="color-badge-opt h-8 rounded-xl bg-error flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
+                  data-color="rose"
                   onclick="window.selectColorBadge('rose', '#ba1a1a', this)"
                   type="button"
                 >
@@ -418,9 +424,11 @@
               <!-- Selector de Icono Rápido -->
               <div
                 class="mt-1 flex items-center justify-between gap-1 overflow-x-auto py-1"
+                id="icon-palette-group"
               >
                 <button
                   class="icon-opt p-1.5 rounded-lg bg-surface-container text-primary hover:bg-surface-container-high transition-colors cursor-pointer"
+                  data-icon="bolt"
                   onclick="window.selectIconSymbol('bolt', this)"
                   title="Eléctrico"
                   type="button"
@@ -430,6 +438,7 @@
                 </button>
                 <button
                   class="icon-opt p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+                  data-icon="devices"
                   onclick="window.selectIconSymbol('devices', this)"
                   title="Dispositivos"
                   type="button"
@@ -440,6 +449,7 @@
                 </button>
                 <button
                   class="icon-opt p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+                  data-icon="handyman"
                   onclick="window.selectIconSymbol('handyman', this)"
                   title="Herramientas"
                   type="button"
@@ -450,6 +460,7 @@
                 </button>
                 <button
                   class="icon-opt p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+                  data-icon="science"
                   onclick="window.selectIconSymbol('science', this)"
                   title="Químicos"
                   type="button"
@@ -460,6 +471,7 @@
                 </button>
                 <button
                   class="icon-opt p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+                  data-icon="settings"
                   onclick="window.selectIconSymbol('settings', this)"
                   title="Repuestos"
                   type="button"
@@ -470,6 +482,7 @@
                 </button>
                 <button
                   class="icon-opt p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+                  data-icon="kitchen"
                   onclick="window.selectIconSymbol('kitchen', this)"
                   title="Electrodomésticos"
                   type="button"
@@ -480,6 +493,7 @@
                 </button>
                 <button
                   class="icon-opt p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+                  data-icon="print"
                   onclick="window.selectIconSymbol('print', this)"
                   title="Periféricos"
                   type="button"
@@ -614,25 +628,28 @@
               class="flex items-center gap-1.5 self-stretch sm:self-auto overflow-x-auto"
             >
               <button
+                id="tab-cat-all"
                 class="status-filter-tab px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-primary text-on-primary shadow-xs transition-all cursor-pointer"
                 onclick="window.filterCategoriesByStatus('all', this)"
                 type="button"
               >
-                Todas (8)
+                Todas (0)
               </button>
               <button
+                id="tab-cat-active"
                 class="status-filter-tab px-3 py-1.5 rounded-lg text-[12px] font-semibold text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all cursor-pointer"
                 onclick="window.filterCategoriesByStatus('active', this)"
                 type="button"
               >
-                Activas (7)
+                Activas (0)
               </button>
               <button
+                id="tab-cat-inactive"
                 class="status-filter-tab px-3 py-1.5 rounded-lg text-[12px] font-semibold text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all cursor-pointer"
                 onclick="window.filterCategoriesByStatus('inactive', this)"
                 type="button"
               >
-                Inactivas (1)
+                Inactivas (0)
               </button>
               <div class="w-px h-5 bg-surface-container mx-1 hidden sm:block">
               </div>
@@ -674,685 +691,9 @@
                   class="divide-y divide-surface-container/40"
                   id="categories-table-body"
                 >
-                  <!-- Fila 1: Electrónicos -->
-                  <tr
-                    class="hover:bg-surface-container-low/50 transition-colors group"
-                    data-id="1"
-                    data-status="active"
-                  >
-                    <td class="px-4 py-3 text-center">
-                      <div
-                        class="w-8 h-8 mx-auto rounded-lg bg-secondary-container text-on-secondary flex items-center justify-center shadow-xs"
-                      >
-                        <span class="material-symbols-outlined text-[18px]"
-                          >bolt</span
-                        >
-                      </div>
-                    </td>
-                    <td class="px-4 py-3">
-                      <div class="flex flex-col">
-                        <span
-                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
-                          >Electrónicos &amp; Sensores</span
-                        >
-                        <span
-                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
-                          >SKU: <span class="text-secondary font-bold"
-                            >EL-XXXX</span
-                          ></span
-                        >
-                      </div>
-                    </td>
-                    <td
-                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
-                    >
-                      Sensores IoT, placas, conectores de precisión y módulos
-                      SMD.
-                    </td>
-                    <td class="px-4 py-3 text-right font-mono">
-                      <span
-                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
-                        title="Ver 310 productos"
-                      >
-                        310 ítems
-                      </span>
-                    </td>
-                    <td
-                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
-                    >
-                      $48,200.00
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                      <span
-                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
-                      >
-                        <span
-                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
-                        ></span>
-                        Activa
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-right">
-                      <div
-                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
-                      >
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(1, 'Electrónicos & Sensores', 'EL', 'Sensores IoT, placas, conectores de precisión y módulos SMD.', 'bolt', 'blue', true)"
-                          title="Editar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >edit</span
-                          >
-                        </button>
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(1, 'Electrónicos & Sensores', 310)"
-                          title="Eliminar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >delete</span
-                          >
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Fila 2: Electrodomésticos -->
-                  <tr
-                    class="hover:bg-surface-container-low/50 transition-colors group"
-                    data-id="2"
-                    data-status="active"
-                  >
-                    <td class="px-4 py-3 text-center">
-                      <div
-                        class="w-8 h-8 mx-auto rounded-lg bg-amber-600 text-white flex items-center justify-center shadow-xs"
-                      >
-                        <span class="material-symbols-outlined text-[18px]"
-                          >kitchen</span
-                        >
-                      </div>
-                    </td>
-                    <td class="px-4 py-3">
-                      <div class="flex flex-col">
-                        <span
-                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
-                          >Electrodomésticos &amp; Hogar</span
-                        >
-                        <span
-                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
-                          >SKU: <span class="text-amber-600 font-bold"
-                            >HOG-XXXX</span
-                          ></span
-                        >
-                      </div>
-                    </td>
-                    <td
-                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
-                    >
-                      Línea menor de cocina, licuadoras, microondas y
-                      ventilación.
-                    </td>
-                    <td class="px-4 py-3 text-right font-mono">
-                      <span
-                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
-                        title="Ver 85 productos"
-                      >
-                        85 ítems
-                      </span>
-                    </td>
-                    <td
-                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
-                    >
-                      $18,900.00
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                      <span
-                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
-                      >
-                        <span
-                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
-                        ></span>
-                        Activa
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-right">
-                      <div
-                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
-                      >
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(2, 'Electrodomésticos & Hogar', 'HOG', 'Línea menor de cocina, licuadoras, microondas y ventilación.', 'kitchen', 'amber', true)"
-                          title="Editar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >edit</span
-                          >
-                        </button>
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(2, 'Electrodomésticos & Hogar', 85)"
-                          title="Eliminar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >delete</span
-                          >
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Fila 3: Repuestos & Rodamientos -->
-                  <tr
-                    class="hover:bg-surface-container-low/50 transition-colors group"
-                    data-id="3"
-                    data-status="active"
-                  >
-                    <td class="px-4 py-3 text-center">
-                      <div
-                        class="w-8 h-8 mx-auto rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-xs"
-                      >
-                        <span class="material-symbols-outlined text-[18px]"
-                          >settings</span
-                        >
-                      </div>
-                    </td>
-                    <td class="px-4 py-3">
-                      <div class="flex flex-col">
-                        <span
-                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
-                          >Repuestos &amp; Rodamientos</span
-                        >
-                        <span
-                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
-                          >SKU: <span class="text-primary font-bold"
-                            >RP-XXXX</span
-                          ></span
-                        >
-                      </div>
-                    </td>
-                    <td
-                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
-                    >
-                      Piezas mecánicas, rodamientos sellados y engranes
-                      industriales.
-                    </td>
-                    <td class="px-4 py-3 text-right font-mono">
-                      <span
-                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
-                        title="Ver 124 productos"
-                      >
-                        124 ítems
-                      </span>
-                    </td>
-                    <td
-                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
-                    >
-                      $14,200.00
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                      <span
-                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
-                      >
-                        <span
-                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
-                        ></span>
-                        Activa
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-right">
-                      <div
-                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
-                      >
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(3, 'Repuestos & Rodamientos', 'RP', 'Piezas mecánicas, rodamientos sellados y engranes industriales.', 'settings', 'dark', false)"
-                          title="Editar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >edit</span
-                          >
-                        </button>
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(3, 'Repuestos & Rodamientos', 124)"
-                          title="Eliminar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >delete</span
-                          >
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Fila 4: Consumibles & Químicos -->
-                  <tr
-                    class="hover:bg-surface-container-low/50 transition-colors group"
-                    data-id="4"
-                    data-status="active"
-                  >
-                    <td class="px-4 py-3 text-center">
-                      <div
-                        class="w-8 h-8 mx-auto rounded-lg bg-on-tertiary-container text-white flex items-center justify-center shadow-xs"
-                      >
-                        <span class="material-symbols-outlined text-[18px]"
-                          >science</span
-                        >
-                      </div>
-                    </td>
-                    <td class="px-4 py-3">
-                      <div class="flex flex-col">
-                        <span
-                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
-                          >Consumibles &amp; Químicos</span
-                        >
-                        <span
-                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
-                          >SKU: <span
-                            class="text-on-tertiary-container font-bold"
-                            >CS-XXXX</span
-                          ></span
-                        >
-                      </div>
-                    </td>
-                    <td
-                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
-                    >
-                      Alcohol isopropílico, flux de soldadura, cintas térmicas y
-                      solventes.
-                    </td>
-                    <td class="px-4 py-3 text-right font-mono">
-                      <span
-                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
-                        title="Ver 98 productos"
-                      >
-                        98 ítems
-                      </span>
-                    </td>
-                    <td
-                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
-                    >
-                      $6,400.00
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                      <span
-                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
-                      >
-                        <span
-                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
-                        ></span>
-                        Activa
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-right">
-                      <div
-                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
-                      >
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(4, 'Consumibles & Químicos', 'CS', 'Alcohol isopropílico, flux de soldadura, cintas térmicas y solventes.', 'science', 'emerald', false)"
-                          title="Editar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >edit</span
-                          >
-                        </button>
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(4, 'Consumibles & Químicos', 98)"
-                          title="Eliminar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >delete</span
-                          >
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Fila 5: Herramientas & Equipamiento -->
-                  <tr
-                    class="hover:bg-surface-container-low/50 transition-colors group"
-                    data-id="5"
-                    data-status="active"
-                  >
-                    <td class="px-4 py-3 text-center">
-                      <div
-                        class="w-8 h-8 mx-auto rounded-lg bg-secondary text-on-secondary flex items-center justify-center shadow-xs"
-                      >
-                        <span class="material-symbols-outlined text-[18px]"
-                          >handyman</span
-                        >
-                      </div>
-                    </td>
-                    <td class="px-4 py-3">
-                      <div class="flex flex-col">
-                        <span
-                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
-                          >Herramientas &amp; Equipamiento</span
-                        >
-                        <span
-                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
-                          >SKU: <span class="text-secondary font-bold"
-                            >HT-XXXX</span
-                          ></span
-                        >
-                      </div>
-                    </td>
-                    <td
-                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
-                    >
-                      Estaciones de soldadura, multímetros digitales y prensas
-                      térmicas.
-                    </td>
-                    <td class="px-4 py-3 text-right font-mono">
-                      <span
-                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
-                        title="Ver 112 productos"
-                      >
-                        112 ítems
-                      </span>
-                    </td>
-                    <td
-                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
-                    >
-                      $21,300.00
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                      <span
-                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
-                      >
-                        <span
-                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
-                        ></span>
-                        Activa
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-right">
-                      <div
-                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
-                      >
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(5, 'Herramientas & Equipamiento', 'HT', 'Estaciones de soldadura, multímetros digitales y prensas térmicas.', 'handyman', 'indigo', true)"
-                          title="Editar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >edit</span
-                          >
-                        </button>
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(5, 'Herramientas & Equipamiento', 112)"
-                          title="Eliminar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >delete</span
-                          >
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Fila 6: Periféricos & POS -->
-                  <tr
-                    class="hover:bg-surface-container-low/50 transition-colors group"
-                    data-id="6"
-                    data-status="active"
-                  >
-                    <td class="px-4 py-3 text-center">
-                      <div
-                        class="w-8 h-8 mx-auto rounded-lg bg-secondary-container text-on-secondary flex items-center justify-center shadow-xs"
-                      >
-                        <span class="material-symbols-outlined text-[18px]"
-                          >print</span
-                        >
-                      </div>
-                    </td>
-                    <td class="px-4 py-3">
-                      <div class="flex flex-col">
-                        <span
-                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
-                          >Periféricos &amp; POS</span
-                        >
-                        <span
-                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
-                          >SKU: <span class="text-secondary-container font-bold"
-                            >POS-XXXX</span
-                          ></span
-                        >
-                      </div>
-                    </td>
-                    <td
-                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
-                    >
-                      Impresoras térmicas, lectores de código de barra y gavetas
-                      RJ11.
-                    </td>
-                    <td class="px-4 py-3 text-right font-mono">
-                      <span
-                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
-                        title="Ver 75 productos"
-                      >
-                        75 ítems
-                      </span>
-                    </td>
-                    <td
-                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
-                    >
-                      $12,800.00
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                      <span
-                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
-                      >
-                        <span
-                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
-                        ></span>
-                        Activa
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-right">
-                      <div
-                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
-                      >
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(6, 'Periféricos & POS', 'POS', 'Impresoras térmicas, lectores de código de barra y gavetas RJ11.', 'print', 'blue', true)"
-                          title="Editar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >edit</span
-                          >
-                        </button>
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(6, 'Periféricos & POS', 75)"
-                          title="Eliminar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >delete</span
-                          >
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Fila 7: Cómputo & Servidores -->
-                  <tr
-                    class="hover:bg-surface-container-low/50 transition-colors group"
-                    data-id="7"
-                    data-status="active"
-                  >
-                    <td class="px-4 py-3 text-center">
-                      <div
-                        class="w-8 h-8 mx-auto rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-xs"
-                      >
-                        <span class="material-symbols-outlined text-[18px]"
-                          >devices</span
-                        >
-                      </div>
-                    </td>
-                    <td class="px-4 py-3">
-                      <div class="flex flex-col">
-                        <span
-                          class="font-semibold text-primary group-hover:text-secondary transition-colors"
-                          >Cómputo &amp; Servidores</span
-                        >
-                        <span
-                          class="font-mono text-[11px] text-on-surface-variant font-semibold tracking-wider"
-                          >SKU: <span class="text-primary font-bold"
-                            >CMP-XXXX</span
-                          ></span
-                        >
-                      </div>
-                    </td>
-                    <td
-                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
-                    >
-                      Mini PCs de caja, switches administrables y memorias ECC.
-                    </td>
-                    <td class="px-4 py-3 text-right font-mono">
-                      <span
-                        class="px-2 py-0.5 rounded-lg bg-surface-container text-primary font-semibold text-[12px] cursor-pointer hover:bg-surface-variant transition-colors"
-                        title="Ver 48 productos"
-                      >
-                        48 ítems
-                      </span>
-                    </td>
-                    <td
-                      class="px-4 py-3 text-right font-mono text-primary font-semibold"
-                    >
-                      $2,700.00
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                      <span
-                        class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container text-[11px] font-semibold inline-flex items-center gap-1"
-                      >
-                        <span
-                          class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"
-                        ></span>
-                        Activa
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-right">
-                      <div
-                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
-                      >
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(7, 'Cómputo & Servidores', 'CMP', 'Mini PCs de caja, switches administrables y memorias ECC.', 'devices', 'dark', true)"
-                          title="Editar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >edit</span
-                          >
-                        </button>
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(7, 'Cómputo & Servidores', 48)"
-                          title="Eliminar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >delete</span
-                          >
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Fila 8: Categoría en Preparación / Inactiva -->
-                  <tr
-                    class="hover:bg-surface-container-low/50 transition-colors group bg-surface/40"
-                    data-id="8"
-                    data-status="inactive"
-                  >
-                    <td class="px-4 py-3 text-center">
-                      <div
-                        class="w-8 h-8 mx-auto rounded-lg bg-surface-container text-on-surface-variant flex items-center justify-center"
-                      >
-                        <span class="material-symbols-outlined text-[18px]"
-                          >folder_off</span
-                        >
-                      </div>
-                    </td>
-                    <td class="px-4 py-3">
-                      <div class="flex flex-col">
-                        <span class="font-semibold text-on-surface-variant"
-                          >Embalaje &amp; Envíos (Piloto)</span
-                        >
-                        <span
-                          class="font-mono text-[11px] text-on-surface-variant"
-                          >SKU: EMB-XXXX</span
-                        >
-                      </div>
-                    </td>
-                    <td
-                      class="px-4 py-3 max-w-xs text-on-surface-variant truncate"
-                    >
-                      Cajas de cartón corrugado, burbuja protectora y precintos.
-                    </td>
-                    <td class="px-4 py-3 text-right font-mono">
-                      <span
-                        class="px-2 py-0.5 rounded-lg bg-surface-container-low text-on-surface-variant font-medium text-[12px]"
-                      >
-                        0 ítems
-                      </span>
-                    </td>
-                    <td
-                      class="px-4 py-3 text-right font-mono text-on-surface-variant"
-                    >
-                      $0.00
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                      <span
-                        class="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-semibold inline-flex items-center gap-1"
-                      >
-                        <span class="w-1.5 h-1.5 rounded-full bg-outline"
-                        ></span>
-                        Inactiva
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-right">
-                      <div
-                        class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity"
-                      >
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.editCategory(8, 'Embalaje & Envíos (Piloto)', 'EMB', 'Cajas de cartón corrugado, burbuja protectora y precintos.', 'folder_off', 'dark', false)"
-                          title="Editar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >edit</span
-                          >
-                        </button>
-                        <button
-                          class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg transition-colors cursor-pointer"
-                          onclick="window.deleteCategory(8, 'Embalaje & Envíos (Piloto)', 0)"
-                          title="Eliminar categoría"
-                          type="button"
-                        >
-                          <span class="material-symbols-outlined text-[17px]"
-                            >delete</span
-                          >
-                        </button>
-                      </div>
+                  <tr>
+                    <td colspan="7" class="px-4 py-8 text-center text-on-surface-variant">
+                      Cargando categorías de la base de datos...
                     </td>
                   </tr>
                 </tbody>
@@ -1454,10 +795,33 @@
 
   let currentColor = "blue";
   let currentIcon = "bolt";
-  let editingCategoryId: number | null = null;
+  let editingCategoryId: string | null = null;
   let toastTimer: any = null;
 
   const API_CATEGORIAS = "http://localhost:3000/api/categorias";
+
+  function getColorClasses(colorName: string): string {
+    switch (colorName) {
+      case "emerald":
+        return "bg-on-tertiary-container text-white";
+      case "indigo":
+        return "bg-secondary text-on-secondary";
+      case "amber":
+        return "bg-amber-600 text-white";
+      case "dark":
+        return "bg-primary text-on-primary";
+      case "rose":
+        return "bg-error text-white";
+      case "blue":
+      default:
+        return "bg-secondary-container text-on-secondary";
+    }
+  }
+
+  function escapeAttr(str?: string): string {
+    if (!str) return "";
+    return str.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+  }
 
   // Cargar categorías reales desde la API del backend
   async function loadBackendCategories() {
@@ -1470,6 +834,44 @@
         // Métricas superiores
         const activeCount = document.getElementById("cat-count-active");
         if (activeCount) activeCount.textContent = String(metricas?.total_activas || categorias.length || 0);
+
+        const totalProds = document.getElementById("cat-total-prods");
+        if (totalProds) totalProds.textContent = String(metricas?.total_articulos ?? 0);
+
+        const leaderName = document.getElementById("cat-leader-name");
+        if (leaderName) leaderName.textContent = metricas?.lider?.nombre || "Ninguna";
+
+        const leaderUnits = document.getElementById("cat-leader-units");
+        if (leaderUnits) leaderUnits.textContent = `${metricas?.lider?.unidades || 0} unidades`;
+
+        const leaderVal = document.getElementById("cat-leader-val");
+        if (leaderVal) leaderVal.textContent = `${metricas?.lider?.valor_formato || "$ 0"} COP`;
+
+        const leaderBar = document.getElementById("cat-leader-bar");
+        if (leaderBar) {
+          const totalVal = categorias.reduce((sum: number, x: any) => sum + (x.valor_inventario || 0), 0);
+          const pct = totalVal > 0 ? Math.min(100, Math.round(((metricas?.lider?.valor || 0) / totalVal) * 100)) : 0;
+          leaderBar.style.width = `${pct}%`;
+        }
+
+        const emptyCount = document.getElementById("cat-empty-count");
+        if (emptyCount) emptyCount.textContent = String(metricas?.vacias ?? 0);
+
+        // Actualizar pestañas de conteo
+        const tabAll = document.getElementById("tab-cat-all");
+        if (tabAll) tabAll.textContent = `Todas (${categorias.length})`;
+
+        const activeCats = categorias.filter((c: any) => c.estado !== "Inactiva");
+        const inactiveCats = categorias.filter((c: any) => c.estado === "Inactiva");
+
+        const tabActive = document.getElementById("tab-cat-active");
+        if (tabActive) tabActive.textContent = `Activas (${activeCats.length})`;
+
+        const tabInactive = document.getElementById("tab-cat-inactive");
+        if (tabInactive) tabInactive.textContent = `Inactivas (${inactiveCats.length})`;
+
+        const tableSummary = document.getElementById("cat-table-summary");
+        if (tableSummary) tableSummary.textContent = `Mostrando ${categorias.length} de ${categorias.length} categorías registradas`;
 
         // Tabla de categorías
         const tbody = document.getElementById("categories-table-body");
@@ -1485,10 +887,10 @@
           } else {
             tbody.innerHTML = categorias
               .map((c: any) => `
-                <tr class="hover:bg-surface-container-low/50 transition-colors group" data-id="${c.id}" data-status="active">
+                <tr class="hover:bg-surface-container-low/50 transition-colors group" data-id="${c.id}" data-status="${c.estado === 'Inactiva' ? 'inactive' : 'active'}">
                   <td class="px-4 py-3 text-center">
-                    <div class="w-8 h-8 mx-auto rounded-lg bg-secondary-container text-on-secondary flex items-center justify-center shadow-xs">
-                      <span class="material-symbols-outlined text-[18px]">category</span>
+                    <div class="w-8 h-8 mx-auto rounded-lg ${getColorClasses(c.color)} flex items-center justify-center shadow-xs">
+                      <span class="material-symbols-outlined text-[18px]">${c.icono || "bolt"}</span>
                     </div>
                   </td>
                   <td class="px-4 py-3">
@@ -1501,18 +903,26 @@
                   <td class="px-4 py-3 text-right font-bold text-on-surface">${c.total_productos} SKUs</td>
                   <td class="px-4 py-3 text-right font-mono font-bold text-primary">${c.valor_inventario_formato || "$ 0"}</td>
                   <td class="px-4 py-3 text-center">
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-tertiary-container text-[11px] font-bold">
-                      <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
-                      Activa
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full ${c.estado === 'Inactiva' ? 'bg-surface-container text-on-surface-variant' : 'bg-surface-container-high text-on-tertiary-container'} text-[11px] font-bold">
+                      <span class="w-1.5 h-1.5 rounded-full ${c.estado === 'Inactiva' ? 'bg-outline' : 'bg-on-tertiary-container'}"></span>
+                      ${c.estado || "Activa"}
                     </span>
                   </td>
                   <td class="px-4 py-3 text-right">
                     <div class="flex items-center justify-end gap-1">
                       <button
+                        class="p-1 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
+                        title="Editar categoría"
+                        type="button"
+                        onclick="window.editCategory('${c.id}', '${escapeAttr(c.nombre)}', '${escapeAttr(c.prefijo)}', '${escapeAttr(c.descripcion)}', '${c.icono || 'bolt'}', '${c.color || 'blue'}', '${c.estado || 'Activa'}')"
+                      >
+                        <span class="material-symbols-outlined text-[17px]">edit</span>
+                      </button>
+                      <button
                         class="p-1 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors cursor-pointer"
                         title="Eliminar categoría"
                         type="button"
-                        onclick="window.deleteCategory && window.deleteCategory('${c.id}', '${c.nombre}', ${c.total_productos})"
+                        onclick="window.deleteCategory && window.deleteCategory('${c.id}', '${escapeAttr(c.nombre)}', ${c.total_productos})"
                       >
                         <span class="material-symbols-outlined text-[17px]">delete</span>
                       </button>
@@ -1579,10 +989,10 @@
   // Selector de Color
   (window as any).selectColorBadge = function (
     colorName: string,
-    hex: string,
+    hex?: string,
     btnElement?: HTMLElement,
   ) {
-    currentColor = colorName;
+    currentColor = colorName || "blue";
     const buttons = document.querySelectorAll(".color-badge-opt");
     buttons.forEach((btn) => {
       const icon = btn.querySelector(".material-symbols-outlined");
@@ -1590,7 +1000,15 @@
       btn.classList.remove("ring-2", "ring-primary");
     });
 
-    const trigger = btnElement || (event?.currentTarget as HTMLElement);
+    let trigger = btnElement;
+    if (!trigger && typeof event !== "undefined" && (event as any)?.currentTarget) {
+      trigger = (event as any).currentTarget as HTMLElement;
+    }
+    if (!trigger) {
+      const matching = document.querySelector(`.color-badge-opt[data-color="${colorName}"]`) as HTMLElement | null;
+      if (matching) trigger = matching;
+    }
+
     if (trigger) {
       trigger.classList.add("ring-2", "ring-primary");
       const activeIcon = trigger.querySelector(".material-symbols-outlined");
@@ -1600,24 +1018,7 @@
     // Actualizar preview en cabecera de formulario
     const previewBox = document.getElementById("form-icon-preview");
     if (previewBox) {
-      if (colorName === "blue")
-        previewBox.className =
-          "w-9 h-9 rounded-xl bg-secondary-container text-on-secondary flex items-center justify-center shadow-xs";
-      else if (colorName === "emerald")
-        previewBox.className =
-          "w-9 h-9 rounded-xl bg-on-tertiary-container text-white flex items-center justify-center shadow-xs";
-      else if (colorName === "indigo")
-        previewBox.className =
-          "w-9 h-9 rounded-xl bg-secondary text-on-secondary flex items-center justify-center shadow-xs";
-      else if (colorName === "amber")
-        previewBox.className =
-          "w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-xs";
-      else if (colorName === "dark")
-        previewBox.className =
-          "w-9 h-9 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-xs";
-      else if (colorName === "rose")
-        previewBox.className =
-          "w-9 h-9 rounded-xl bg-error text-white flex items-center justify-center shadow-xs";
+      previewBox.className = `w-9 h-9 rounded-xl ${getColorClasses(currentColor)} flex items-center justify-center shadow-xs`;
     }
   };
 
@@ -1626,21 +1027,29 @@
     iconName: string,
     btnElement?: HTMLElement,
   ) {
-    currentIcon = iconName;
+    currentIcon = iconName || "bolt";
     const buttons = document.querySelectorAll(".icon-opt");
     buttons.forEach((btn) => {
       btn.classList.remove("bg-surface-container", "text-primary");
       btn.classList.add("text-on-surface-variant");
     });
 
-    const trigger = btnElement || (event?.currentTarget as HTMLElement);
+    let trigger = btnElement;
+    if (!trigger && typeof event !== "undefined" && (event as any)?.currentTarget) {
+      trigger = (event as any).currentTarget as HTMLElement;
+    }
+    if (!trigger) {
+      const matching = document.querySelector(`.icon-opt[data-icon="${iconName}"]`) as HTMLElement | null;
+      if (matching) trigger = matching;
+    }
+
     if (trigger) {
       trigger.classList.add("bg-surface-container", "text-primary");
       trigger.classList.remove("text-on-surface-variant");
     }
 
     const preview = document.getElementById("preview-icon-symbol");
-    if (preview) preview.textContent = iconName;
+    if (preview) preview.textContent = currentIcon;
   };
 
   // Generador de Prefijo
@@ -1692,44 +1101,37 @@
     if (btnText) btnText.textContent = "Guardar Categoría";
     if (preview) preview.textContent = "bolt";
 
-    (window as any).selectColorBadge("blue", "#316bf3");
+    (window as any).selectColorBadge("blue");
+    (window as any).selectIconSymbol("bolt");
   };
 
   (window as any).editCategory = function (
-    id: number,
+    id: string,
     name: string,
     prefix: string,
     desc: string,
     icon: string,
     color: string,
-    hasSerial: boolean,
+    status: string,
   ) {
     editingCategoryId = id;
-    const nameEl = document.getElementById(
-      "cat-name",
-    ) as HTMLInputElement | null;
-    const prefixEl = document.getElementById(
-      "cat-prefix",
-    ) as HTMLInputElement | null;
-    const descEl = document.getElementById(
-      "cat-desc",
-    ) as HTMLTextAreaElement | null;
-    const traceEl = document.getElementById(
-      "cat-trace",
-    ) as HTMLInputElement | null;
+    const nameEl = document.getElementById("cat-name") as HTMLInputElement | null;
+    const prefixEl = document.getElementById("cat-prefix") as HTMLInputElement | null;
+    const descEl = document.getElementById("cat-desc") as HTMLTextAreaElement | null;
+    const statusEl = document.getElementById("cat-status") as HTMLSelectElement | null;
 
     if (nameEl) nameEl.value = name;
     if (prefixEl) prefixEl.value = prefix;
     if (descEl) descEl.value = desc;
-    if (traceEl) traceEl.checked = Boolean(hasSerial);
+    if (statusEl) statusEl.value = (status === "Inactiva" || status === "inactive") ? "inactive" : "active";
 
     const heading = document.getElementById("form-heading");
     const btnText = document.getElementById("submit-btn-text");
     if (heading) heading.textContent = "Editar: " + name;
     if (btnText) btnText.textContent = "Actualizar Cambios";
 
-    const preview = document.getElementById("preview-icon-symbol");
-    if (preview) preview.textContent = icon;
+    (window as any).selectColorBadge(color || "blue");
+    (window as any).selectIconSymbol(icon || "bolt");
 
     if (nameEl) {
       nameEl.focus();
@@ -1790,10 +1192,14 @@
     const descInput = document.getElementById(
       "cat-desc",
     ) as HTMLTextAreaElement | null;
+    const statusSelect = document.getElementById(
+      "cat-status",
+    ) as HTMLSelectElement | null;
 
     const name = nameInput?.value.trim() || "";
     const prefix = prefixInput?.value.trim() || "";
     const descripcion = descInput?.value.trim() || "";
+    const estado = statusSelect?.value === "inactive" ? "Inactiva" : "Activa";
 
     if (!name) {
       alert("Por favor ingrese el nombre de la categoría.");
@@ -1801,12 +1207,21 @@
       return;
     }
 
+    const payload = {
+      nombre: name,
+      prefijo: prefix,
+      descripcion,
+      icono: currentIcon || "bolt",
+      color: currentColor || "blue",
+      estado,
+    };
+
     try {
       if (editingCategoryId) {
         const res = await fetch(`${API_CATEGORIAS}/${editingCategoryId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nombre: name, prefijo: prefix, descripcion }),
+          body: JSON.stringify(payload),
         });
         const json = await res.json();
         if (json.success) {
@@ -1823,7 +1238,7 @@
         const res = await fetch(API_CATEGORIAS, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nombre: name, prefijo: prefix, descripcion }),
+          body: JSON.stringify(payload),
         });
         const json = await res.json();
         if (json.success) {
@@ -1927,6 +1342,17 @@
       });
     }, 3200);
   };
+
+  // Cargar al inicio y suscripción a eventos
+  loadBackendCategories();
+
+  window.addEventListener("categoriaActualizada", () => {
+    loadBackendCategories();
+  });
+
+  document.addEventListener("astro:page-load", () => {
+    loadBackendCategories();
+  });
 
   // Cerrar con Escape
   document.addEventListener("keydown", (e) => {
