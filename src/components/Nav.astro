@@ -9,6 +9,14 @@ const {
   storeName = "Central Sucursal 01",
   operationStatus = "Operación Normal",
 } = Astro.props;
+
+const nowServer = new Date();
+const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
 ---
 
 <header
@@ -53,8 +61,9 @@ const {
   <div class="flex items-center gap-3 sm:gap-4 shrink-0">
     {/* Fecha y Estado Operativo */}
     <div class="hidden md:flex flex-col text-right">
-      <span id="nav-live-date" class="font-label-sm text-[11px] text-on-surface-variant font-medium">
-        Turno Operativo
+      <span id="nav-live-date" class="font-label-sm text-[12px] text-on-surface font-semibold capitalize flex items-center justify-end gap-1">
+        <span class="material-symbols-outlined text-[14px] text-secondary">calendar_today</span>
+        {serverDateFormatted.charAt(0).toUpperCase() + serverDateFormatted.slice(1)}
       </span>
       <span class="font-label-sm text-[11px] text-on-tertiary-container font-semibold flex items-center justify-end gap-1">
         <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
@@ -113,8 +122,11 @@ const {
         weekday: "short",
         day: "numeric",
         month: "short",
+        year: "numeric",
       };
-      dateEl.textContent = now.toLocaleDateString("es-CO", options);
+      const formatted = now.toLocaleDateString("es-CO", options);
+      const cap = formatted.charAt(0).toUpperCase() + formatted.slice(1);
+      dateEl.innerHTML = `<span class="material-symbols-outlined text-[14px] text-secondary">calendar_today</span> ${cap}`;
     }
   }
 </script>

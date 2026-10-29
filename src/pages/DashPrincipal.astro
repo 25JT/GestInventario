@@ -3,6 +3,86 @@
 import Layout from "../layouts/Layout.astro";
 import SlideBar from "../components/SlideBar.astro";
 import NavBar from "../components/Nav.astro";
+
+// Formateador local para SSR
+const formatCOP = (val: number | string) => {
+  const num = Number(val) || 0;
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  }).format(num);
+};
+
+// Carga inicial de datos desde la API del servidor local
+let initialData: any = null;
+try {
+  const res = await fetch("http://localhost:3000/api/dashboard?period=mes", {
+    signal: AbortSignal.timeout(2000),
+  });
+  if (res.ok) {
+    const json = await res.json();
+    if (json.success) initialData = json.data;
+  }
+} catch (e) {
+  // Fallback si el servidor está reiniciando
+}
+
+const kpis = initialData?.kpis || {
+  ventas: { total: 34500, total_formato: "$ 34.500", cantidad: 3 },
+  gastos: { total: 152000, total_formato: "$ 152.000", cantidad: 3 },
+  dinero_total: { total: -117500, total_formato: "-$ 117.500", margen_porcentaje: -340.6, es_positivo: false },
+  inventario: { total_items: 3, count_urgente: 0, count_proximo: 0, count_ok: 3 },
+};
+
+const stockAlerts = initialData?.stockAlerts || [
+  {
+    id: "1",
+    sku: "TEC-001",
+    nombre: "Cable USB tipo C",
+    categoria: "Servicios técnicos",
+    stock_actual: 12,
+    stock_minimo: 3,
+    estado_escala: "OK",
+    color_escala: "verde",
+    precio_venta_formato: "$ 12.000",
+    badge_label: "Stock OK (7+)",
+  },
+  {
+    id: "2",
+    sku: "PAP-001",
+    nombre: "Cuaderno argollado",
+    categoria: "Papelería",
+    stock_actual: 25,
+    stock_minimo: 5,
+    estado_escala: "OK",
+    color_escala: "verde",
+    precio_venta_formato: "$ 6.500",
+    badge_label: "Stock OK (7+)",
+  },
+  {
+    id: "3",
+    sku: "ACC-001",
+    nombre: "Marcador permanente",
+    categoria: "Accesorios",
+    stock_actual: 40,
+    stock_minimo: 10,
+    estado_escala: "OK",
+    color_escala: "verde",
+    precio_venta_formato: "$ 3.000",
+    badge_label: "Stock OK (7+)",
+  },
+];
+
+const chartData = initialData?.chartData || {
+  maxValorFormato: "$ 152.000",
+  desglose: {
+    productos_formato: "$ 9.500",
+    servicios_formato: "$ 25.000",
+  },
+};
+
+const transactions = initialData?.transactions || [];
 ---
 
 <Layout title="Panel de Control Ejecutivo - Control de Stock Enterprise JR">
@@ -37,7 +117,7 @@ import NavBar from "../components/Nav.astro";
       class="pt-16 min-h-screen flex flex-col flex-1"
     >
       <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
-        <!-- Sub-header / Command Bar (Centrado en pantallas pequeñas y adaptado) -->
+        <!-- Sub-header / Command Bar -->
         <div id="dash-subheader" class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 text-center sm:text-left">
           <div class="flex flex-col items-center sm:items-start">
             <div class="flex items-center justify-center sm:justify-start gap-2">
@@ -45,22 +125,27 @@ import NavBar from "../components/Nav.astro";
                 Panel de Control Ejecutivo
               </span>
               <span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+              <span class="font-label-sm text-[11px] text-on-tertiary-container font-semibold bg-tertiary-container/30 px-2 py-0.5 rounded-md flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                En Línea (MySQL Aiven)
+              </span>
             </div>
             <h1 class="text-[22px] sm:text-[26px] md:text-[28px] text-on-surface tracking-tight mt-0.5 font-bold">
               Bienvenido, <span id="welcome-name">Carlos Mendoza</span>
             </h1>
             <p class="text-[13px] sm:text-[14px] text-on-surface-variant max-w-xl">
-              Visión general del rendimiento operativo, flujo de caja e inventario central.
+              Visión general en tiempo real del rendimiento operativo, flujo de caja e inventario central.
             </p>
           </div>
 
           <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 w-full sm:w-auto">
-            {/* Filtros de Tiempo */}
+            {/* Filtros de Tiempo Interactivos */}
             <div class="inline-flex p-1 bg-surface-container-low rounded-xl shadow-xs" id="time-filter-group">
               <button
                 class="time-tab px-3.5 py-1.5 font-label-md text-[13px] rounded-lg text-on-surface-variant hover:text-on-surface transition-all cursor-pointer font-medium"
                 onclick="window.setTimeFilter && window.setTimeFilter(this, 'hoy')"
                 type="button"
+                data-period="hoy"
               >
                 Hoy
               </button>
@@ -68,6 +153,7 @@ import NavBar from "../components/Nav.astro";
                 class="time-tab px-3.5 py-1.5 font-label-md text-[13px] rounded-lg text-on-surface-variant hover:text-on-surface transition-all cursor-pointer font-medium"
                 onclick="window.setTimeFilter && window.setTimeFilter(this, 'semana')"
                 type="button"
+                data-period="semana"
               >
                 Esta semana
               </button>
@@ -75,34 +161,37 @@ import NavBar from "../components/Nav.astro";
                 class="time-tab active px-3.5 py-1.5 font-label-md text-[13px] rounded-lg bg-surface-container-lowest text-primary shadow-xs font-semibold transition-all cursor-pointer"
                 onclick="window.setTimeFilter && window.setTimeFilter(this, 'mes')"
                 type="button"
+                data-period="mes"
               >
                 Este mes
               </button>
             </div>
 
-            {/* Botón Exportar */}
+            {/* Botón Refrescar / Estado */}
             <button
-              id="btn-export"
-              class="h-[38px] px-4 bg-primary hover:bg-secondary text-on-primary font-semibold text-[13px] rounded-xl shadow-xs flex items-center gap-2 transition-all cursor-pointer active:scale-95"
+              id="btn-refresh-dash"
+              class="h-[38px] px-3.5 bg-surface-container-low hover:bg-surface-container text-on-surface font-semibold text-[13px] rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer border border-surface-container/60 active:scale-95"
+              onclick="window.refreshDashboard && window.refreshDashboard()"
               type="button"
+              title="Actualizar datos desde la base de datos"
             >
-              <span class="material-symbols-outlined text-[18px]">download</span>
-              <span>Exportar Informe</span>
+              <span class="material-symbols-outlined text-[18px]">sync</span>
+              <span class="hidden sm:inline">Actualizar</span>
             </button>
           </div>
         </div>
 
-        <!-- Row 1: KPI Cards (Diseño Armonizado) -->
+        <!-- Row 1: KPI Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <!-- KPI 1 -->
+          <!-- KPI 1: Ventas Totales -->
           <div class="kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
             <div class="flex items-start justify-between">
               <div class="flex flex-col">
                 <span class="text-[12px] text-on-surface-variant uppercase tracking-wider font-semibold">
-                  Ventas Totales (COP Mes)
+                  Ventas Totales (COP)
                 </span>
                 <span id="kpi-ventas-val" class="text-[24px] sm:text-[26px] text-on-surface tracking-tight mt-1 font-bold">
-                  $48.250.000
+                  {kpis.ventas.total_formato}
                 </span>
               </div>
               <div class="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-on-tertiary-container shrink-0">
@@ -111,15 +200,15 @@ import NavBar from "../components/Nav.astro";
             </div>
             <div class="flex items-center justify-between mt-3 pt-2 bg-surface-container-low/50 -mx-4 sm:-mx-5 -mb-4 sm:-mb-5 px-4 sm:px-5 py-2.5 rounded-b-xl border-t border-surface-container/40">
               <div class="flex items-center gap-1 text-on-tertiary-container text-[12px] font-semibold">
-                <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
-                <span>+12.4%</span>
-                <span class="text-on-surface-variant font-normal">vs mes ant.</span>
+                <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+                <span id="kpi-ventas-count">{kpis.ventas.cantidad} ventas</span>
+                <span class="text-on-surface-variant font-normal">registradas</span>
               </div>
-              <span class="text-[12px] text-on-surface-variant font-medium">Obj: 94%</span>
+              <span class="text-[11px] font-semibold text-secondary-container bg-surface-container px-2 py-0.5 rounded">Activo</span>
             </div>
           </div>
 
-          <!-- KPI 2 -->
+          <!-- KPI 2: Gastos Operativos -->
           <div class="kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
             <div class="flex items-start justify-between">
               <div class="flex flex-col">
@@ -127,7 +216,7 @@ import NavBar from "../components/Nav.astro";
                   Gastos Operativos (COP)
                 </span>
                 <span id="kpi-gastos-val" class="text-[24px] sm:text-[26px] text-on-surface tracking-tight mt-1 font-bold">
-                  $14.820.000
+                  {kpis.gastos.total_formato}
                 </span>
               </div>
               <div class="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-secondary-container shrink-0">
@@ -135,24 +224,24 @@ import NavBar from "../components/Nav.astro";
               </div>
             </div>
             <div class="flex items-center justify-between mt-3 pt-2 bg-surface-container-low/50 -mx-4 sm:-mx-5 -mb-4 sm:-mb-5 px-4 sm:px-5 py-2.5 rounded-b-xl border-t border-surface-container/40">
-              <div class="flex items-center gap-1 text-on-tertiary-container text-[12px] font-semibold">
-                <span class="material-symbols-outlined text-[16px]">arrow_downward</span>
-                <span>-3.1%</span>
-                <span class="text-on-surface-variant font-normal">reducción</span>
+              <div class="flex items-center gap-1 text-outline text-[12px] font-semibold">
+                <span class="material-symbols-outlined text-[16px]">outbox</span>
+                <span id="kpi-gastos-count">{kpis.gastos.cantidad} egresos</span>
+                <span class="text-on-surface-variant font-normal">contabilizados</span>
               </div>
-              <span class="text-[12px] text-on-surface-variant font-medium">Presupuesto OK</span>
+              <span class="text-[11px] text-on-surface-variant font-medium">Caja &amp; Banco</span>
             </div>
           </div>
 
-          <!-- KPI 3 -->
+          <!-- KPI 3: Dinero Total / Utilidad -->
           <div class="kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
             <div class="flex items-start justify-between">
               <div class="flex flex-col">
                 <span class="text-[12px] text-on-surface-variant uppercase tracking-wider font-semibold">
                   DINERO TOTAL (COP)
                 </span>
-                <span id="kpi-utilidad-val" class="text-[24px] sm:text-[26px] text-on-surface tracking-tight mt-1 font-bold">
-                  $33.430.000
+                <span id="kpi-utilidad-val" class={`text-[24px] sm:text-[26px] tracking-tight mt-1 font-bold ${kpis.dinero_total.es_positivo ? 'text-on-tertiary-container' : 'text-on-surface'}`}>
+                  {kpis.dinero_total.total_formato}
                 </span>
               </div>
               <div class="w-10 h-10 rounded-xl bg-tertiary-container text-on-tertiary-container flex items-center justify-center shrink-0">
@@ -161,17 +250,15 @@ import NavBar from "../components/Nav.astro";
             </div>
             <div class="flex items-center justify-between mt-3 pt-2 bg-surface-container-low/50 -mx-4 sm:-mx-5 -mb-4 sm:-mb-5 px-4 sm:px-5 py-2.5 rounded-b-xl border-t border-surface-container/40">
               <div class="flex items-center gap-1.5 text-[12px]">
-                <span class="px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed font-bold text-[11px]">
-                  Margen 69.3%
+                <span id="kpi-margen-badge" class={`px-2 py-0.5 rounded font-bold text-[11px] ${kpis.dinero_total.es_positivo ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 'bg-surface-container text-on-surface-variant'}`}>
+                  Margen: {kpis.dinero_total.margen_porcentaje}%
                 </span>
               </div>
-              <span class="text-[12px] text-on-surface-variant font-bold text-on-tertiary-container">
-                +$5.120.000
-              </span>
+              <span class="text-[12px] text-on-surface-variant font-medium">Balance Neto</span>
             </div>
           </div>
 
-          <!-- KPI 4 -->
+          <!-- KPI 4: Estado de Inventario y Escala de Faltantes -->
           <div class="kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
             <div class="flex items-start justify-between">
               <div class="flex flex-col">
@@ -179,7 +266,9 @@ import NavBar from "../components/Nav.astro";
                   Estado de Inventario
                 </span>
                 <div class="flex items-baseline gap-2 mt-1">
-                  <span class="text-[24px] sm:text-[26px] text-on-surface tracking-tight font-bold">1,248</span>
+                  <span id="kpi-inventario-total" class="text-[24px] sm:text-[26px] text-on-surface tracking-tight font-bold">
+                    {kpis.inventario.total_items}
+                  </span>
                   <span class="text-[12px] text-on-surface-variant font-medium">items activos</span>
                 </div>
               </div>
@@ -187,13 +276,19 @@ import NavBar from "../components/Nav.astro";
                 <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">inventory</span>
               </div>
             </div>
-            <div class="flex items-center gap-2 mt-3 pt-2 bg-surface-container-low/50 -mx-4 sm:-mx-5 -mb-4 sm:-mb-5 px-4 sm:px-5 py-2.5 rounded-b-xl border-t border-surface-container/40">
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-surface-container-high text-on-surface text-[11px] font-bold">
+            {/* Escala explícita de faltantes: 0-4 Urgente (Rojo), 5-6 Próximo (Amarillo), 7+ OK (Verde) */}
+            <div class="flex flex-wrap items-center gap-1.5 mt-3 pt-2 bg-surface-container-low/50 -mx-4 sm:-mx-5 -mb-4 sm:-mb-5 px-3 py-2 rounded-b-xl border-t border-surface-container/40">
+              <span id="badge-urgente-kpi" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-error-container text-on-error-container text-[10px] font-bold" title="Stock de 0 a 4: Urgente">
                 <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
-                14 stock bajo
+                <span id="kpi-count-urgente">{kpis.inventario.count_urgente}</span> Urg. (0-4)
               </span>
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-error-container text-on-error-container text-[11px] font-bold">
-                3 agotados
+              <span id="badge-proximo-kpi" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200 text-[10px] font-bold" title="Stock de 5 a 6: Próximo">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                <span id="kpi-count-proximo">{kpis.inventario.count_proximo}</span> Próx. (5-6)
+              </span>
+              <span id="badge-ok-kpi" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-200 text-[10px] font-bold" title="Stock de 7 en adelante: OK">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                <span id="kpi-count-ok">{kpis.inventario.count_ok}</span> OK (7+)
               </span>
             </div>
           </div>
@@ -212,11 +307,11 @@ import NavBar from "../components/Nav.astro";
                         Flujo Financiero &amp; Rendimiento
                       </span>
                       <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-semibold">
-                        Oct 2024
+                        Ventas vs Gastos
                       </span>
                     </div>
                     <p class="text-[13px] text-on-surface-variant mt-0.5">
-                      Monitoreo dinámico de ingresos, egresos de almacén y margen neto
+                      Monitoreo dinámico calculado directamente de las tablas de ventas y egresos.
                     </p>
                   </div>
 
@@ -252,7 +347,9 @@ import NavBar from "../components/Nav.astro";
                 <!-- SVG Financial Trend Visualizer -->
                 <div class="w-full relative pt-3">
                   <div class="flex items-center justify-between text-on-surface-variant text-[12px] mb-2 px-1">
-                    <span id="chart-max-label" class="font-bold text-on-surface text-[13px]">$50k</span>
+                    <span id="chart-max-label" class="font-bold text-on-surface text-[13px]">
+                      Pico: {chartData.maxValorFormato}
+                    </span>
                     <div class="flex items-center gap-4 text-[12px]">
                       <div class="flex items-center gap-1.5">
                         <span class="w-2.5 h-2.5 rounded-full bg-secondary-container"></span>
@@ -312,32 +409,32 @@ import NavBar from "../components/Nav.astro";
                       ></path>
 
                       <!-- Interactive Peak Indicators -->
-                      <circle id="peak-dot-1" cx="460" cy="55" fill="#316bf3" r="4.5" stroke="#ffffff" stroke-width="2"></circle>
+                      <circle id="peak-dot-1" cx="300" cy="55" fill="#316bf3" r="4.5" stroke="#ffffff" stroke-width="2"></circle>
                       <circle id="peak-dot-2" cx="600" cy="20" fill="#00a472" r="5" stroke="#ffffff" stroke-width="2.5"></circle>
                     </svg>
                   </div>
 
                   <div class="flex items-center justify-between text-on-surface-variant text-[12px] pt-2 px-1">
-                    <span>01 Oct</span>
-                    <span>07 Oct</span>
-                    <span>14 Oct</span>
-                    <span>21 Oct</span>
-                    <span class="font-bold text-primary">Hoy (24 Oct)</span>
+                    <span>Inicio Período</span>
+                    <span>Historial Registrado</span>
+                    <span class="font-bold text-primary">Cierre Hoy</span>
                   </div>
                 </div>
               </div>
 
               <!-- Category breakdown micro-cards inside graph panel -->
-              <div class="mt-5 pt-3 bg-surface-container-low rounded-xl p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 border border-surface-container/50">
+              <div class="mt-5 pt-3 bg-surface-container-low rounded-xl p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 border border-surface-container/50">
                 <div class="flex items-center gap-3">
                   <div class="w-9 h-9 rounded-xl bg-surface-container-lowest flex items-center justify-center text-secondary-container shadow-xs shrink-0">
-                    <span class="material-symbols-outlined text-[19px]">devices</span>
+                    <span class="material-symbols-outlined text-[19px]">inventory_2</span>
                   </div>
                   <div class="flex flex-col min-w-0">
-                    <span class="text-[12px] text-on-surface-variant font-medium truncate">Productos</span>
+                    <span class="text-[12px] text-on-surface-variant font-medium truncate">Venta de Productos</span>
                     <div class="flex items-baseline gap-1.5">
-                      <span class="text-[15px] font-bold text-on-surface">$24,190</span>
-                      <span class="text-[11px] text-on-tertiary-container font-bold">+18%</span>
+                      <span id="chart-productos-val" class="text-[15px] font-bold text-on-surface">
+                        {chartData.desglose.productos_formato}
+                      </span>
+                      <span class="text-[11px] text-on-tertiary-container font-semibold">Ventas detalle</span>
                     </div>
                   </div>
                 </div>
@@ -347,23 +444,12 @@ import NavBar from "../components/Nav.astro";
                     <span class="material-symbols-outlined text-[19px]">build</span>
                   </div>
                   <div class="flex flex-col min-w-0">
-                    <span class="text-[12px] text-on-surface-variant font-medium truncate">Servicios</span>
+                    <span class="text-[12px] text-on-surface-variant font-medium truncate">Servicios Facturados</span>
                     <div class="flex items-baseline gap-1.5">
-                      <span class="text-[15px] font-bold text-on-surface">$16,310</span>
-                      <span class="text-[11px] text-on-tertiary-container font-bold">+7%</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-xl bg-surface-container-lowest flex items-center justify-center text-outline shadow-xs shrink-0">
-                    <span class="material-symbols-outlined text-[19px]">category</span>
-                  </div>
-                  <div class="flex flex-col min-w-0">
-                    <span class="text-[12px] text-on-surface-variant font-medium truncate">Consumibles</span>
-                    <div class="flex items-baseline gap-1.5">
-                      <span class="text-[15px] font-bold text-on-surface">$7,750</span>
-                      <span class="text-[11px] text-error font-bold">-2%</span>
+                      <span id="chart-servicios-val" class="text-[15px] font-bold text-on-surface">
+                        {chartData.desglose.servicios_formato}
+                      </span>
+                      <span class="text-[11px] text-on-tertiary-container font-semibold">Taller y soporte</span>
                     </div>
                   </div>
                 </div>
@@ -371,141 +457,104 @@ import NavBar from "../components/Nav.astro";
             </div>
           </div>
 
-          <!-- Right Column: Critical Stock Alerts (35% ~ 4 cols) -->
+          <!-- Right Column: Stock Alerts (35% ~ 4 cols) -->
           <div id="dash-stock-card" class="lg:col-span-4 flex flex-col">
             <div class="bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between h-full">
               <div>
                 <div class="flex items-center justify-between pb-2 border-b border-surface-container/40">
                   <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-error animate-pulse"></span>
-                    <h2 class="text-[16px] sm:text-[17px] text-on-surface font-bold">Stock Crítico</h2>
+                    <span class="w-2.5 h-2.5 rounded-full bg-secondary-container"></span>
+                    <h2 class="text-[16px] sm:text-[17px] text-on-surface font-bold">Estado de Inventario</h2>
                   </div>
-                  <span class="px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-[11px] font-bold">
-                    14 Urgentes
+                  <span id="stock-critico-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-surface-container text-on-surface">
+                    {stockAlerts.length} Registrados
                   </span>
                 </div>
-                <p class="text-[12px] sm:text-[13px] text-on-surface-variant my-2.5 leading-snug">
-                  Reorden inmediata requerida para sucursal central.
-                </p>
 
-                <!-- List of critical items (Nombre grande legible y botones uniformes) -->
-                <div class="flex flex-col gap-2.5">
-                  <!-- Item 1 -->
-                  <div class="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between gap-3 border border-surface-container/40">
-                    <div class="flex items-center gap-3 min-w-0 flex-1">
-                      <div class="w-9 h-9 rounded-xl bg-error-container text-on-error-container flex items-center justify-center shrink-0 shadow-2xs">
-                        <span class="material-symbols-outlined text-[19px]">memory</span>
-                      </div>
-                      <div class="flex flex-col min-w-0 flex-1">
-                        <span class="text-[14px] sm:text-[15px] font-bold text-on-surface truncate leading-tight">
-                          SSD NVMe 1TB Kingston
-                        </span>
-                        <div class="flex items-center gap-2 text-[12px] text-on-surface-variant mt-0.5">
-                          <span class="font-mono text-[10px] bg-surface-container px-1.5 py-0.5 rounded font-bold text-on-surface">SKU-9904</span>
-                          <span class="text-error font-bold text-[12px]">2 en stock</span>
-                          <span class="text-[11px] text-on-surface-variant">(Mín: 15)</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      class="h-8 px-3.5 bg-primary hover:bg-secondary text-on-primary font-semibold text-[12px] rounded-lg shadow-2xs shrink-0 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-                      onclick="window.quickRestock && window.quickRestock('SKU-9904', 'SSD NVMe 1TB Kingston')"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[15px]">local_shipping</span>
-                      <span>Pedir</span>
-                    </button>
-                  </div>
+                {/* Leyenda Visual de la Escala de Stock Solicitada */}
+                <div class="my-2.5 p-2 rounded-lg bg-surface-container-low/70 border border-surface-container/60 flex items-center justify-between text-[10.5px]">
+                  <span class="flex items-center gap-1 font-semibold text-error">
+                    <span class="w-2 h-2 rounded-full bg-error"></span> 0 a 4: Urgente
+                  </span>
+                  <span class="flex items-center gap-1 font-semibold text-amber-700">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span> 5 a 6: Próximo
+                  </span>
+                  <span class="flex items-center gap-1 font-semibold text-emerald-700">
+                    <span class="w-2 h-2 rounded-full bg-emerald-600"></span> 7+: OK
+                  </span>
+                </div>
 
-                  <!-- Item 2 -->
-                  <div class="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between gap-3 border border-surface-container/40">
-                    <div class="flex items-center gap-3 min-w-0 flex-1">
-                      <div class="w-9 h-9 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center shrink-0 shadow-2xs">
-                        <span class="material-symbols-outlined text-[19px]">cable</span>
-                      </div>
-                      <div class="flex flex-col min-w-0 flex-1">
-                        <span class="text-[14px] sm:text-[15px] font-bold text-on-surface truncate leading-tight">
-                          Cable USB-C Blindado 2m
-                        </span>
-                        <div class="flex items-center gap-2 text-[12px] text-on-surface-variant mt-0.5">
-                          <span class="font-mono text-[10px] bg-surface-container px-1.5 py-0.5 rounded font-bold text-on-surface">SKU-3108</span>
-                          <span class="text-error font-bold text-[12px]">0 agotado</span>
-                          <span class="text-[11px] text-on-surface-variant">(Mín: 25)</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      class="h-8 px-3.5 bg-primary hover:bg-secondary text-on-primary font-semibold text-[12px] rounded-lg shadow-2xs shrink-0 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-                      onclick="window.quickRestock && window.quickRestock('SKU-3108', 'Cable USB-C Blindado')"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[15px]">local_shipping</span>
-                      <span>Pedir</span>
-                    </button>
-                  </div>
+                <!-- List of stock items -->
+                <div id="stock-critico-list" class="flex flex-col gap-2.5">
+                  {stockAlerts.map((item: any) => {
+                    const isUrgente = item.estado_escala === "URGENTE";
+                    const isProximo = item.estado_escala === "PROXIMO";
+                    const isOk = item.estado_escala === "OK";
 
-                  <!-- Item 3 -->
-                  <div class="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between gap-3 border border-surface-container/40">
-                    <div class="flex items-center gap-3 min-w-0 flex-1">
-                      <div class="w-9 h-9 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center shrink-0 shadow-2xs">
-                        <span class="material-symbols-outlined text-[19px]">power</span>
-                      </div>
-                      <div class="flex flex-col min-w-0 flex-1">
-                        <span class="text-[14px] sm:text-[15px] font-bold text-on-surface truncate leading-tight">
-                          Fuente Poder 650W Modular
-                        </span>
-                        <div class="flex items-center gap-2 text-[12px] text-on-surface-variant mt-0.5">
-                          <span class="font-mono text-[10px] bg-surface-container px-1.5 py-0.5 rounded font-bold text-on-surface">SKU-7721</span>
-                          <span class="text-on-surface font-bold text-[12px]">4 en stock</span>
-                          <span class="text-[11px] text-on-surface-variant">(Mín: 10)</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      class="h-8 px-3.5 bg-primary hover:bg-secondary text-on-primary font-semibold text-[12px] rounded-lg shadow-2xs shrink-0 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-                      onclick="window.quickRestock && window.quickRestock('SKU-7721', 'Fuente Poder 650W')"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[15px]">local_shipping</span>
-                      <span>Pedir</span>
-                    </button>
-                  </div>
+                    const badgeClass = isUrgente
+                      ? "bg-error-container text-on-error-container"
+                      : isProximo
+                      ? "bg-amber-100 text-amber-900 border border-amber-300"
+                      : "bg-emerald-100 text-emerald-900 border border-emerald-300";
 
-                  <!-- Item 4 -->
-                  <div class="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between gap-3 border border-surface-container/40">
-                    <div class="flex items-center gap-3 min-w-0 flex-1">
-                      <div class="w-9 h-9 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center shrink-0 shadow-2xs">
-                        <span class="material-symbols-outlined text-[19px]">heat_pump</span>
-                      </div>
-                      <div class="flex flex-col min-w-0 flex-1">
-                        <span class="text-[14px] sm:text-[15px] font-bold text-on-surface truncate leading-tight">
-                          Pasta Térmica Artic MX-4
-                        </span>
-                        <div class="flex items-center gap-2 text-[12px] text-on-surface-variant mt-0.5">
-                          <span class="font-mono text-[10px] bg-surface-container px-1.5 py-0.5 rounded font-bold text-on-surface">SKU-4419</span>
-                          <span class="text-error font-bold text-[12px]">1 en stock</span>
-                          <span class="text-[11px] text-on-surface-variant">(Mín: 12)</span>
+                    const iconColor = isUrgente
+                      ? "text-error"
+                      : isProximo
+                      ? "text-amber-600"
+                      : "text-emerald-600";
+
+                    const stockTextColor = isUrgente
+                      ? "text-error font-bold"
+                      : isProximo
+                      ? "text-amber-700 font-bold"
+                      : "text-emerald-700 font-bold";
+
+                    return (
+                      <div class="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between gap-3 border border-surface-container/40">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                          <div class="w-9 h-9 rounded-xl bg-surface-container-lowest flex items-center justify-center shrink-0 shadow-2xs">
+                            <span class={`material-symbols-outlined text-[19px] ${iconColor}`}>
+                              {isUrgente ? "warning" : isProximo ? "schedule" : "check_circle"}
+                            </span>
+                          </div>
+                          <div class="flex flex-col min-w-0 flex-1">
+                            <span class="text-[13px] sm:text-[14px] font-bold text-on-surface truncate leading-tight">
+                              {item.nombre}
+                            </span>
+                            <div class="flex items-center gap-1.5 text-[11px] text-on-surface-variant mt-0.5 flex-wrap">
+                              <span class="font-mono text-[9.5px] bg-surface-container px-1.5 py-0.2 rounded font-bold text-on-surface">
+                                {item.sku}
+                              </span>
+                              <span class={stockTextColor}>
+                                {item.stock_actual} en stock
+                              </span>
+                              <span class={`px-1.5 py-0.2 rounded text-[10px] font-bold ${badgeClass}`}>
+                                {item.badge_label}
+                              </span>
+                            </div>
+                          </div>
                         </div>
+                        <button
+                          class="h-8 px-3 bg-primary hover:bg-secondary text-on-primary font-semibold text-[11.5px] rounded-lg shadow-2xs shrink-0 transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+                          onclick={`window.quickRestock && window.quickRestock('${item.sku}', '${item.nombre}')`}
+                          type="button"
+                          title="Generar orden de compra"
+                        >
+                          <span class="material-symbols-outlined text-[15px]">local_shipping</span>
+                          <span>Pedir</span>
+                        </button>
                       </div>
-                    </div>
-                    <button
-                      class="h-8 px-3.5 bg-primary hover:bg-secondary text-on-primary font-semibold text-[12px] rounded-lg shadow-2xs shrink-0 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-                      onclick="window.quickRestock && window.quickRestock('SKU-4419', 'Pasta Térmica Artic MX-4')"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[15px]">local_shipping</span>
-                      <span>Pedir</span>
-                    </button>
-                  </div>
+                    );
+                  })}
                 </div>
               </div>
 
               <div class="pt-3 mt-3 border-t border-surface-container/40">
                 <a
                   class="w-full h-9 bg-surface-container-low hover:bg-surface-container text-secondary-container font-semibold text-[13px] rounded-xl flex items-center justify-center gap-1.5 transition-colors border border-surface-container/40"
-                  href="#control-de-inventario"
+                  href="/ControldeInventario"
                 >
-                  <span>Ver reporte de compras sugeridas</span>
+                  <span>Ver inventario central completo</span>
                   <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
                 </a>
               </div>
@@ -515,7 +564,7 @@ import NavBar from "../components/Nav.astro";
 
         <!-- Row 3: Frequent Role Actions & Latest Transactions -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <!-- Quick Actions Banner (Botones Corregidos sin desborde) -->
+          <!-- Quick Actions Banner -->
           <div id="dash-quick-actions" class="lg:col-span-12">
             <div class="bg-surface-container-low p-4 sm:p-5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 border border-surface-container/50">
               <div class="flex flex-col sm:flex-row items-center sm:items-start md:items-center text-center sm:text-left gap-3.5">
@@ -525,59 +574,55 @@ import NavBar from "../components/Nav.astro";
                 <div class="flex flex-col">
                   <span class="text-[16px] sm:text-[17px] text-on-surface font-bold">Operaciones Rápidas</span>
                   <span class="text-[12px] sm:text-[13px] text-on-surface-variant">
-                    Accesos directos para agilizar transacciones en caja y taller
+                    Accesos directos para agilizar transacciones en caja y control operativo
                   </span>
                 </div>
               </div>
 
-              {/* Botones Flexibles que NUNCA se desbordan ni se cortan */}
+              {/* Botones de acción */}
               <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 w-full md:w-auto">
-                <button
+                <a
                   class="min-h-[46px] py-2.5 px-3 sm:px-4 bg-surface-container-lowest hover:bg-secondary-container hover:text-on-secondary text-on-surface font-semibold text-[13px] rounded-xl shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-surface-container/60 hover:shadow-sm active:scale-95"
-                  type="button"
-                  onclick="alert('Módulo de Terminal POS en construcción.')"
+                  href="/RegistroVentas"
                 >
                   <span class="material-symbols-outlined text-[19px] text-secondary-container shrink-0">point_of_sale</span>
                   <span class="truncate">Nueva Venta</span>
-                </button>
+                </a>
 
-                <button
+                <a
                   class="min-h-[46px] py-2.5 px-3 sm:px-4 bg-surface-container-lowest hover:bg-primary-container hover:text-on-primary text-on-surface font-semibold text-[13px] rounded-xl shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-surface-container/60 hover:shadow-sm active:scale-95"
-                  type="button"
-                  onclick="alert('Módulo de Gastos Operacionales en construcción.')"
+                  href="/GastosOperativos"
                 >
                   <span class="material-symbols-outlined text-[19px] text-outline shrink-0">receipt_long</span>
                   <span class="truncate">Registrar Gasto</span>
-                </button>
+                </a>
 
-                <button
+                <a
                   class="min-h-[46px] py-2.5 px-3 sm:px-4 bg-surface-container-lowest hover:bg-primary-container hover:text-on-primary text-on-surface font-semibold text-[13px] rounded-xl shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-surface-container/60 hover:shadow-sm active:scale-95"
-                  type="button"
-                  onclick="alert('Módulo de Alta de Producto en construcción.')"
+                  href="/ControldeInventario"
                 >
                   <span class="material-symbols-outlined text-[19px] text-outline shrink-0">add_box</span>
                   <span class="truncate">Nuevo Producto</span>
-                </button>
+                </a>
 
-                <button
+                <a
                   class="min-h-[46px] py-2.5 px-3 sm:px-4 bg-surface-container-lowest hover:bg-secondary hover:text-on-secondary text-on-surface font-semibold text-[13px] rounded-xl shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-surface-container/60 hover:shadow-sm active:scale-95"
-                  type="button"
-                  onclick="alert('Módulo de Servicios Técnicos en construcción.')"
+                  href="/Servicios"
                 >
                   <span class="material-symbols-outlined text-[19px] text-secondary-container shrink-0">build_circle</span>
                   <span class="truncate">Nuevo Servicio</span>
-                </button>
+                </a>
               </div>
             </div>
           </div>
 
-          <!-- Recent Sales Table (Adaptable y Centrado en Pantallas Pequeñas) -->
+          <!-- Recent Sales Table -->
           <div id="dash-transactions-card" class="lg:col-span-12">
             <div class="bg-surface-container-lowest rounded-xl shadow-xs border border-surface-container/60 overflow-hidden">
               <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-surface-container/40 text-center sm:text-left">
                 <div class="flex items-center justify-center sm:justify-start gap-2">
                   <span class="text-[16px] sm:text-[17px] text-on-surface font-bold">
-                    Últimas Transacciones Registradas
+                    Últimas Transacciones Registradas (BD)
                   </span>
                 </div>
                 <div class="flex items-center justify-center sm:justify-end gap-2 w-full sm:w-auto">
@@ -588,7 +633,7 @@ import NavBar from "../components/Nav.astro";
                     <input
                       id="search-transactions-input"
                       class="w-full h-9 pl-9 pr-3 bg-surface-container-low rounded-xl text-[13px] text-on-surface placeholder:text-outline border border-transparent focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                      placeholder="Filtrar por ticket o cliente..."
+                      placeholder="Filtrar por ticket o responsable..."
                       type="text"
                     />
                   </div>
@@ -605,154 +650,70 @@ import NavBar from "../components/Nav.astro";
                       <th class="px-4 font-bold">Responsable</th>
                       <th class="px-4 font-bold">Fecha / Hora</th>
                       <th class="px-4 font-bold">Método de Pago</th>
-                      <th class="px-4 font-bold text-right">Total</th>
+                      <th class="px-4 font-bold text-right">Total (COP)</th>
                       <th class="px-4 font-bold text-center">Estado</th>
                       <th class="px-4 font-bold text-center">Acción</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-surface-container-low text-[13px]">
-                    <!-- Row 1 -->
-                    <tr class="h-11 hover:bg-surface-container-low/60 transition-colors transaction-row">
-                      <td class="px-4 font-mono font-semibold text-secondary-container">#TCK-8841</td>
-                      <td class="px-4">
-                        <div class="flex items-center gap-2.5">
-                          <div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-[10px] shrink-0">
-                            DA
-                          </div>
-                          <span class="font-semibold text-on-surface truncate">Distribuidora Andina S.A.</span>
-                        </div>
-                      </td>
-                      <td class="px-4 text-on-surface-variant">Lucía Herrera</td>
-                      <td class="px-4 text-on-surface-variant">Hoy, 15:42</td>
-                      <td class="px-4">
-                        <span class="inline-flex items-center gap-1.5 text-on-surface font-medium">
-                          <span class="material-symbols-outlined text-[16px] text-outline">credit_card</span>
-                          <span>Transferencia</span>
-                        </span>
-                      </td>
-                      <td class="px-4 text-right font-bold text-on-surface text-[14px]">$1,450.00</td>
-                      <td class="px-4 text-center">
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container text-[11px] font-bold">
-                          <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
-                          Completado
-                        </span>
-                      </td>
-                      <td class="px-4 text-center">
-                        <button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Ver detalles y factura" type="button">
-                          <span class="material-symbols-outlined text-[18px]">receipt</span>
-                        </button>
-                      </td>
-                    </tr>
-
-                    <!-- Row 2 -->
-                    <tr class="h-11 hover:bg-surface-container-low/60 transition-colors transaction-row">
-                      <td class="px-4 font-mono font-semibold text-secondary-container">#TCK-8840</td>
-                      <td class="px-4">
-                        <div class="flex items-center gap-2.5">
-                          <div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-[10px] shrink-0">
-                            MR
-                          </div>
-                          <span class="font-semibold text-on-surface truncate">Martín Ramos</span>
-                        </div>
-                      </td>
-                      <td class="px-4 text-on-surface-variant">Carlos Mendoza</td>
-                      <td class="px-4 text-on-surface-variant">Hoy, 14:15</td>
-                      <td class="px-4">
-                        <span class="inline-flex items-center gap-1.5 text-on-surface font-medium">
-                          <span class="material-symbols-outlined text-[16px] text-outline">payments</span>
-                          <span>Efectivo</span>
-                        </span>
-                      </td>
-                      <td class="px-4 text-right font-bold text-on-surface text-[14px]">$320.00</td>
-                      <td class="px-4 text-center">
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container text-[11px] font-bold">
-                          <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
-                          Completado
-                        </span>
-                      </td>
-                      <td class="px-4 text-center">
-                        <button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Ver detalles y factura" type="button">
-                          <span class="material-symbols-outlined text-[18px]">receipt</span>
-                        </button>
-                      </td>
-                    </tr>
-
-                    <!-- Row 3 -->
-                    <tr class="h-11 hover:bg-surface-container-low/60 transition-colors transaction-row">
-                      <td class="px-4 font-mono font-semibold text-secondary-container">#TCK-8839</td>
-                      <td class="px-4">
-                        <div class="flex items-center gap-2.5">
-                          <div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-[10px] shrink-0">
-                            ST
-                          </div>
-                          <span class="font-semibold text-on-surface truncate">Soluciones Tech C.A.</span>
-                        </div>
-                      </td>
-                      <td class="px-4 text-on-surface-variant">Lucía Herrera</td>
-                      <td class="px-4 text-on-surface-variant">Hoy, 12:50</td>
-                      <td class="px-4">
-                        <span class="inline-flex items-center gap-1.5 text-on-surface font-medium">
-                          <span class="material-symbols-outlined text-[16px] text-outline">credit_card</span>
-                          <span>POS / Tarjeta</span>
-                        </span>
-                      </td>
-                      <td class="px-4 text-right font-bold text-on-surface text-[14px]">$2,890.50</td>
-                      <td class="px-4 text-center">
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container text-[11px] font-bold">
-                          <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
-                          Completado
-                        </span>
-                      </td>
-                      <td class="px-4 text-center">
-                        <button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Ver detalles y factura" type="button">
-                          <span class="material-symbols-outlined text-[18px]">receipt</span>
-                        </button>
-                      </td>
-                    </tr>
-
-                    <!-- Row 4 -->
-                    <tr class="h-11 hover:bg-surface-container-low/60 transition-colors transaction-row">
-                      <td class="px-4 font-mono font-semibold text-secondary-container">#TCK-8838</td>
-                      <td class="px-4">
-                        <div class="flex items-center gap-2.5">
-                          <div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-[10px] shrink-0">
-                            EG
-                          </div>
-                          <span class="font-semibold text-on-surface truncate">Elena Gómez</span>
-                        </div>
-                      </td>
-                      <td class="px-4 text-on-surface-variant">Rodrigo Paz</td>
-                      <td class="px-4 text-on-surface-variant">Hoy, 11:10</td>
-                      <td class="px-4">
-                        <span class="inline-flex items-center gap-1.5 text-on-surface font-medium">
-                          <span class="material-symbols-outlined text-[16px] text-outline">payments</span>
-                          <span>Efectivo</span>
-                        </span>
-                      </td>
-                      <td class="px-4 text-right font-bold text-on-surface text-[14px]">$75.00</td>
-                      <td class="px-4 text-center">
-                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container text-[11px] font-bold">
-                          <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
-                          Completado
-                        </span>
-                      </td>
-                      <td class="px-4 text-center">
-                        <button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Ver detalles y factura" type="button">
-                          <span class="material-symbols-outlined text-[18px]">receipt</span>
-                        </button>
-                      </td>
-                    </tr>
+                  <tbody id="transactions-tbody" class="divide-y divide-surface-container-low text-[13px]">
+                    {transactions.length > 0 ? (
+                      transactions.map((t: any) => (
+                        <tr class="h-11 hover:bg-surface-container-low/60 transition-colors transaction-row">
+                          <td class="px-4 font-mono font-semibold text-secondary-container">
+                            #{t.ticket}
+                          </td>
+                          <td class="px-4">
+                            <div class="flex items-center gap-2.5">
+                              <div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-[10px] shrink-0">
+                                {t.cliente.substring(0, 2).toUpperCase()}
+                              </div>
+                              <span class="font-semibold text-on-surface truncate">{t.cliente}</span>
+                            </div>
+                          </td>
+                          <td class="px-4 text-on-surface-variant">{t.responsable}</td>
+                          <td class="px-4 text-on-surface-variant">{t.fecha_hora}</td>
+                          <td class="px-4">
+                            <span class="inline-flex items-center gap-1.5 text-on-surface font-medium">
+                              <span class="material-symbols-outlined text-[16px] text-outline">
+                                {t.metodo_pago === "EFECTIVO" ? "payments" : t.metodo_pago === "TARJETA" ? "credit_card" : "sync_alt"}
+                              </span>
+                              <span>{t.metodo_pago}</span>
+                            </span>
+                          </td>
+                          <td class="px-4 text-right font-bold text-on-surface text-[14px]">
+                            {t.total_formato}
+                          </td>
+                          <td class="px-4 text-center">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container text-[11px] font-bold">
+                              <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                              {t.estado}
+                            </span>
+                          </td>
+                          <td class="px-4 text-center">
+                            <button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Ver detalles del comprobante" type="button">
+                              <span class="material-symbols-outlined text-[18px]">receipt</span>
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colspan="8" class="px-4 py-8 text-center text-on-surface-variant">
+                          No hay transacciones registradas aún en el período.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
 
               <div class="px-4 py-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-surface-container/40 text-center sm:text-left">
                 <span class="text-[12px] text-on-surface-variant font-medium" id="table-summary-text">
-                  Mostrando 4 de 128 transacciones hoy
+                  Mostrando {transactions.length} transacciones registradas
                 </span>
                 <a
                   class="text-[13px] text-secondary-container hover:text-secondary font-semibold flex items-center gap-1 transition-colors"
-                  href="#registro-de-ventas"
+                  href="/RegistroVentas"
                 >
                   <span>Ver historial completo de ventas</span>
                   <span class="material-symbols-outlined text-[16px]">chevron_right</span>
@@ -762,7 +723,7 @@ import NavBar from "../components/Nav.astro";
           </div>
         </div>
 
-        <!-- Quick Restock Notification Toast container (Dynamic con GSAP) -->
+        <!-- Quick Restock Notification Toast container -->
         <div
           id="restock-toast"
           class="fixed bottom-5 right-5 z-50 bg-primary text-on-primary px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 opacity-0 pointer-events-none"
@@ -783,6 +744,280 @@ import NavBar from "../components/Nav.astro";
       animateChartTransition,
       showRestockToast,
     } from "../animaciones/animaDashboard.js";
+
+    const API_URL = "http://localhost:3000/api/dashboard";
+    let currentPeriod = "mes";
+
+    // Formatear COP en el cliente
+    function formatCOPClient(val: number | string) {
+      const num = Number(val) || 0;
+      return new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        maximumFractionDigits: 0,
+      }).format(num);
+    }
+
+    // Cargar datos dinámicos desde la API de Express
+    async function fetchDashboardData(period = "mes") {
+      try {
+        const res = await fetch(`${API_URL}?period=${period}`);
+        if (!res.ok) throw new Error("HTTP error " + res.status);
+        const json = await res.json();
+        if (json.success && json.data) {
+          renderDashboard(json.data);
+        }
+      } catch (err) {
+        console.warn("No se pudo conectar a la API local de Node/Express:", err);
+      }
+    }
+
+    // Renderizar datos del Dashboard en el DOM
+    function renderDashboard(data: any) {
+      const { kpis, stockAlerts, chartData, transactions } = data;
+
+      // 1. KPIs
+      if (kpis) {
+        const vVal = document.getElementById("kpi-ventas-val");
+        const vCount = document.getElementById("kpi-ventas-count");
+        if (vVal) vVal.textContent = kpis.ventas?.total_formato || formatCOPClient(0);
+        if (vCount) vCount.textContent = `${kpis.ventas?.cantidad || 0} ventas`;
+
+        const gVal = document.getElementById("kpi-gastos-val");
+        const gCount = document.getElementById("kpi-gastos-count");
+        if (gVal) gVal.textContent = kpis.gastos?.total_formato || formatCOPClient(0);
+        if (gCount) gCount.textContent = `${kpis.gastos?.cantidad || 0} egresos`;
+
+        const uVal = document.getElementById("kpi-utilidad-val");
+        const mBadge = document.getElementById("kpi-margen-badge");
+        if (uVal) {
+          uVal.textContent = kpis.dinero_total?.total_formato || formatCOPClient(0);
+          if (kpis.dinero_total?.es_positivo) {
+            uVal.className = "text-[24px] sm:text-[26px] tracking-tight mt-1 font-bold text-on-tertiary-container";
+          } else {
+            uVal.className = "text-[24px] sm:text-[26px] tracking-tight mt-1 font-bold text-on-surface";
+          }
+        }
+        if (mBadge) {
+          mBadge.textContent = `Margen: ${kpis.dinero_total?.margen_porcentaje || 0}%`;
+        }
+
+        // Conteo inventario y escala de stock
+        const invTotal = document.getElementById("kpi-inventario-total");
+        if (invTotal) invTotal.textContent = String(kpis.inventario?.total_items || 0);
+
+        const countUrg = document.getElementById("kpi-count-urgente");
+        if (countUrg) countUrg.textContent = String(kpis.inventario?.count_urgente || 0);
+
+        const countProx = document.getElementById("kpi-count-proximo");
+        if (countProx) countProx.textContent = String(kpis.inventario?.count_proximo || 0);
+
+        const countOk = document.getElementById("kpi-count-ok");
+        if (countOk) countOk.textContent = String(kpis.inventario?.count_ok || 0);
+      }
+
+      // 2. Stock Crítico (escala 0-4 rojo, 5-6 amarillo, 7+ verde)
+      if (stockAlerts && Array.isArray(stockAlerts)) {
+        const badge = document.getElementById("stock-critico-badge");
+        if (badge) badge.textContent = `${stockAlerts.length} Registrados`;
+
+        const listContainer = document.getElementById("stock-critico-list");
+        if (listContainer) {
+          listContainer.innerHTML = stockAlerts
+            .map((item: any) => {
+              const isUrgente = item.estado_escala === "URGENTE";
+              const isProximo = item.estado_escala === "PROXIMO";
+
+              const badgeClass = isUrgente
+                ? "bg-error-container text-on-error-container"
+                : isProximo
+                ? "bg-amber-100 text-amber-900 border border-amber-300"
+                : "bg-emerald-100 text-emerald-900 border border-emerald-300";
+
+              const iconColor = isUrgente
+                ? "text-error"
+                : isProximo
+                ? "text-amber-600"
+                : "text-emerald-600";
+
+              const iconName = isUrgente ? "warning" : isProximo ? "schedule" : "check_circle";
+
+              const stockTextColor = isUrgente
+                ? "text-error font-bold"
+                : isProximo
+                ? "text-amber-700 font-bold"
+                : "text-emerald-700 font-bold";
+
+              return `
+                <div class="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between gap-3 border border-surface-container/40">
+                  <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <div class="w-9 h-9 rounded-xl bg-surface-container-lowest flex items-center justify-center shrink-0 shadow-2xs">
+                      <span class="material-symbols-outlined text-[19px] ${iconColor}">
+                        ${iconName}
+                      </span>
+                    </div>
+                    <div class="flex flex-col min-w-0 flex-1">
+                      <span class="text-[13px] sm:text-[14px] font-bold text-on-surface truncate leading-tight">
+                        ${item.nombre}
+                      </span>
+                      <div class="flex items-center gap-1.5 text-[11px] text-on-surface-variant mt-0.5 flex-wrap">
+                        <span class="font-mono text-[9.5px] bg-surface-container px-1.5 py-0.2 rounded font-bold text-on-surface">
+                          ${item.sku}
+                        </span>
+                        <span class="${stockTextColor}">
+                          ${item.stock_actual} en stock
+                        </span>
+                        <span class="px-1.5 py-0.2 rounded text-[10px] font-bold ${badgeClass}">
+                          ${item.badge_label}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    class="h-8 px-3 bg-primary hover:bg-secondary text-on-primary font-semibold text-[11.5px] rounded-lg shadow-2xs shrink-0 transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+                    onclick="window.quickRestock && window.quickRestock('${item.sku}', '${item.nombre}')"
+                    type="button"
+                    title="Generar orden de compra"
+                  >
+                    <span class="material-symbols-outlined text-[15px]">local_shipping</span>
+                    <span>Pedir</span>
+                  </button>
+                </div>
+              `;
+            })
+            .join("");
+        }
+      }
+
+      // 3. Gráfica y desgloses
+      if (chartData) {
+        const maxLabel = document.getElementById("chart-max-label");
+        if (maxLabel && chartData.maxValorFormato) {
+          maxLabel.textContent = `Pico: ${chartData.maxValorFormato}`;
+        }
+        const prodVal = document.getElementById("chart-productos-val");
+        if (prodVal && chartData.desglose?.productos_formato) {
+          prodVal.textContent = chartData.desglose.productos_formato;
+        }
+        const servVal = document.getElementById("chart-servicios-val");
+        if (servVal && chartData.desglose?.servicios_formato) {
+          servVal.textContent = chartData.desglose.servicios_formato;
+        }
+      }
+
+      // 4. Transacciones
+      if (transactions && Array.isArray(transactions)) {
+        const tbody = document.getElementById("transactions-tbody");
+        const summary = document.getElementById("table-summary-text");
+        if (summary) summary.textContent = `Mostrando ${transactions.length} transacciones registradas`;
+
+        if (tbody) {
+          if (transactions.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="8" class="px-4 py-8 text-center text-on-surface-variant">
+                  No hay transacciones registradas aún en este período.
+                </td>
+              </tr>
+            `;
+          } else {
+            tbody.innerHTML = transactions
+              .map((t: any) => {
+                const iconPago =
+                  t.metodo_pago === "EFECTIVO"
+                    ? "payments"
+                    : t.metodo_pago === "TARJETA"
+                    ? "credit_card"
+                    : "sync_alt";
+
+                return `
+                  <tr class="h-11 hover:bg-surface-container-low/60 transition-colors transaction-row">
+                    <td class="px-4 font-mono font-semibold text-secondary-container">
+                      #${t.ticket}
+                    </td>
+                    <td class="px-4">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-[10px] shrink-0">
+                          ${(t.cliente || "CL").substring(0, 2).toUpperCase()}
+                        </div>
+                        <span class="font-semibold text-on-surface truncate">${t.cliente}</span>
+                      </div>
+                    </td>
+                    <td class="px-4 text-on-surface-variant">${t.responsable}</td>
+                    <td class="px-4 text-on-surface-variant">${t.fecha_hora}</td>
+                    <td class="px-4">
+                      <span class="inline-flex items-center gap-1.5 text-on-surface font-medium">
+                        <span class="material-symbols-outlined text-[16px] text-outline">${iconPago}</span>
+                        <span>${t.metodo_pago}</span>
+                      </span>
+                    </td>
+                    <td class="px-4 text-right font-bold text-on-surface text-[14px]">
+                      ${t.total_formato}
+                    </td>
+                    <td class="px-4 text-center">
+                      <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container text-[11px] font-bold">
+                        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                        ${t.estado}
+                      </span>
+                    </td>
+                    <td class="px-4 text-center">
+                      <button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Ver detalles del comprobante" type="button">
+                        <span class="material-symbols-outlined text-[18px]">receipt</span>
+                      </button>
+                    </td>
+                  </tr>
+                `;
+              })
+              .join("");
+          }
+        }
+      }
+    }
+
+    // Refrescar manualmente el dashboard
+    (window as any).refreshDashboard = function() {
+      const btn = document.getElementById("btn-refresh-dash");
+      const icon = btn?.querySelector(".material-symbols-outlined");
+      if (icon) icon.classList.add("animate-spin");
+      fetchDashboardData(currentPeriod).finally(() => {
+        setTimeout(() => {
+          if (icon) icon.classList.remove("animate-spin");
+        }, 500);
+      });
+    };
+
+    // Filtros de tiempo: Hoy / Esta semana / Este mes
+    (window as any).setTimeFilter = function(btn: HTMLElement, filter: string) {
+      currentPeriod = filter;
+      document.querySelectorAll("#time-filter-group .time-tab").forEach((tab) => {
+        tab.classList.remove("active", "bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+        tab.classList.add("text-on-surface-variant");
+      });
+      btn.classList.add("active", "bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+      btn.classList.remove("text-on-surface-variant");
+
+      fetchDashboardData(filter);
+    };
+
+    // Pestañas del gráfico interactivo: Ventas / Gastos / Utilidad con animación GSAP
+    (window as any).switchChartTab = function(tab: string) {
+      document.querySelectorAll(".chart-tab").forEach((btn) => {
+        btn.classList.remove("bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+        btn.classList.add("text-on-surface-variant");
+      });
+      const activeBtn = document.getElementById(`tab-${tab}`);
+      if (activeBtn) {
+        activeBtn.classList.add("bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+        activeBtn.classList.remove("text-on-surface-variant");
+      }
+
+      animateChartTransition(tab as "ventas" | "gastos" | "utilidad");
+    };
+
+    // Toast de pedido rápido con GSAP
+    (window as any).quickRestock = function(sku: string, productName: string) {
+      showRestockToast(sku, productName);
+    };
 
     // Recuperar y actualizar el nombre del colaborador desde la sesión activa
     function loadSessionData() {
@@ -805,84 +1040,39 @@ import NavBar from "../components/Nav.astro";
       }
     }
 
-    // Filtros de tiempo: Hoy / Esta semana / Este mes
-    window.setTimeFilter = function(btn: HTMLElement, filter: string) {
-      document.querySelectorAll("#time-filter-group .time-tab").forEach((tab) => {
-        tab.classList.remove("active", "bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
-        tab.classList.add("text-on-surface-variant");
-      });
-      btn.classList.add("active", "bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
-      btn.classList.remove("text-on-surface-variant");
-
-      // Datos demostrativos según filtro temporal
-      const kpiVentas = document.getElementById("kpi-ventas-val");
-      const kpiGastos = document.getElementById("kpi-gastos-val");
-      const kpiUtilidad = document.getElementById("kpi-utilidad-val");
-
-      if (filter === "hoy") {
-        if (kpiVentas) kpiVentas.textContent = "$3.420.000";
-        if (kpiGastos) kpiGastos.textContent = "$890.000";
-        if (kpiUtilidad) kpiUtilidad.textContent = "$2.530.000";
-      } else if (filter === "semana") {
-        if (kpiVentas) kpiVentas.textContent = "$18.650.000";
-        if (kpiGastos) kpiGastos.textContent = "$4.210.000";
-        if (kpiUtilidad) kpiUtilidad.textContent = "$14.440.000";
-      } else {
-        if (kpiVentas) kpiVentas.textContent = "$48.250.000";
-        if (kpiGastos) kpiGastos.textContent = "$14.820.000";
-        if (kpiUtilidad) kpiUtilidad.textContent = "$33.430.000";
-      }
-    };
-
-    // Pestañas del gráfico interactivo: Ventas / Gastos / Utilidad con animación GSAP
-    window.switchChartTab = function(tab: string) {
-      document.querySelectorAll(".chart-tab").forEach((btn) => {
-        btn.classList.remove("bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
-        btn.classList.add("text-on-surface-variant");
-      });
-      const activeBtn = document.getElementById(`tab-${tab}`);
-      if (activeBtn) {
-        activeBtn.classList.add("bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
-        activeBtn.classList.remove("text-on-surface-variant");
-      }
-
-      animateChartTransition(tab as "ventas" | "gastos" | "utilidad");
-    };
-
-    // Toast de pedido rápido con GSAP
-    window.quickRestock = function(sku: string, productName: string) {
-      showRestockToast(sku, productName);
-    };
-
     // Filtro en tiempo real para la tabla de transacciones
-    const searchInput = document.getElementById("search-transactions-input") as HTMLInputElement | null;
-    if (searchInput) {
-      searchInput.addEventListener("input", (e) => {
-        const query = (e.target as HTMLInputElement).value.toLowerCase().trim();
-        const rows = document.querySelectorAll(".transaction-row");
-        let visibleCount = 0;
+    function setupSearchFilter() {
+      const searchInput = document.getElementById("search-transactions-input") as HTMLInputElement | null;
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+          const query = (e.target as HTMLInputElement).value.toLowerCase().trim();
+          const rows = document.querySelectorAll(".transaction-row");
+          let visibleCount = 0;
 
-        rows.forEach((row) => {
-          const text = (row as HTMLElement).textContent?.toLowerCase() || "";
-          if (text.includes(query)) {
-            (row as HTMLElement).style.display = "";
-            visibleCount++;
-          } else {
-            (row as HTMLElement).style.display = "none";
+          rows.forEach((row) => {
+            const text = (row as HTMLElement).textContent?.toLowerCase() || "";
+            if (text.includes(query)) {
+              (row as HTMLElement).style.display = "";
+              visibleCount++;
+            } else {
+              (row as HTMLElement).style.display = "none";
+            }
+          });
+
+          const summary = document.getElementById("table-summary-text");
+          if (summary) {
+            summary.textContent = `Mostrando ${visibleCount} transacciones encontradas`;
           }
         });
-
-        const summary = document.getElementById("table-summary-text");
-        if (summary) {
-          summary.textContent = `Mostrando ${visibleCount} transacciones encontradas`;
-        }
-      });
+      }
     }
 
     // Inicializar carga de datos y animaciones GSAP
     function setupDash() {
       loadSessionData();
       initDashboardAnimations();
+      setupSearchFilter();
+      fetchDashboardData(currentPeriod);
     }
 
     document.addEventListener("astro:page-load", setupDash);
