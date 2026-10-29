@@ -160,10 +160,10 @@ try {
           <div class="inv-kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
             <div class="flex items-center justify-between">
               <span class="text-[12px] uppercase tracking-wide text-on-surface-variant font-semibold">
-                Stock en Umbral Crítico
+                Stock Urgente (0 a 4)
               </span>
               <span class="px-2 py-0.5 rounded-lg bg-error-container text-error text-[11px] font-bold animate-pulse">
-                Alerta
+                Urgente
               </span>
             </div>
             <div class="mt-3 flex items-baseline gap-2">
@@ -242,8 +242,9 @@ try {
                 class="h-9 pl-3 pr-7 bg-surface hover:bg-surface-container-low text-on-surface rounded-xl text-[12px] font-medium appearance-none cursor-pointer border border-transparent hover:border-surface-container focus:outline-none focus:bg-surface-container-lowest transition-all"
               >
                 <option value="">Salud Stock: Todo</option>
-                <option value="opt">En Stock (Normal)</option>
-                <option value="low">Stock Crítico (< Mínimo)</option>
+                <option value="urgente">0 a 4: Urgente (Rojo)</option>
+                <option value="proximo">5 a 6: Próximo (Amarillo)</option>
+                <option value="ok">7 en adelante: OK (Verde)</option>
                 <option value="zero">Agotado (0 Unidades)</option>
               </select>
               <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant">
@@ -275,6 +276,28 @@ try {
             >
               <span class="material-symbols-outlined text-[18px]">restart_alt</span>
             </button>
+          </div>
+        </div>
+
+        <!-- Barra de Leyenda de Escala de Stock Solicitada -->
+        <div class="mb-4 px-4 py-2.5 rounded-xl bg-surface-container-lowest border border-surface-container/60 shadow-2xs flex flex-wrap items-center justify-between gap-3 text-[12px]">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-secondary-container">rule</span>
+            <span class="font-bold text-on-surface">Escala de Salud de Inventario:</span>
+          </div>
+          <div class="flex items-center gap-3 flex-wrap">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-error-container text-on-error-container text-[11px] font-bold">
+              <span class="w-2 h-2 rounded-full bg-error"></span>
+              <span>0 a 4: Urgente (Rojo)</span>
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 border border-amber-300 text-[11px] font-bold">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span>5 a 6: Próximo (Amarillo)</span>
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-900 border border-emerald-300 text-[11px] font-bold">
+              <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+              <span>7 en adelante: OK (Verde)</span>
+            </span>
           </div>
         </div>
 
