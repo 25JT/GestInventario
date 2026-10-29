@@ -116,9 +116,9 @@
               <input
                 id="expenseFolioInput"
                 class="w-full h-10 pl-9 pr-3 bg-surface rounded-xl font-mono text-[13px] text-on-surface placeholder:text-on-surface-variant/70 border border-surface-container/60 focus:outline-none focus:bg-surface-container-lowest transition-all"
-                placeholder="Ej: F001-0004892"
+                placeholder="Ej: EXP-2026-001"
                 type="text"
-                value="F001-0004892"
+                value=""
               />
             </div>
           </div>
@@ -131,7 +131,6 @@
                 id="expenseDateInput"
                 class="w-full h-10 pl-9 pr-3 bg-surface rounded-xl font-mono text-[13px] text-on-surface border border-surface-container/60 focus:outline-none focus:bg-surface-container-lowest transition-all"
                 type="datetime-local"
-                value="2024-10-24T14:30"
               />
             </div>
           </div>
@@ -141,10 +140,11 @@
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">event_note</span>
               <input
+                id="expensePeriodInput"
                 class="w-full h-10 pl-9 pr-3 bg-surface-container-low text-on-surface-variant text-[12px] font-medium rounded-xl border border-surface-container/60 cursor-not-allowed"
                 readonly
                 type="text"
-                value="Octubre 2024 (Abierto)"
+                value="Período Abierto"
               />
             </div>
           </div>
@@ -287,9 +287,9 @@
             <textarea
               id="expenseConceptDescription"
               class="w-full p-3 bg-surface rounded-xl text-[12px] text-on-surface placeholder:text-on-surface-variant/70 border border-surface-container/60 focus:outline-none focus:bg-surface-container-lowest transition-all resize-none"
-              placeholder="Describe brevemente el destino de los insumos o el trabajo ejecutado..."
+              placeholder="agrega una nota aqui "
               rows="2"
-            >Adquisición de 25 rollos térmicos de 80mm para impresoras POS de recepción y 15 resmas papel bond A4 para guías de remisión física.</textarea>
+            ></textarea>
           </div>
         </div>
       </div>
@@ -311,52 +311,52 @@
           <!-- Method 1 -->
           <label class="cursor-pointer">
             <input checked class="peer sr-only" name="payment_method" type="radio" value="caja_chica" />
-            <div class="p-3 rounded-xl bg-surface peer-checked:bg-primary-container peer-checked:text-on-primary hover:bg-surface-container-low transition-all flex flex-col gap-1 border border-surface-container/60">
+            <div class="p-3 rounded-xl bg-surface-container-low text-on-surface peer-checked:bg-primary peer-checked:border-primary peer-checked:shadow-sm hover:bg-surface-container transition-all flex flex-col gap-1 border border-surface-container/60 peer-checked:[&_*]:text-white">
               <div class="flex items-center justify-between">
-                <span class="material-symbols-outlined text-[20px] text-secondary-container">point_of_sale</span>
-                <span class="text-[11px] text-on-surface-variant">Caja 01</span>
+                <span class="material-symbols-outlined text-[20px] text-secondary">point_of_sale</span>
+                <span class="text-[11px] font-medium opacity-75">Caja 01</span>
               </div>
-              <span class="text-[12px] font-semibold text-on-surface peer-checked:text-on-primary">Caja Chica Operativa</span>
-              <span class="font-mono text-[11px] text-on-surface-variant peer-checked:text-on-primary-container">Disp: $1,360.00</span>
+              <span class="text-[12px] font-semibold leading-tight">Caja Chica Operativa</span>
+              <span class="font-mono text-[11px] opacity-75">Disponible en caja</span>
             </div>
           </label>
 
           <!-- Method 2 -->
           <label class="cursor-pointer">
             <input class="peer sr-only" name="payment_method" type="radio" value="tarjeta_debito" />
-            <div class="p-3 rounded-xl bg-surface peer-checked:bg-primary-container peer-checked:text-on-primary hover:bg-surface-container-low transition-all flex flex-col gap-1 border border-surface-container/60">
+            <div class="p-3 rounded-xl bg-surface-container-low text-on-surface peer-checked:bg-primary peer-checked:border-primary peer-checked:shadow-sm hover:bg-surface-container transition-all flex flex-col gap-1 border border-surface-container/60 peer-checked:[&_*]:text-white">
               <div class="flex items-center justify-between">
-                <span class="material-symbols-outlined text-[20px] text-secondary-container">credit_card</span>
-                <span class="text-[11px] text-on-surface-variant">**** 8941</span>
+                <span class="material-symbols-outlined text-[20px] text-secondary">credit_card</span>
+                <span class="text-[11px] font-medium opacity-75">Corp.</span>
               </div>
-              <span class="text-[12px] font-semibold text-on-surface peer-checked:text-on-primary">Tarjeta Débito Corp</span>
-              <span class="font-mono text-[11px] text-on-surface-variant peer-checked:text-on-primary-container">Banco de Crédito</span>
+              <span class="text-[12px] font-semibold leading-tight">Tarjeta Débito Corp</span>
+              <span class="font-mono text-[11px] opacity-75">Banco corporativo</span>
             </div>
           </label>
 
           <!-- Method 3 -->
           <label class="cursor-pointer">
             <input class="peer sr-only" name="payment_method" type="radio" value="transferencia" />
-            <div class="p-3 rounded-xl bg-surface peer-checked:bg-primary-container peer-checked:text-on-primary hover:bg-surface-container-low transition-all flex flex-col gap-1 border border-surface-container/60">
+            <div class="p-3 rounded-xl bg-surface-container-low text-on-surface peer-checked:bg-primary peer-checked:border-primary peer-checked:shadow-sm hover:bg-surface-container transition-all flex flex-col gap-1 border border-surface-container/60 peer-checked:[&_*]:text-white">
               <div class="flex items-center justify-between">
-                <span class="material-symbols-outlined text-[20px] text-secondary-container">account_balance</span>
-                <span class="text-[11px] text-on-surface-variant">Cta Cte</span>
+                <span class="material-symbols-outlined text-[20px] text-secondary">account_balance</span>
+                <span class="text-[11px] font-medium opacity-75">Cta Cte</span>
               </div>
-              <span class="text-[12px] font-semibold text-on-surface peer-checked:text-on-primary">Transferencia Bancaria</span>
-              <span class="font-mono text-[11px] text-on-surface-variant peer-checked:text-on-primary-container">Interbank Operativo</span>
+              <span class="text-[12px] font-semibold leading-tight">Transferencia Bancaria</span>
+              <span class="font-mono text-[11px] opacity-75">Interbancario</span>
             </div>
           </label>
 
           <!-- Method 4 -->
           <label class="cursor-pointer">
             <input class="peer sr-only" name="payment_method" type="radio" value="credito" />
-            <div class="p-3 rounded-xl bg-surface peer-checked:bg-primary-container peer-checked:text-on-primary hover:bg-surface-container-low transition-all flex flex-col gap-1 border border-surface-container/60">
+            <div class="p-3 rounded-xl bg-surface-container-low text-on-surface peer-checked:bg-primary peer-checked:border-primary peer-checked:shadow-sm hover:bg-surface-container transition-all flex flex-col gap-1 border border-surface-container/60 peer-checked:[&_*]:text-white">
               <div class="flex items-center justify-between">
-                <span class="material-symbols-outlined text-[20px] text-secondary-container">pending_actions</span>
-                <span class="text-[11px] text-error font-semibold">Por Pagar</span>
+                <span class="material-symbols-outlined text-[20px] text-secondary">pending_actions</span>
+                <span class="text-[11px] font-semibold opacity-85">Por Pagar</span>
               </div>
-              <span class="text-[12px] font-semibold text-on-surface peer-checked:text-on-primary">Crédito a 30 Días</span>
-              <span class="font-mono text-[11px] text-on-surface-variant peer-checked:text-on-primary-container">Cuenta por pagar</span>
+              <span class="text-[12px] font-semibold leading-tight">Crédito a 30 Días</span>
+              <span class="font-mono text-[11px] opacity-75">Cuenta por pagar</span>
             </div>
           </label>
         </div>
@@ -408,23 +408,85 @@
 
   const BACKEND_URL = "http://localhost:3000";
 
+  // Obtener fecha y hora local en formato YYYY-MM-DDTHH:MM
+  function getNowLocalISO(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  // Obtener nombre del colaborador o usuario en sesión activa
+  function getActiveUserName(): string {
+    try {
+      const rawUser = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+      if (rawUser) {
+        const parsed = JSON.parse(rawUser);
+        const name = (parsed.name || parsed.nombre || (parsed.identifier ? parsed.identifier.split("@")[0] : "")).trim();
+        const lastname = (parsed.lastname || parsed.apellido || "").trim();
+        const fullName = `${name} ${lastname}`.trim();
+        if (fullName) return fullName;
+        if (name) return name;
+        if (parsed.username || parsed.usuario) return parsed.username || parsed.usuario;
+      }
+    } catch (e) {
+      console.warn("Error leyendo sesión de usuario:", e);
+    }
+
+    const navName = document.querySelector("#user-display-name, [data-user-name], .user-name")?.textContent?.trim();
+    if (navName && !navName.includes("Cargando") && !navName.includes("Administrador")) return navName;
+    return "Carlos Mendoza";
+  }
+
+  function syncModalUserData() {
+    const userName = getActiveUserName();
+    const userEl = document.getElementById("expenseModalUser");
+    if (userEl) userEl.textContent = userName;
+
+    // Actualizar período contable al mes y año actual
+    const periodInput = document.getElementById("expensePeriodInput") as HTMLInputElement | null;
+    if (periodInput) {
+      const monthName = new Date().toLocaleDateString("es-CO", { month: "long" });
+      const year = new Date().getFullYear();
+      const capMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+      periodInput.value = `${capMonth} ${year} (Abierto)`;
+    }
+
+    // Restringir fecha para que NO pueda ser superior al día/hora actual
+    const dateInput = document.getElementById("expenseDateInput") as HTMLInputElement | null;
+    if (dateInput) {
+      const nowStr = getNowLocalISO();
+      dateInput.max = nowStr;
+      if (!dateInput.value || dateInput.value > nowStr) {
+        dateInput.value = nowStr;
+      }
+    }
+  }
+
   // Apertura del modal con animación GSAP y sincronización de datos iniciales
   (window as any).openExpenseModal = function () {
     const modal = document.getElementById("expenseModalOverlay") || document.getElementById("expenseModal");
     const container = document.getElementById("expenseModalContainer") || document.getElementById("expenseModalPanel");
     if (!modal || !container) return;
 
-    // Sincronizar usuario actual
-    try {
-      const rawUser = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
-      if (rawUser) {
-        const parsed = JSON.parse(rawUser);
-        const userName = parsed.nombre || parsed.usuario || "Administrador";
-        const userEl = document.getElementById("expenseModalUser");
-        if (userEl) userEl.textContent = userName;
-      }
-    } catch (e) {
-      console.warn("No se pudo leer usuario autenticado:", e);
+    // Sincronizar usuario activo y período
+    syncModalUserData();
+
+    // Fecha y hora: valor por defecto actual y límite máximo = ahora mismo
+    const dateInput = document.getElementById("expenseDateInput") as HTMLInputElement | null;
+    if (dateInput) {
+      const nowStr = getNowLocalISO();
+      dateInput.max = nowStr;
+      dateInput.value = nowStr;
+    }
+
+    // Concepto: debe iniciar en blanco con su placeholder
+    const descInput = document.getElementById("expenseConceptDescription") as HTMLTextAreaElement | null;
+    if (descInput) {
+      descInput.value = "";
     }
 
     // Generar folio sugerido con timestamp actual
@@ -432,14 +494,6 @@
     if (folioInput && (!folioInput.value || folioInput.value === "F001-0004892")) {
       const rnd = Math.floor(1000 + Math.random() * 9000);
       folioInput.value = `EXP-${rnd}`;
-    }
-
-    // Establecer fecha actual
-    const dateInput = document.getElementById("expenseDateInput") as HTMLInputElement | null;
-    if (dateInput) {
-      const now = new Date();
-      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-      dateInput.value = now.toISOString().slice(0, 16);
     }
 
     // Refrescar display de monto inicial
@@ -518,8 +572,22 @@
     const amountInput = document.getElementById("totalAmountInput") as HTMLInputElement | null;
     const folioInput = document.getElementById("expenseFolioInput") as HTMLInputElement | null;
     const descInput = document.getElementById("expenseConceptDescription") as HTMLTextAreaElement | null;
+    const dateInput = document.getElementById("expenseDateInput") as HTMLInputElement | null;
     const categorySelect = document.getElementById("expenseCategorySelect") as HTMLSelectElement | null;
     const submitBtn = document.getElementById("submitExpenseBtn") as HTMLButtonElement | null;
+
+    // Validación de fecha: no puede ser superior al día y hora actual
+    const maxNow = getNowLocalISO();
+    if (dateInput && dateInput.value && dateInput.value > maxNow) {
+      if (window.showExpenseToast) {
+        window.showExpenseToast("La fecha y hora de emisión no puede ser superior al día actual.", "warning");
+      } else {
+        alert("La fecha y hora de emisión no puede ser superior al día actual.");
+      }
+      dateInput.value = maxNow;
+      dateInput.focus();
+      return;
+    }
 
     // Limpiar dígitos del monto en COP
     const cleanDigits = (amountInput?.value || "").replace(/\D/g, "");
@@ -553,15 +621,8 @@
     const selectedMethodRadio = document.querySelector('input[name="payment_method"]:checked') as HTMLInputElement | null;
     const metodo_pago = selectedMethodRadio?.value || "caja_chica";
 
-    // Obtener usuario autenticado
-    let usuario_nombre = "";
-    try {
-      const rawUser = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
-      if (rawUser) {
-        const u = JSON.parse(rawUser);
-        usuario_nombre = u.nombre || u.usuario || "";
-      }
-    } catch (e) {}
+    // Obtener usuario autenticado en sesión
+    const usuario_nombre = getActiveUserName();
 
     const payload = {
       descripcion,
@@ -609,6 +670,7 @@
         if (descInput) descInput.value = "";
         const rnd = Math.floor(1000 + Math.random() * 9000);
         if (folioInput) folioInput.value = `EXP-${rnd}`;
+        if (dateInput) dateInput.value = getNowLocalISO();
         (window as any).syncAmountDisplays("0");
         amountInput?.focus();
       }
@@ -627,23 +689,51 @@
     }
   };
 
-  // Atajo de teclado Escape
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      const modal = document.getElementById("expenseModalOverlay");
-      if (modal && !modal.classList.contains("hidden")) {
-        (window as any).closeExpenseModal();
-      }
-    }
-  });
+  // Inicializar listeners al cargar la página
+  function initModalEvents() {
+    syncModalUserData();
 
-  // Cerrar al hacer clic en el backdrop exterior
-  const overlay = document.getElementById("expenseModalOverlay");
-  if (overlay) {
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) {
-        (window as any).closeExpenseModal();
+    // Listener para bloquear fechas futuras en tiempo real
+    const dateInput = document.getElementById("expenseDateInput") as HTMLInputElement | null;
+    if (dateInput) {
+      const nowStr = getNowLocalISO();
+      dateInput.max = nowStr;
+      dateInput.addEventListener("change", () => {
+        const curMax = getNowLocalISO();
+        if (dateInput.value > curMax) {
+          dateInput.value = curMax;
+          if (window.showExpenseToast) {
+            window.showExpenseToast("La fecha no puede ser superior al día actual.", "warning");
+          }
+        }
+      });
+    }
+
+    // Atajo de teclado Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const modal = document.getElementById("expenseModalOverlay");
+        if (modal && !modal.classList.contains("hidden")) {
+          (window as any).closeExpenseModal();
+        }
       }
     });
+
+    // Cerrar al hacer clic en el backdrop exterior
+    const overlay = document.getElementById("expenseModalOverlay");
+    if (overlay) {
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) {
+          (window as any).closeExpenseModal();
+        }
+      });
+    }
+  }
+
+  document.addEventListener("astro:page-load", initModalEvents);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initModalEvents);
+  } else {
+    initModalEvents();
   }
 </script>
