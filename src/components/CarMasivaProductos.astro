@@ -111,7 +111,7 @@
             <span class="material-symbols-outlined text-[17px]"
               >check_circle</span
             >
-            <span id="save-btn-text">Guardar Productos (6)</span>
+            <span id="save-btn-text">Guardar Productos (0)</span>
             <span
               class="bg-white/20 text-white text-[10px] font-mono px-1.5 py-0.5 rounded font-normal"
               >Ctrl+↵</span
@@ -173,11 +173,11 @@
             class="flex items-center gap-1.5 text-[12px] text-on-surface-variant"
           >
             <span
-              class="w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"
+              class="w-2 h-2 rounded-full bg-emerald-500"
             ></span>
             <span id="counter-badge">
               <strong class="font-bold text-on-surface" id="item-count"
-                >6</strong
+                >0</strong
               > artículos listos
             </span>
           </div>
@@ -188,19 +188,15 @@
           <span class="text-[12px] text-on-surface-variant hidden xl:inline">
             Acciones (<span
               class="font-bold text-on-surface"
-              id="selected-count">2</span
+              id="selected-count">0</span
             >):
           </span>
           <select
+            id="batch-category-select"
             class="h-7 px-2 bg-surface border border-surface-container text-[12px] text-on-surface rounded-lg focus:outline-none cursor-pointer"
             onchange="window.applyBatchCategory(this.value)"
           >
             <option disabled selected value="">🏷️ Asignar Categoría...</option>
-            <option value="Electrónicos">Electrónicos</option>
-            <option value="Repuestos">Repuestos</option>
-            <option value="Consumibles">Consumibles</option>
-            <option value="Herramientas">Herramientas</option>
-            <option value="Accesorios">Accesorios</option>
           </select>
           <button
             class="h-7 px-2.5 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-lg text-[12px] font-medium flex items-center gap-1 transition-colors cursor-pointer"
@@ -220,7 +216,7 @@
             type="button"
           >
             <span class="material-symbols-outlined text-[15px]">delete</span>
-            <span>Eliminar (<span id="delete-count-badge">2</span>)</span>
+            <span>Eliminar (<span id="delete-count-badge">0</span>)</span>
           </button>
         </div>
       </div>
@@ -231,24 +227,24 @@
       >
         <!-- Empty State si no hay renglones -->
         <div
-          class="hidden p-12 text-center flex-col items-center justify-center"
+          class="flex p-12 py-16 text-center flex-col items-center justify-center"
           id="empty-state"
         >
           <div
-            class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center text-on-surface-variant mb-2"
+            class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center text-on-surface-variant mb-3"
           >
-            <span class="material-symbols-outlined text-[24px]"
+            <span class="material-symbols-outlined text-[26px]"
               >inventory_2</span
             >
           </div>
-          <h3 class="text-[15px] font-bold text-on-surface">
+          <h3 class="text-[16px] font-bold text-on-surface">
             No hay artículos en la matriz
           </h3>
-          <p class="text-[12px] text-on-surface-variant mt-0.5">
+          <p class="text-[13px] text-on-surface-variant mt-1">
             Haz clic en '+ Añadir Fila' o pega datos tabulares desde Excel.
           </p>
           <button
-            class="mt-3 h-8 px-4 bg-primary hover:bg-primary-container text-on-primary rounded-xl text-[12px] font-semibold cursor-pointer transition-colors"
+            class="mt-4 h-9 px-5 bg-primary hover:bg-primary-container text-on-primary rounded-xl text-[12px] font-semibold cursor-pointer transition-colors shadow-xs"
             onclick="window.addNewRow()"
             type="button"
           >
@@ -256,7 +252,7 @@
           </button>
         </div>
 
-        <div class="overflow-x-auto w-full" id="table-container">
+        <div class="overflow-x-auto w-full hidden" id="table-container">
           <table class="w-full text-left border-collapse min-w-[1500px]">
             <thead>
               <tr
@@ -300,949 +296,6 @@
               class="divide-y divide-surface-container/40 text-[12px] font-body-md"
               id="inventory-rows"
             >
-              <!-- Fila 1 -->
-              <tr
-                class="bg-secondary-container/5 hover:bg-surface-container-low transition-colors group"
-                data-row-id="1"
-              >
-                <td class="px-3 py-2 text-center">
-                  <input
-                    checked
-                    class="row-checkbox w-4 h-4 rounded border-surface-container text-secondary-container focus:ring-secondary-container cursor-pointer"
-                    onchange="window.updateSelectedMetrics()"
-                    type="checkbox"
-                  />
-                </td>
-                <td
-                  class="px-2 py-2 text-center font-mono text-on-surface-variant font-semibold text-[11px] row-index"
-                  >1</td
-                >
-                <td class="px-3 py-2">
-                  <div class="relative flex items-center">
-                    <input
-                      class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] uppercase text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                      placeholder="SKU-XXXX"
-                      type="text"
-                      value="SKU-8821-EL"
-                    />
-                    <button
-                      class="absolute right-1 text-on-surface-variant hover:text-secondary p-0.5 rounded cursor-pointer"
-                      onclick="window.generateSku(this)"
-                      title="Autogenerar SKU"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[15px]"
-                        >autorenew</span
-                      >
-                    </button>
-                  </div>
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    placeholder="750100234567"
-                    type="text"
-                    value="7501009845123"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] font-medium text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all truncate"
-                    placeholder="Nombre del producto..."
-                    title="Fuente de Poder Conmutada 12V 10A Metálica"
-                    type="text"
-                    value="Fuente de Poder Conmutada 12V 10A Metálica"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all category-select cursor-pointer"
-                  >
-                    <option selected value="Electrónicos">Electrónicos</option>
-                    <option value="Repuestos">Repuestos</option>
-                    <option value="Consumibles">Consumibles</option>
-                    <option value="Herramientas">Herramientas</option>
-                    <option value="Accesorios">Accesorios</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all cursor-pointer"
-                  >
-                    <option selected value="Central Sucursal 01"
-                      >Central 01</option
-                    >
-                    <option value="Sucursal Norte">Norte</option>
-                    <option value="Sucursal Sur">Sur</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all cursor-pointer"
-                  >
-                    <option selected value="Físico">Físico</option>
-                    <option value="Consumo">Consumo</option>
-                    <option value="Servicio">Servicio</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-cost"
-                    inputmode="numeric"
-                    onblur="window.formatCOPInput(this)"
-                    oninput="window.calculateRow(this)"
-                    type="text"
-                    value="48.000"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] font-bold text-primary hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-price"
-                    inputmode="numeric"
-                    onblur="window.formatCOPInput(this)"
-                    oninput="window.calculateRow(this)"
-                    type="text"
-                    value="89.000"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-stock"
-                    min="0"
-                    oninput="window.calculateRow(this)"
-                    type="number"
-                    value="45"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    min="0"
-                    type="number"
-                    value="10"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    placeholder="Pasillo A - Est. 01"
-                    type="text"
-                    value="Pasillo E - Est. 03"
-                  />
-                </td>
-                <td class="px-3 py-2 text-center">
-                  <div
-                    class="flex items-center justify-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity"
-                  >
-                    <button
-                      class="p-1 rounded text-on-surface-variant hover:text-secondary hover:bg-surface-container cursor-pointer"
-                      onclick="window.duplicateSingleRow(this)"
-                      title="Duplicar renglón"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[16px]"
-                        >content_copy</span
-                      >
-                    </button>
-                    <button
-                      class="p-1 rounded text-on-surface-variant hover:text-error hover:bg-error-container/20 cursor-pointer"
-                      onclick="window.deleteSingleRow(this)"
-                      title="Eliminar renglón"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[16px]"
-                        >delete</span
-                      >
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Fila 2 -->
-              <tr
-                class="bg-secondary-container/5 hover:bg-surface-container-low transition-colors group"
-                data-row-id="2"
-              >
-                <td class="px-3 py-2 text-center">
-                  <input
-                    checked
-                    class="row-checkbox w-4 h-4 rounded border-surface-container text-secondary-container focus:ring-secondary-container cursor-pointer"
-                    onchange="window.updateSelectedMetrics()"
-                    type="checkbox"
-                  />
-                </td>
-                <td
-                  class="px-2 py-2 text-center font-mono text-on-surface-variant font-semibold text-[11px] row-index"
-                  >2</td
-                >
-                <td class="px-3 py-2">
-                  <div class="relative flex items-center">
-                    <input
-                      class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] uppercase text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                      placeholder="SKU-XXXX"
-                      type="text"
-                      value="SKU-9402-RP"
-                    />
-                    <button
-                      class="absolute right-1 text-on-surface-variant hover:text-secondary p-0.5 rounded cursor-pointer"
-                      onclick="window.generateSku(this)"
-                      title="Autogenerar SKU"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[15px]"
-                        >autorenew</span
-                      >
-                    </button>
-                  </div>
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    placeholder="750100234567"
-                    type="text"
-                    value="7501008821945"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] font-medium text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all truncate"
-                    placeholder="Nombre del producto..."
-                    title="Kit Balero Delantero Cerámico Doble Blindaje"
-                    type="text"
-                    value="Kit Balero Delantero Cerámico Doble Blindaje"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all category-select cursor-pointer"
-                  >
-                    <option value="Electrónicos">Electrónicos</option>
-                    <option selected value="Repuestos">Repuestos</option>
-                    <option value="Consumibles">Consumibles</option>
-                    <option value="Herramientas">Herramientas</option>
-                    <option value="Accesorios">Accesorios</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all cursor-pointer"
-                  >
-                    <option selected value="Central Sucursal 01"
-                      >Central 01</option
-                    >
-                    <option value="Sucursal Norte">Norte</option>
-                    <option value="Sucursal Sur">Sur</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all cursor-pointer"
-                  >
-                    <option selected value="Físico">Físico</option>
-                    <option value="Consumo">Consumo</option>
-                    <option value="Servicio">Servicio</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-cost"
-                    inputmode="numeric"
-                    onblur="window.formatCOPInput(this)"
-                    oninput="window.calculateRow(this)"
-                    type="text"
-                    value="65.000"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] font-bold text-primary hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-price"
-                    inputmode="numeric"
-                    onblur="window.formatCOPInput(this)"
-                    oninput="window.calculateRow(this)"
-                    type="text"
-                    value="120.000"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-stock"
-                    min="0"
-                    oninput="window.calculateRow(this)"
-                    type="number"
-                    value="80"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    min="0"
-                    type="number"
-                    value="15"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    placeholder="Pasillo A - Est. 01"
-                    type="text"
-                    value="Pasillo R - Est. 12"
-                  />
-                </td>
-                <td class="px-3 py-2 text-center">
-                  <div
-                    class="flex items-center justify-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity"
-                  >
-                    <button
-                      class="p-1 rounded text-on-surface-variant hover:text-secondary hover:bg-surface-container cursor-pointer"
-                      onclick="window.duplicateSingleRow(this)"
-                      title="Duplicar renglón"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[16px]"
-                        >content_copy</span
-                      >
-                    </button>
-                    <button
-                      class="p-1 rounded text-on-surface-variant hover:text-error hover:bg-error-container/20 cursor-pointer"
-                      onclick="window.deleteSingleRow(this)"
-                      title="Eliminar renglón"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[16px]"
-                        >delete</span
-                      >
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Fila 3 -->
-              <tr
-                class="hover:bg-surface-container-low transition-colors group"
-                data-row-id="3"
-              >
-                <td class="px-3 py-2 text-center">
-                  <input
-                    class="row-checkbox w-4 h-4 rounded border-surface-container text-secondary-container focus:ring-secondary-container cursor-pointer"
-                    onchange="window.updateSelectedMetrics()"
-                    type="checkbox"
-                  />
-                </td>
-                <td
-                  class="px-2 py-2 text-center font-mono text-on-surface-variant font-semibold text-[11px] row-index"
-                  >3</td
-                >
-                <td class="px-3 py-2">
-                  <div class="relative flex items-center">
-                    <input
-                      class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] uppercase text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                      placeholder="SKU-XXXX"
-                      type="text"
-                      value="SKU-3119-CS"
-                    />
-                    <button
-                      class="absolute right-1 text-on-surface-variant hover:text-secondary p-0.5 rounded cursor-pointer"
-                      onclick="window.generateSku(this)"
-                      title="Autogenerar SKU"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[15px]"
-                        >autorenew</span
-                      >
-                    </button>
-                  </div>
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    placeholder="750100234567"
-                    type="text"
-                    value="7501004112009"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] font-medium text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all truncate"
-                    placeholder="Nombre del producto..."
-                    title="Estaño para Soldar 60/40 Tubo 1.0mm 100g"
-                    type="text"
-                    value="Estaño para Soldar 60/40 Tubo 1.0mm 100g"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all category-select cursor-pointer"
-                  >
-                    <option value="Electrónicos">Electrónicos</option>
-                    <option value="Repuestos">Repuestos</option>
-                    <option selected value="Consumibles">Consumibles</option>
-                    <option value="Herramientas">Herramientas</option>
-                    <option value="Accesorios">Accesorios</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all cursor-pointer"
-                  >
-                    <option selected value="Central Sucursal 01"
-                      >Central 01</option
-                    >
-                    <option value="Sucursal Norte">Norte</option>
-                    <option value="Sucursal Sur">Sur</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all cursor-pointer"
-                  >
-                    <option value="Físico">Físico</option>
-                    <option selected value="Consumo">Consumo</option>
-                    <option value="Servicio">Servicio</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-cost"
-                    inputmode="numeric"
-                    onblur="window.formatCOPInput(this)"
-                    oninput="window.calculateRow(this)"
-                    type="text"
-                    value="15.000"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] font-bold text-primary hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-price"
-                    inputmode="numeric"
-                    onblur="window.formatCOPInput(this)"
-                    oninput="window.calculateRow(this)"
-                    type="text"
-                    value="28.000"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-stock"
-                    min="0"
-                    oninput="window.calculateRow(this)"
-                    type="number"
-                    value="120"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    min="0"
-                    type="number"
-                    value="25"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    placeholder="Pasillo A - Est. 01"
-                    type="text"
-                    value="Pasillo C - Est. 01"
-                  />
-                </td>
-                <td class="px-3 py-2 text-center">
-                  <div
-                    class="flex items-center justify-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity"
-                  >
-                    <button
-                      class="p-1 rounded text-on-surface-variant hover:text-secondary hover:bg-surface-container cursor-pointer"
-                      onclick="window.duplicateSingleRow(this)"
-                      title="Duplicar renglón"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[16px]"
-                        >content_copy</span
-                      >
-                    </button>
-                    <button
-                      class="p-1 rounded text-on-surface-variant hover:text-error hover:bg-error-container/20 cursor-pointer"
-                      onclick="window.deleteSingleRow(this)"
-                      title="Eliminar renglón"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[16px]"
-                        >delete</span
-                      >
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Fila 4 -->
-              <tr
-                class="hover:bg-surface-container-low transition-colors group"
-                data-row-id="4"
-              >
-                <td class="px-3 py-2 text-center">
-                  <input
-                    class="row-checkbox w-4 h-4 rounded border-surface-container text-secondary-container focus:ring-secondary-container cursor-pointer"
-                    onchange="window.updateSelectedMetrics()"
-                    type="checkbox"
-                  />
-                </td>
-                <td
-                  class="px-2 py-2 text-center font-mono text-on-surface-variant font-semibold text-[11px] row-index"
-                  >4</td
-                >
-                <td class="px-3 py-2">
-                  <div class="relative flex items-center">
-                    <input
-                      class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] uppercase text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                      placeholder="SKU-XXXX"
-                      type="text"
-                      value="SKU-5520-HR"
-                    />
-                    <button
-                      class="absolute right-1 text-on-surface-variant hover:text-secondary p-0.5 rounded cursor-pointer"
-                      onclick="window.generateSku(this)"
-                      title="Autogenerar SKU"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[15px]"
-                        >autorenew</span
-                      >
-                    </button>
-                  </div>
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    placeholder="750100234567"
-                    type="text"
-                    value="7501005510044"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] font-medium text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all truncate"
-                    placeholder="Nombre del producto..."
-                    title="Cautín Tipo Pistola de Temperatura Regulable 60W"
-                    type="text"
-                    value="Cautín Tipo Pistola de Temperatura Regulable 60W"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all category-select cursor-pointer"
-                  >
-                    <option value="Electrónicos">Electrónicos</option>
-                    <option value="Repuestos">Repuestos</option>
-                    <option value="Consumibles">Consumibles</option>
-                    <option selected value="Herramientas">Herramientas</option>
-                    <option value="Accesorios">Accesorios</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all cursor-pointer"
-                  >
-                    <option selected value="Central Sucursal 01"
-                      >Central 01</option
-                    >
-                    <option value="Sucursal Norte">Norte</option>
-                    <option value="Sucursal Sur">Sur</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all cursor-pointer"
-                  >
-                    <option selected value="Físico">Físico</option>
-                    <option value="Consumo">Consumo</option>
-                    <option value="Servicio">Servicio</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-cost"
-                    inputmode="numeric"
-                    onblur="window.formatCOPInput(this)"
-                    oninput="window.calculateRow(this)"
-                    type="text"
-                    value="60.000"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] font-bold text-primary hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-price"
-                    inputmode="numeric"
-                    onblur="window.formatCOPInput(this)"
-                    oninput="window.calculateRow(this)"
-                    type="text"
-                    value="110.000"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-stock"
-                    min="0"
-                    oninput="window.calculateRow(this)"
-                    type="number"
-                    value="35"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    min="0"
-                    type="number"
-                    value="8"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    placeholder="Pasillo A - Est. 01"
-                    type="text"
-                    value="Pasillo H - Est. 05"
-                  />
-                </td>
-                <td class="px-3 py-2 text-center">
-                  <div
-                    class="flex items-center justify-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity"
-                  >
-                    <button
-                      class="p-1 rounded text-on-surface-variant hover:text-secondary hover:bg-surface-container cursor-pointer"
-                      onclick="window.duplicateSingleRow(this)"
-                      title="Duplicar renglón"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[16px]"
-                        >content_copy</span
-                      >
-                    </button>
-                    <button
-                      class="p-1 rounded text-on-surface-variant hover:text-error hover:bg-error-container/20 cursor-pointer"
-                      onclick="window.deleteSingleRow(this)"
-                      title="Eliminar renglón"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[16px]"
-                        >delete</span
-                      >
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Fila 5 -->
-              <tr
-                class="hover:bg-surface-container-low transition-colors group"
-                data-row-id="5"
-              >
-                <td class="px-3 py-2 text-center">
-                  <input
-                    class="row-checkbox w-4 h-4 rounded border-surface-container text-secondary-container focus:ring-secondary-container cursor-pointer"
-                    onchange="window.updateSelectedMetrics()"
-                    type="checkbox"
-                  />
-                </td>
-                <td
-                  class="px-2 py-2 text-center font-mono text-on-surface-variant font-semibold text-[11px] row-index"
-                  >5</td
-                >
-                <td class="px-3 py-2">
-                  <div class="relative flex items-center">
-                    <input
-                      class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] uppercase text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                      placeholder="SKU-XXXX"
-                      type="text"
-                      value="SKU-7714-EL"
-                    />
-                    <button
-                      class="absolute right-1 text-on-surface-variant hover:text-secondary p-0.5 rounded cursor-pointer"
-                      onclick="window.generateSku(this)"
-                      title="Autogenerar SKU"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[15px]"
-                        >autorenew</span
-                      >
-                    </button>
-                  </div>
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    placeholder="750100234567"
-                    type="text"
-                    value="7501007714028"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] font-medium text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all truncate"
-                    placeholder="Nombre del producto..."
-                    title="Módulo Regulador Reductor LM2596 DC-DC con Display"
-                    type="text"
-                    value="Módulo Regulador Reductor LM2596 DC-DC con Display"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all category-select cursor-pointer"
-                  >
-                    <option selected value="Electrónicos">Electrónicos</option>
-                    <option value="Repuestos">Repuestos</option>
-                    <option value="Consumibles">Consumibles</option>
-                    <option value="Herramientas">Herramientas</option>
-                    <option value="Accesorios">Accesorios</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all cursor-pointer"
-                  >
-                    <option selected value="Central Sucursal 01"
-                      >Central 01</option
-                    >
-                    <option value="Sucursal Norte">Norte</option>
-                    <option value="Sucursal Sur">Sur</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all cursor-pointer"
-                  >
-                    <option selected value="Físico">Físico</option>
-                    <option value="Consumo">Consumo</option>
-                    <option value="Servicio">Servicio</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-cost"
-                    inputmode="numeric"
-                    onblur="window.formatCOPInput(this)"
-                    oninput="window.calculateRow(this)"
-                    type="text"
-                    value="12.000"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] font-bold text-primary hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-price"
-                    inputmode="numeric"
-                    onblur="window.formatCOPInput(this)"
-                    oninput="window.calculateRow(this)"
-                    type="text"
-                    value="25.000"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-stock"
-                    min="0"
-                    oninput="window.calculateRow(this)"
-                    type="number"
-                    value="110"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    min="0"
-                    type="number"
-                    value="20"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    placeholder="Pasillo A - Est. 01"
-                    type="text"
-                    value="Pasillo E - Est. 08"
-                  />
-                </td>
-                <td class="px-3 py-2 text-center">
-                  <div
-                    class="flex items-center justify-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity"
-                  >
-                    <button
-                      class="p-1 rounded text-on-surface-variant hover:text-secondary hover:bg-surface-container cursor-pointer"
-                      onclick="window.duplicateSingleRow(this)"
-                      title="Duplicar renglón"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[16px]"
-                        >content_copy</span
-                      >
-                    </button>
-                    <button
-                      class="p-1 rounded text-on-surface-variant hover:text-error hover:bg-error-container/20 cursor-pointer"
-                      onclick="window.deleteSingleRow(this)"
-                      title="Eliminar renglón"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[16px]"
-                        >delete</span
-                      >
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Fila 6 -->
-              <tr
-                class="hover:bg-surface-container-low transition-colors group"
-                data-row-id="6"
-              >
-                <td class="px-3 py-2 text-center">
-                  <input
-                    class="row-checkbox w-4 h-4 rounded border-surface-container text-secondary-container focus:ring-secondary-container cursor-pointer"
-                    onchange="window.updateSelectedMetrics()"
-                    type="checkbox"
-                  />
-                </td>
-                <td
-                  class="px-2 py-2 text-center font-mono text-on-surface-variant font-semibold text-[11px] row-index"
-                  >6</td
-                >
-                <td class="px-3 py-2">
-                  <div class="relative flex items-center">
-                    <input
-                      class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] uppercase text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                      placeholder="SKU-XXXX"
-                      type="text"
-                      value="SKU-2041-AC"
-                    />
-                    <button
-                      class="absolute right-1 text-on-surface-variant hover:text-secondary p-0.5 rounded cursor-pointer"
-                      onclick="window.generateSku(this)"
-                      title="Autogenerar SKU"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[15px]"
-                        >autorenew</span
-                      >
-                    </button>
-                  </div>
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    placeholder="750100234567"
-                    type="text"
-                    value="7501002041198"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] font-medium text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all truncate"
-                    placeholder="Nombre del producto..."
-                    title="Cinta Aislante Autofundente de Goma 19mm x 5m"
-                    type="text"
-                    value="Cinta Aislante Autofundente de Goma 19mm x 5m"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all category-select cursor-pointer"
-                  >
-                    <option value="Electrónicos">Electrónicos</option>
-                    <option value="Repuestos">Repuestos</option>
-                    <option value="Consumibles">Consumibles</option>
-                    <option value="Herramientas">Herramientas</option>
-                    <option selected value="Accesorios">Accesorios</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all cursor-pointer"
-                  >
-                    <option selected value="Central Sucursal 01"
-                      >Central 01</option
-                    >
-                    <option value="Sucursal Norte">Norte</option>
-                    <option value="Sucursal Sur">Sur</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <select
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all cursor-pointer"
-                  >
-                    <option value="Físico">Físico</option>
-                    <option selected value="Consumo">Consumo</option>
-                    <option value="Servicio">Servicio</option>
-                  </select>
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-cost"
-                    inputmode="numeric"
-                    onblur="window.formatCOPInput(this)"
-                    oninput="window.calculateRow(this)"
-                    type="text"
-                    value="14.000"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] font-bold text-primary hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-price"
-                    inputmode="numeric"
-                    onblur="window.formatCOPInput(this)"
-                    oninput="window.calculateRow(this)"
-                    type="text"
-                    value="26.000"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-stock"
-                    min="0"
-                    oninput="window.calculateRow(this)"
-                    type="number"
-                    value="60"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    min="0"
-                    type="number"
-                    value="12"
-                  />
-                </td>
-                <td class="px-3 py-2">
-                  <input
-                    class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all"
-                    placeholder="Pasillo A - Est. 01"
-                    type="text"
-                    value="Pasillo A - Est. 04"
-                  />
-                </td>
-                <td class="px-3 py-2 text-center">
-                  <div
-                    class="flex items-center justify-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity"
-                  >
-                    <button
-                      class="p-1 rounded text-on-surface-variant hover:text-secondary hover:bg-surface-container cursor-pointer"
-                      onclick="window.duplicateSingleRow(this)"
-                      title="Duplicar renglón"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[16px]"
-                        >content_copy</span
-                      >
-                    </button>
-                    <button
-                      class="p-1 rounded text-on-surface-variant hover:text-error hover:bg-error-container/20 cursor-pointer"
-                      onclick="window.deleteSingleRow(this)"
-                      title="Eliminar renglón"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[16px]"
-                        >delete</span
-                      >
-                    </button>
-                  </div>
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -1298,7 +351,7 @@
             <div class="flex items-baseline gap-1.5 mt-1">
               <span
                 class="text-2xl font-bold font-mono text-primary"
-                id="summary-items">6</span
+                id="summary-items">0</span
               >
               <span class="text-xs text-on-surface-variant">referencias</span>
             </div>
@@ -1313,10 +366,10 @@
             <div class="flex items-baseline gap-1.5 mt-1">
               <span
                 class="text-2xl font-bold font-mono text-primary"
-                id="summary-stock">450</span
+                id="summary-stock">0</span
               >
               <span class="text-xs text-on-tertiary-container font-semibold"
-                >+100% exist.</span
+                >0 exist.</span
               >
             </div>
           </div>
@@ -1330,7 +383,7 @@
             <div class="flex items-baseline gap-1.5 mt-1">
               <span
                 class="text-2xl font-bold font-mono text-primary"
-                id="summary-cost">$13.420.000</span
+                id="summary-cost">$ 0</span
               >
               <span class="text-xs text-on-surface-variant">costo total</span>
             </div>
@@ -1345,10 +398,10 @@
             <div class="flex items-baseline gap-1.5 mt-1">
               <span
                 class="text-2xl font-bold font-mono text-secondary"
-                id="summary-price">$25.125.000</span
+                id="summary-price">$ 0</span
               >
               <span class="text-xs text-on-tertiary-container font-semibold" id="summary-margin"
-                >+87.2%</span
+                >+0.0%</span
               >
             </div>
           </div>
@@ -1453,11 +506,73 @@
 <script>
   import gsap from "gsap";
 
+  // Categorías sincronizadas dinámicamente con la base de datos
+  let availableCategories: { nombre_categoria: string }[] = [];
+
+  async function loadBulkCategories() {
+    try {
+      const res = await fetch("http://localhost:3000/api/categorias");
+      const json = await res.json();
+      if (json.success) {
+        const rawList = json.data?.categorias || (Array.isArray(json.data) ? json.data : []);
+        availableCategories = rawList.map((c: any) => ({
+          nombre_categoria: c.nombre || c.nombre_categoria || c.name || "General",
+        }));
+        updateBulkCategoryDropdowns();
+      }
+    } catch (err) {
+      console.warn("No se pudieron cargar categorías:", err);
+    }
+  }
+
+  function buildBulkCategoryOptions(selectedCat?: string): string {
+    if (!availableCategories || availableCategories.length === 0) {
+      return `<option value="General" ${selectedCat === "General" ? "selected" : ""}>General</option>`;
+    }
+    return availableCategories
+      .map(
+        (c) =>
+          `<option value="${c.nombre_categoria}" ${selectedCat === c.nombre_categoria ? "selected" : ""}>${c.nombre_categoria}</option>`,
+      )
+      .join("");
+  }
+
+  function updateBulkCategoryDropdowns() {
+    // 1. Dropdown en la barra superior de acciones por lote
+    const batchSelect = document.getElementById(
+      "batch-category-select",
+    ) as HTMLSelectElement | null;
+    if (batchSelect) {
+      const prevVal = batchSelect.value;
+      let opts = `<option disabled selected value="">🏷️ Asignar Categoría...</option>`;
+      availableCategories.forEach((cat) => {
+        opts += `<option value="${cat.nombre_categoria}">${cat.nombre_categoria}</option>`;
+      });
+      batchSelect.innerHTML = opts;
+      if (prevVal) batchSelect.value = prevVal;
+    }
+
+    // 2. Dropdown de cada fila existente si las hay
+    document
+      .querySelectorAll("#inventory-rows .category-select")
+      .forEach((sel) => {
+        const select = sel as HTMLSelectElement;
+        const currentVal = select.value;
+        select.innerHTML = buildBulkCategoryOptions(currentVal);
+      });
+  }
+
+  window.addEventListener("categoriaActualizada", () => {
+    loadBulkCategories();
+  });
+
   // Apertura y Cierre con animación GSAP
   (window as any).openBulkUploadModal = function () {
     const modal = document.getElementById("bulkUploadModal");
     const container = document.getElementById("bulkUploadContainer");
     if (!modal || !container) return;
+
+    loadBulkCategories();
 
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
@@ -1472,6 +587,8 @@
       { y: 30, scale: 0.96, opacity: 0 },
       { y: 0, scale: 1, opacity: 1, duration: 0.28, ease: "back.out(1.2)" },
     );
+    (window as any).updateRowIndices();
+    (window as any).updateSelectedMetrics();
     (window as any).recalculateTotals();
   };
 
@@ -1636,11 +753,11 @@
     const sumCost = document.getElementById("summary-cost");
     if (sumCost)
       sumCost.textContent =
-        "$" + Math.round(totalCost).toLocaleString("es-CO");
+        "$ " + Math.round(totalCost).toLocaleString("es-CO");
     const sumPrice = document.getElementById("summary-price");
     if (sumPrice)
       sumPrice.textContent =
-        "$" + Math.round(totalPrice).toLocaleString("es-CO");
+        "$ " + Math.round(totalPrice).toLocaleString("es-CO");
 
     const marginBadge = document.getElementById("summary-margin");
     if (marginBadge) {
@@ -1692,11 +809,7 @@
       </td>
       <td class="px-3 py-2">
         <select class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all category-select cursor-pointer">
-          <option value="Electrónicos" ${data.cat === "Electrónicos" ? "selected" : ""}>Electrónicos</option>
-          <option value="Repuestos" ${data.cat === "Repuestos" ? "selected" : ""}>Repuestos</option>
-          <option value="Consumibles" ${data.cat === "Consumibles" ? "selected" : ""}>Consumibles</option>
-          <option value="Herramientas" ${data.cat === "Herramientas" ? "selected" : ""}>Herramientas</option>
-          <option value="Accesorios" ${data.cat === "Accesorios" ? "selected" : ""}>Accesorios</option>
+          ${buildBulkCategoryOptions(data.cat)}
         </select>
       </td>
       <td class="px-3 py-2">
@@ -1714,19 +827,19 @@
         </select>
       </td>
       <td class="px-3 py-2">
-        <input type="text" inputmode="numeric" value="${data.cost !== undefined ? (typeof data.cost === 'number' ? data.cost.toLocaleString('es-CO') : data.cost) : '25.000'}" oninput="window.calculateRow(this)" onblur="window.formatCOPInput(this)" class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-cost" />
+        <input type="text" inputmode="numeric" value="${data.cost !== undefined ? (typeof data.cost === 'number' ? data.cost.toLocaleString('es-CO') : data.cost) : ''}" placeholder="0" oninput="window.calculateRow(this)" onblur="window.formatCOPInput(this)" class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-cost" />
       </td>
       <td class="px-3 py-2">
-        <input type="text" inputmode="numeric" value="${data.price !== undefined ? (typeof data.price === 'number' ? data.price.toLocaleString('es-CO') : data.price) : '45.000'}" oninput="window.calculateRow(this)" onblur="window.formatCOPInput(this)" class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] font-bold text-primary hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-price" />
+        <input type="text" inputmode="numeric" value="${data.price !== undefined ? (typeof data.price === 'number' ? data.price.toLocaleString('es-CO') : data.price) : ''}" placeholder="0" oninput="window.calculateRow(this)" onblur="window.formatCOPInput(this)" class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] font-bold text-primary hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-price" />
       </td>
       <td class="px-3 py-2">
-        <input type="number" min="0" value="${data.stock || 10}" oninput="window.calculateRow(this)" class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-stock" />
+        <input type="number" min="0" value="${data.stock !== undefined ? data.stock : 0}" oninput="window.calculateRow(this)" class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all field-stock" />
       </td>
       <td class="px-3 py-2">
-        <input type="number" min="0" value="${data.min || 5}" class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all" />
+        <input type="number" min="0" value="${data.min !== undefined ? data.min : 5}" class="w-full h-8 px-2 text-right bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all" />
       </td>
       <td class="px-3 py-2">
-        <input type="text" value="${data.location || "Pasillo A - Est. 01"}" class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all" />
+        <input type="text" value="${data.location || "Bodega Central"}" class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all" />
       </td>
       <td class="px-3 py-2 text-center">
         <div class="flex items-center justify-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
@@ -2007,11 +1120,13 @@
     });
   }
 
+  loadBulkCategories();
   (window as any).updateRowIndices();
   (window as any).updateSelectedMetrics();
   (window as any).recalculateTotals();
 
   document.addEventListener("astro:page-load", () => {
+    loadBulkCategories();
     (window as any).updateRowIndices();
     (window as any).updateSelectedMetrics();
     (window as any).recalculateTotals();
