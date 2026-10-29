@@ -414,10 +414,20 @@ const transactions = initialData?.transactions || [];
                     </svg>
                   </div>
 
-                  <div class="flex items-center justify-between text-on-surface-variant text-[12px] pt-2 px-1">
-                    <span>Inicio Período</span>
-                    <span>Historial Registrado</span>
-                    <span class="font-bold text-primary">Cierre Hoy</span>
+                  <div id="chart-timeline-labels" class="flex items-center justify-between text-on-surface-variant text-[12px] pt-2 px-1">
+                    {chartData.etiquetas && chartData.etiquetas.length > 0 ? (
+                      chartData.etiquetas.map((lbl: string, idx: number) => (
+                        <span class={idx === chartData.etiquetas.length - 1 ? "font-bold text-primary" : ""}>
+                          {lbl}
+                        </span>
+                      ))
+                    ) : (
+                      <>
+                        <span>Inicio Período</span>
+                        <span>Historial Registrado</span>
+                        <span class="font-bold text-primary">Cierre Hoy</span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -747,6 +757,8 @@ const transactions = initialData?.transactions || [];
 
     const API_URL = "http://localhost:3000/api/dashboard";
     let currentPeriod = "mes";
+    let lastChartData: any = null;
+    let currentChartTab: "ventas" | "gastos" | "utilidad" = "ventas";
 
     // Formatear COP en el cliente
     function formatCOPClient(val: number | string) {
@@ -776,7 +788,7 @@ const transactions = initialData?.transactions || [];
     function renderDashboard(data: any) {
       const { kpis, stockAlerts, chartData, transactions } = data;
 
-      // 1. KPIs
+      // 1. KPIs Financieros (afectados por Hoy / Esta semana / Este mes)
       if (kpis) {
         const vVal = document.getElementById("kpi-ventas-val");
         const vCount = document.getElementById("kpi-ventas-count");
@@ -802,27 +814,27 @@ const transactions = initialData?.transactions || [];
           mBadge.textContent = `Margen: ${kpis.dinero_total?.margen_porcentaje || 0}%`;
         }
 
-        // Conteo inventario y escala de stock
+        // Conteo inventario global (el estado de inventario no cambia con el filtro temporal)
         const invTotal = document.getElementById("kpi-inventario-total");
-        if (invTotal) invTotal.textContent = String(kpis.inventario?.total_items || 0);
+        if (invTotal && kpis.inventario) invTotal.textContent = String(kpis.inventario.total_items || 0);
 
         const countUrg = document.getElementById("kpi-count-urgente");
-        if (countUrg) countUrg.textContent = String(kpis.inventario?.count_urgente || 0);
+        if (countUrg && kpis.inventario) countUrg.textContent = String(kpis.inventario.count_urgente || 0);
 
         const countProx = document.getElementById("kpi-count-proximo");
-        if (countProx) countProx.textContent = String(kpis.inventario?.count_proximo || 0);
+        if (countProx && kpis.inventario) countProx.textContent = String(kpis.inventario.count_proximo || 0);
 
         const countOk = document.getElementById("kpi-count-ok");
-        if (countOk) countOk.textContent = String(kpis.inventario?.count_ok || 0);
+        if (countOk && kpis.inventario) countOk.textContent = String(kpis.inventario.count_ok || 0);
       }
 
-      // 2. Stock Crítico (escala 0-4 rojo, 5-6 amarillo, 7+ verde)
-      if (stockAlerts && Array.isArray(stockAlerts)) {
+      // 2. Stock Crítico (Almacén global permanente - No afectado por el filtro temporal)
+      if (stockAlerts && Array.isArray(stockAlerts) && stockAlerts.length > 0) {
         const badge = document.getElementById("stock-critico-badge");
         if (badge) badge.textContent = `${stockAlerts.length} Registrados`;
 
         const listContainer = document.getElementById("stock-critico-list");
-        if (listContainer) {
+        if (listContainer && (!listContainer.children.length || listContainer.children.length === 0)) {
           listContainer.innerHTML = stockAlerts
             .map((item: any) => {
               const isUrgente = item.estado_escala === "URGENTE";
@@ -889,34 +901,52 @@ const transactions = initialData?.transactions || [];
         }
       }
 
-      // 3. Gráfica y desgloses
+      // 3. Gráfica de Flujo Financiero Dinámica y Desgloses (afectados por el período)
       if (chartData) {
+        lastChartData = chartData;
+
         const maxLabel = document.getElementById("chart-max-label");
         if (maxLabel && chartData.maxValorFormato) {
           maxLabel.textContent = `Pico: ${chartData.maxValorFormato}`;
         }
+
         const prodVal = document.getElementById("chart-productos-val");
         if (prodVal && chartData.desglose?.productos_formato) {
           prodVal.textContent = chartData.desglose.productos_formato;
         }
+
         const servVal = document.getElementById("chart-servicios-val");
         if (servVal && chartData.desglose?.servicios_formato) {
           servVal.textContent = chartData.desglose.servicios_formato;
         }
+
+        // Actualizar etiquetas de la línea de tiempo del gráfico
+        const timelineLabelsEl = document.getElementById("chart-timeline-labels");
+        if (timelineLabelsEl && chartData.etiquetas && chartData.etiquetas.length > 0) {
+          timelineLabelsEl.innerHTML = chartData.etiquetas
+            .map(
+              (lbl: string, idx: number) =>
+                `<span class="${idx === chartData.etiquetas.length - 1 ? 'font-bold text-primary' : ''}">${lbl}</span>`
+            )
+            .join("");
+        }
+
+        // Animar la transición del gráfico con los datos reales del período
+        animateChartTransition(currentChartTab, chartData);
       }
 
-      // 4. Transacciones
+      // 4. Transacciones Registradas (filtradas por el período)
       if (transactions && Array.isArray(transactions)) {
         const tbody = document.getElementById("transactions-tbody");
         const summary = document.getElementById("table-summary-text");
-        if (summary) summary.textContent = `Mostrando ${transactions.length} transacciones registradas`;
+        if (summary) summary.textContent = `Mostrando ${transactions.length} transacciones en este período`;
 
         if (tbody) {
           if (transactions.length === 0) {
             tbody.innerHTML = `
               <tr>
                 <td colspan="8" class="px-4 py-8 text-center text-on-surface-variant">
-                  No hay transacciones registradas aún en este período.
+                  No hay transacciones registradas aún en el período seleccionado.
                 </td>
               </tr>
             `;
@@ -987,6 +1017,7 @@ const transactions = initialData?.transactions || [];
     };
 
     // Filtros de tiempo: Hoy / Esta semana / Este mes
+    // Afecta ventas, gastos, balance y gráfica sin alterar inventario
     (window as any).setTimeFilter = function(btn: HTMLElement, filter: string) {
       currentPeriod = filter;
       document.querySelectorAll("#time-filter-group .time-tab").forEach((tab) => {
@@ -1000,7 +1031,8 @@ const transactions = initialData?.transactions || [];
     };
 
     // Pestañas del gráfico interactivo: Ventas / Gastos / Utilidad con animación GSAP
-    (window as any).switchChartTab = function(tab: string) {
+    (window as any).switchChartTab = function(tab: "ventas" | "gastos" | "utilidad") {
+      currentChartTab = tab;
       document.querySelectorAll(".chart-tab").forEach((btn) => {
         btn.classList.remove("bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
         btn.classList.add("text-on-surface-variant");
@@ -1011,7 +1043,7 @@ const transactions = initialData?.transactions || [];
         activeBtn.classList.remove("text-on-surface-variant");
       }
 
-      animateChartTransition(tab as "ventas" | "gastos" | "utilidad");
+      animateChartTransition(tab, lastChartData);
     };
 
     // Toast de pedido rápido con GSAP

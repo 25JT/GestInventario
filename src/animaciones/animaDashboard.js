@@ -130,8 +130,9 @@ export function initDashboardAnimations() {
 /**
  * Animación suave de transición para el gráfico financiero interactivo
  * @param {'ventas' | 'gastos' | 'utilidad'} tab
+ * @param {object} [dynamicData] Datos reales provenientes de la API
  */
-export function animateChartTransition(tab) {
+export function animateChartTransition(tab, dynamicData = null) {
   const chartSvg = document.getElementById("financial-svg-chart");
   const salesArea = document.getElementById("chart-sales-area");
   const salesLine = document.getElementById("chart-sales-line");
@@ -141,34 +142,68 @@ export function animateChartTransition(tab) {
 
   if (!chartSvg) return;
 
-  // Curvas representativas según pestaña
-  const curves = {
-    ventas: {
-      max: "$50k",
-      salesArea: "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20 L 600,160 L 0,160 Z",
-      salesLine: "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20",
-      showExpense: true,
-    },
-    gastos: {
-      max: "$25k",
-      salesArea: "M 0,140 Q 80,105 160,115 T 320,85 T 460,95 T 600,70 L 600,160 L 0,160 Z",
-      salesLine: "M 0,140 Q 80,105 160,115 T 320,85 T 460,95 T 600,70",
-      showExpense: false,
-    },
-    utilidad: {
-      max: "$40k",
-      salesArea: "M 0,120 Q 80,50 160,65 T 320,30 T 460,40 T 600,15 L 600,160 L 0,160 Z",
-      salesLine: "M 0,120 Q 80,50 160,65 T 320,30 T 460,40 T 600,15",
-      showExpense: true,
-    },
-  };
+  // Curvas dinámicas si existen, o curvas de respaldo
+  let salesAreaD = "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20 L 600,160 L 0,160 Z";
+  let salesLineD = "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20";
+  let expenseAreaD = "M 0,110 Q 75,95 150,115 T 300,105 T 450,120 T 600,95 L 600,160 L 0,160 Z";
+  let expenseLineD = "M 0,110 Q 75,95 150,115 T 300,105 T 450,120 T 600,95";
+  let maxText = "$ 50.000";
+  let showExpense = true;
 
-  const selected = curves[tab] || curves.ventas;
+  if (dynamicData && dynamicData.svg) {
+    if (tab === "ventas") {
+      salesAreaD = dynamicData.svg.sales?.area || salesAreaD;
+      salesLineD = dynamicData.svg.sales?.line || salesLineD;
+      expenseAreaD = dynamicData.svg.expense?.area || expenseAreaD;
+      expenseLineD = dynamicData.svg.expense?.line || expenseLineD;
+      maxText = `Pico: ${dynamicData.maxValorFormato}`;
+      showExpense = true;
+    } else if (tab === "gastos") {
+      salesAreaD = dynamicData.svg.expense?.area || salesAreaD;
+      salesLineD = dynamicData.svg.expense?.line || salesLineD;
+      maxText = `Total Gastos: ${dynamicData.totales?.gastos_formato || dynamicData.maxValorFormato}`;
+      showExpense = false;
+    } else if (tab === "utilidad") {
+      salesAreaD = dynamicData.svg.utilidad?.area || salesAreaD;
+      salesLineD = dynamicData.svg.utilidad?.line || salesLineD;
+      expenseAreaD = dynamicData.svg.expense?.area || expenseAreaD;
+      expenseLineD = dynamicData.svg.expense?.line || expenseLineD;
+      maxText = `Balance: ${dynamicData.totales?.utilidad_formato || dynamicData.maxValorFormato}`;
+      showExpense = true;
+    }
+  } else {
+    // Curvas estáticas representativas de fallback
+    const curves = {
+      ventas: {
+        max: "$ 50.000",
+        salesArea: "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20 L 600,160 L 0,160 Z",
+        salesLine: "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20",
+        showExpense: true,
+      },
+      gastos: {
+        max: "$ 25.000",
+        salesArea: "M 0,140 Q 80,105 160,115 T 320,85 T 460,95 T 600,70 L 600,160 L 0,160 Z",
+        salesLine: "M 0,140 Q 80,105 160,115 T 320,85 T 460,95 T 600,70",
+        showExpense: false,
+      },
+      utilidad: {
+        max: "$ 40.000",
+        salesArea: "M 0,120 Q 80,50 160,65 T 320,30 T 460,40 T 600,15 L 600,160 L 0,160 Z",
+        salesLine: "M 0,120 Q 80,50 160,65 T 320,30 T 460,40 T 600,15",
+        showExpense: true,
+      },
+    };
+    const selected = curves[tab] || curves.ventas;
+    salesAreaD = selected.salesArea;
+    salesLineD = selected.salesLine;
+    maxText = selected.max;
+    showExpense = selected.showExpense;
+  }
 
   // Animación del contenedor de la gráfica
   gsap.fromTo(
     chartSvg,
-    { opacity: 0.5, scaleY: 0.96 },
+    { opacity: 0.6, scaleY: 0.98 },
     {
       opacity: 1,
       scaleY: 1,
@@ -178,13 +213,15 @@ export function animateChartTransition(tab) {
     }
   );
 
-  if (salesArea) salesArea.setAttribute("d", selected.salesArea);
-  if (salesLine) salesLine.setAttribute("d", selected.salesLine);
-  if (maxLabel) maxLabel.textContent = selected.max;
+  if (salesArea) salesArea.setAttribute("d", salesAreaD);
+  if (salesLine) salesLine.setAttribute("d", salesLineD);
+  if (expenseArea && dynamicData?.svg?.expense?.area) expenseArea.setAttribute("d", expenseAreaD);
+  if (expenseLine && dynamicData?.svg?.expense?.line) expenseLine.setAttribute("d", expenseLineD);
+  if (maxLabel) maxLabel.textContent = maxText;
 
   if (expenseArea && expenseLine) {
     gsap.to([expenseArea, expenseLine], {
-      opacity: selected.showExpense ? 1 : 0.2,
+      opacity: showExpense ? 1 : 0.15,
       duration: 0.3,
     });
   }
