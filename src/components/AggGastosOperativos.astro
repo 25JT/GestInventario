@@ -212,15 +212,16 @@
               </div>
             </div>
             <div class="flex items-center gap-1.5">
-              <span class="text-[20px] font-bold text-primary">$</span>
+              <span class="text-[20px] font-bold text-primary select-none">$</span>
               <input
                 class="w-full text-[22px] sm:text-[24px] text-primary font-bold bg-transparent focus:outline-none tracking-tight font-mono"
                 id="totalAmountInput"
-                type="number"
-                step="100"
-                min="0"
-                value="385000"
-                oninput="window.syncAmountDisplays(this.value)"
+                type="text"
+                inputmode="numeric"
+                value="385.000"
+                placeholder="0"
+                autocomplete="off"
+                oninput="window.syncAmountDisplays && window.syncAmountDisplays(this.value)"
               />
             </div>
             <div class="flex items-center justify-between text-[11px] text-on-surface-variant pt-1 border-t border-surface-container/40">
@@ -363,8 +364,8 @@
 
       <!-- Optional Operational Tags -->
       <div class="flex items-center justify-between pt-1 text-on-surface-variant text-[12px]">
-        <span>Registrado por: <strong class="text-on-surface">C. Mendoza</strong></span>
-        <span class="font-mono text-[11px]">Audit ID: OP-2024-EXP-1104</span>
+        <span>Registrado por: <strong class="text-on-surface" id="expenseModalUser">Administrador</strong></span>
+        <span class="font-mono text-[11px]" id="expenseAuditId">Audit ID: OP-EXP-REG</span>
       </div>
     </form>
 
@@ -405,11 +406,47 @@
 <script>
   import gsap from "gsap";
 
-  // Apertura del modal con animación GSAP
+  const BACKEND_URL = "http://localhost:3000";
+
+  // Apertura del modal con animación GSAP y sincronización de datos iniciales
   (window as any).openExpenseModal = function () {
     const modal = document.getElementById("expenseModalOverlay") || document.getElementById("expenseModal");
     const container = document.getElementById("expenseModalContainer") || document.getElementById("expenseModalPanel");
     if (!modal || !container) return;
+
+    // Sincronizar usuario actual
+    try {
+      const rawUser = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+      if (rawUser) {
+        const parsed = JSON.parse(rawUser);
+        const userName = parsed.nombre || parsed.usuario || "Administrador";
+        const userEl = document.getElementById("expenseModalUser");
+        if (userEl) userEl.textContent = userName;
+      }
+    } catch (e) {
+      console.warn("No se pudo leer usuario autenticado:", e);
+    }
+
+    // Generar folio sugerido con timestamp actual
+    const folioInput = document.getElementById("expenseFolioInput") as HTMLInputElement | null;
+    if (folioInput && (!folioInput.value || folioInput.value === "F001-0004892")) {
+      const rnd = Math.floor(1000 + Math.random() * 9000);
+      folioInput.value = `EXP-${rnd}`;
+    }
+
+    // Establecer fecha actual
+    const dateInput = document.getElementById("expenseDateInput") as HTMLInputElement | null;
+    if (dateInput) {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      dateInput.value = now.toISOString().slice(0, 16);
+    }
+
+    // Refrescar display de monto inicial
+    const amountInput = document.getElementById("totalAmountInput") as HTMLInputElement | null;
+    if (amountInput) {
+      (window as any).syncAmountDisplays(amountInput.value);
+    }
 
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
@@ -448,46 +485,145 @@
     });
   };
 
-  // Sincronizar importes, subtotal, IVA 19% y texto del botón en Peso Colombiano (COP)
+  // Sincronizar importes, subtotal, IVA 19% y texto del botón con formato limpio COP (separador de miles con punto)
   (window as any).syncAmountDisplays = function (val: string) {
-    const amount = parseFloat(val) || 0;
-    const btnText = document.getElementById("submitExpenseBtnText");
-    const formattedAmount = Math.round(amount).toLocaleString("es-CO");
+    const amountInput = document.getElementById("totalAmountInput") as HTMLInputElement | null;
+    // Extraer solo dígitos numéricos
+    const cleanDigits = (val || "").replace(/\D/g, "");
+    const amount = parseInt(cleanDigits, 10) || 0;
 
+    // Si el usuario está escribiendo, formatear visualmente con puntos de miles (COP)
+    const formattedAmount = amount > 0 ? amount.toLocaleString("es-CO") : "";
+    if (amountInput && amountInput.value !== formattedAmount && document.activeElement === amountInput) {
+      amountInput.value = formattedAmount;
+    }
+
+    const btnText = document.getElementById("submitExpenseBtnText");
     if (btnText) {
-      btnText.textContent = `Registrar Gasto ($${formattedAmount} COP)`;
+      btnText.textContent = amount > 0 ? `Registrar Gasto ($${formattedAmount} COP)` : `Registrar Gasto ($0 COP)`;
     }
 
     const subtotalEl = document.getElementById("expenseSubtotal");
     const taxEl = document.getElementById("expenseTax");
     if (subtotalEl && taxEl) {
-      const subtotal = amount / 1.19;
+      const subtotal = Math.round(amount / 1.19);
       const tax = amount - subtotal;
-      subtotalEl.textContent = `$${Math.round(subtotal).toLocaleString("es-CO")} COP`;
-      taxEl.textContent = `$${Math.round(tax).toLocaleString("es-CO")} COP`;
+      subtotalEl.textContent = `$${subtotal.toLocaleString("es-CO")} COP`;
+      taxEl.textContent = `$${tax.toLocaleString("es-CO")} COP`;
     }
   };
 
-  // Guardar registro de gasto (mockup reactivo)
-  (window as any).saveExpenseRecord = function (repeat = false) {
+  // Guardar registro de gasto conectado a la API de MySQL
+  (window as any).saveExpenseRecord = async function (repeat = false) {
     const amountInput = document.getElementById("totalAmountInput") as HTMLInputElement | null;
     const folioInput = document.getElementById("expenseFolioInput") as HTMLInputElement | null;
     const descInput = document.getElementById("expenseConceptDescription") as HTMLTextAreaElement | null;
+    const categorySelect = document.getElementById("expenseCategorySelect") as HTMLSelectElement | null;
+    const submitBtn = document.getElementById("submitExpenseBtn") as HTMLButtonElement | null;
 
-    const amount = amountInput?.value || "385000";
-    const formatted = Math.round(parseFloat(amount) || 0).toLocaleString("es-CO");
-    const folio = folioInput?.value || "F001-0004892";
+    // Limpiar dígitos del monto en COP
+    const cleanDigits = (amountInput?.value || "").replace(/\D/g, "");
+    const totalAmount = parseInt(cleanDigits, 10) || 0;
 
-    if (window.showExpenseToast) {
-      window.showExpenseToast(`Gasto ${folio} por $${formatted} COP registrado exitosamente e imputado a libros.`);
+    if (totalAmount <= 0) {
+      if (window.showExpenseToast) {
+        window.showExpenseToast("Por favor ingresa un monto válido mayor a 0.", "warning");
+      } else {
+        alert("Por favor ingresa un monto válido mayor a 0.");
+      }
+      amountInput?.focus();
+      return;
     }
 
-    if (!repeat) {
-      (window as any).closeExpenseModal();
-    } else {
-      if (amountInput) amountInput.value = "";
-      if (descInput) descInput.value = "";
-      (window as any).syncAmountDisplays("0");
+    const descripcion = descInput?.value.trim();
+    if (!descripcion) {
+      if (window.showExpenseToast) {
+        window.showExpenseToast("Por favor describe el concepto o justificación del gasto.", "warning");
+      } else {
+        alert("Por favor describe el concepto o justificación del gasto.");
+      }
+      descInput?.focus();
+      return;
+    }
+
+    const folio = folioInput?.value.trim() || `EXP-${Date.now().toString().slice(-4)}`;
+    const clasificacion = categorySelect?.value || "suministros";
+
+    // Método de pago seleccionado
+    const selectedMethodRadio = document.querySelector('input[name="payment_method"]:checked') as HTMLInputElement | null;
+    const metodo_pago = selectedMethodRadio?.value || "caja_chica";
+
+    // Obtener usuario autenticado
+    let usuario_nombre = "";
+    try {
+      const rawUser = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+      if (rawUser) {
+        const u = JSON.parse(rawUser);
+        usuario_nombre = u.nombre || u.usuario || "";
+      }
+    } catch (e) {}
+
+    const payload = {
+      descripcion,
+      total: totalAmount,
+      clasificacion,
+      metodo_pago,
+      folio,
+      usuario_nombre,
+    };
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.classList.add("opacity-60", "cursor-not-allowed");
+    }
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/gastos`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const resData = await response.json();
+
+      if (!response.ok || !resData.success) {
+        throw new Error(resData.error || "Error al guardar el gasto en la base de datos.");
+      }
+
+      const formattedTotal = totalAmount.toLocaleString("es-CO");
+      if (window.showExpenseToast) {
+        window.showExpenseToast(`Gasto ${folio} por $${formattedTotal} COP guardado con éxito.`);
+      }
+
+      // Refrescar tabla y KPIs principales
+      if ((window as any).loadGastosFromDB) {
+        await (window as any).loadGastosFromDB();
+      }
+
+      if (!repeat) {
+        (window as any).closeExpenseModal();
+      } else {
+        if (amountInput) amountInput.value = "";
+        if (descInput) descInput.value = "";
+        const rnd = Math.floor(1000 + Math.random() * 9000);
+        if (folioInput) folioInput.value = `EXP-${rnd}`;
+        (window as any).syncAmountDisplays("0");
+        amountInput?.focus();
+      }
+    } catch (err: any) {
+      console.error("Error al registrar gasto:", err);
+      if (window.showExpenseToast) {
+        window.showExpenseToast(err.message || "Error al conectar con el servidor.", "warning");
+      } else {
+        alert(err.message || "Error al conectar con el servidor.");
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-60", "cursor-not-allowed");
+      }
     }
   };
 

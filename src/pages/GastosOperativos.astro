@@ -66,24 +66,24 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
           </div>
         </div>
 
-        <!-- KPI Grid: 4 Métricas Clave -->
+        <!-- KPI Grid: 4 Métricas Clave Dinámicas desde BD -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- Card 1: Gastos Totales -->
           <div class="expense-kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
             <div class="flex items-center justify-between">
               <span class="text-[12px] text-on-surface-variant font-medium">Gastos Totales (Mes)</span>
               <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-tertiary-container font-semibold">
-                <span class="material-symbols-outlined text-[13px]">trending_down</span>
-                -3.1% vs mes ant.
+                <span class="material-symbols-outlined text-[13px]">payments</span>
+                Actualizado
               </span>
             </div>
             <div class="mt-3">
-              <span class="text-[26px] font-bold text-primary tracking-tight">$14.820.000 COP</span>
+              <span id="kpi-total-gastos" class="text-[26px] font-bold text-primary tracking-tight">$0 COP</span>
             </div>
             <div class="mt-2 flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
               <span class="text-[11px] text-on-surface-variant">
-                74% del límite ($20M COP) <strong class="text-on-surface font-semibold">En Presupuesto</strong>
+                Total registrado en base de datos
               </span>
             </div>
           </div>
@@ -97,11 +97,11 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
               </span>
             </div>
             <div class="mt-3">
-              <span class="text-[26px] font-bold text-primary tracking-tight">$8,450.00</span>
+              <span id="kpi-gastos-fijos" class="text-[26px] font-bold text-primary tracking-tight">$0 COP</span>
             </div>
             <div class="mt-2 flex items-center gap-1.5">
               <span class="text-[11px] text-on-surface-variant truncate">
-                Alquiler local, energía, conectividad y pólizas
+                Servicios públicos, alquiler y tecnología
               </span>
             </div>
           </div>
@@ -115,11 +115,11 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
               </span>
             </div>
             <div class="mt-3">
-              <span class="text-[26px] font-bold text-primary tracking-tight">$4,920.00</span>
+              <span id="kpi-compras-suministros" class="text-[26px] font-bold text-primary tracking-tight">$0 COP</span>
             </div>
             <div class="mt-2 flex items-center gap-1.5">
               <span class="text-[11px] text-on-surface-variant truncate">
-                Bobinas POS, empaque y refacciones activas
+                Insumos, empaque, logística y taller
               </span>
             </div>
           </div>
@@ -129,16 +129,16 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
             <div class="flex items-center justify-between">
               <span class="text-[12px] text-on-surface-variant font-medium">Fondo Fijo / Caja Chica</span>
               <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container-high text-[11px] text-secondary font-semibold">
-                Saldo Óptimo
+                Caja Chica
               </span>
             </div>
             <div class="mt-3">
-              <span class="text-[26px] font-bold text-primary tracking-tight">$1,450.00</span>
+              <span id="kpi-caja-chica" class="text-[26px] font-bold text-primary tracking-tight">$0 COP</span>
             </div>
             <div class="mt-2 flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
               <span class="text-[11px] text-on-surface-variant truncate">
-                Efectivo físico disponible para gastos menores
+                Gastos abonados por caja chica
               </span>
             </div>
           </div>
@@ -445,270 +445,14 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
                   <th class="px-4 text-center font-semibold">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-surface-container/40">
-                <!-- Fila 1 -->
-                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group" data-category="suministros y empaque" data-amount="185.00">
-                  <td class="px-4 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4">
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-[12px] font-bold text-primary">#EXP-2024-089</span>
-                      <span class="px-1.5 py-0.2 rounded bg-surface-container text-[10px] font-semibold text-on-tertiary-container">Fac. Electrónica</span>
-                    </div>
-                  </td>
-                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">24 Oct, 09:15 AM</td>
-                  <td class="px-4">
-                    <div class="flex flex-col">
-                      <span class="font-semibold text-primary">Compra de bobinas papel térmico y resmas</span>
-                      <span class="text-[11px] text-on-surface-variant">12 bobinas 80mm + 4 resmas bond A4</span>
-                    </div>
-                  </td>
-                  <td class="px-4">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container-high text-[11px] text-secondary font-semibold">
-                      Suministros
-                    </span>
-                  </td>
-                  <td class="px-4 font-medium text-primary">Papelera Central S.A.</td>
-                  <td class="px-4 text-[12px] text-on-surface-variant">Tarjeta / Transferencia</td>
-                  <td class="px-4 text-right font-bold text-primary tabular-nums">$185.00</td>
-                  <td class="px-4 text-center">
-                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
-                        <span class="material-symbols-outlined text-[18px]">visibility</span>
-                      </button>
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+              <tbody class="divide-y divide-surface-container/40" id="expenses-table-body">
 
-                <!-- Fila 2 -->
-                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group bg-surface-container-low/20" data-category="servicios básicos" data-amount="640.20">
-                  <td class="px-4 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4">
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-[12px] font-bold text-primary">#EXP-2024-088</span>
-                      <span class="px-1.5 py-0.2 rounded bg-surface-container text-[10px] font-semibold text-on-tertiary-container">Fac. Electrónica</span>
-                    </div>
-                  </td>
-                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">23 Oct, 04:30 PM</td>
-                  <td class="px-4">
-                    <div class="flex flex-col">
-                      <span class="font-semibold text-primary">Servicio de Energía Eléctrica Sucursal 01</span>
-                      <span class="text-[11px] text-on-surface-variant">Periodo Septiembre - Octubre 2024</span>
-                    </div>
-                  </td>
-                  <td class="px-4">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-primary font-semibold">
-                      Servicios Básicos
-                    </span>
-                  </td>
-                  <td class="px-4 font-medium text-primary">Empresa Eléctrica Nacional</td>
-                  <td class="px-4 text-[12px] text-on-surface-variant">Débito Automático</td>
-                  <td class="px-4 text-right font-bold text-primary tabular-nums">$640.20</td>
-                  <td class="px-4 text-center">
-                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
-                        <span class="material-symbols-outlined text-[18px]">visibility</span>
-                      </button>
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
 
-                <!-- Fila 3 -->
-                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group" data-category="suministros y empaque" data-amount="95.00">
-                  <td class="px-4 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4">
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-[12px] font-bold text-primary">#EXP-2024-087</span>
-                      <span class="px-1.5 py-0.2 rounded bg-surface-container-high text-[10px] font-semibold text-on-surface-variant">Recibo Simple</span>
-                    </div>
-                  </td>
-                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">23 Oct, 11:20 AM</td>
-                  <td class="px-4">
-                    <div class="flex flex-col">
-                      <span class="font-semibold text-primary">Cajas de cartón corrugado y cinta de embalaje</span>
-                      <span class="text-[11px] text-on-surface-variant">50 unidades calibre industrial para envíos</span>
-                    </div>
-                  </td>
-                  <td class="px-4">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container-high text-[11px] text-secondary font-semibold">
-                      Suministros
-                    </span>
-                  </td>
-                  <td class="px-4 font-medium text-primary">Distribuidora Empaques Pack</td>
-                  <td class="px-4 text-[12px] text-on-surface-variant">Efectivo Caja Chica</td>
-                  <td class="px-4 text-right font-bold text-primary tabular-nums">$95.00</td>
-                  <td class="px-4 text-center">
-                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
-                        <span class="material-symbols-outlined text-[18px]">visibility</span>
-                      </button>
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
 
-                <!-- Fila 4 -->
-                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group bg-surface-container-low/20" data-category="mantenimiento y taller" data-amount="320.00">
-                  <td class="px-4 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox">
-                  </td>
-                  <td class="px-4">
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-[12px] font-bold text-primary">#EXP-2024-086</span>
-                      <span class="px-1.5 py-0.2 rounded bg-surface-container text-[10px] font-semibold text-on-tertiary-container">Fac. Electrónica</span>
-                    </div>
-                  </td>
-                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">22 Oct, 02:45 PM</td>
-                  <td class="px-4">
-                    <div class="flex flex-col">
-                      <span class="font-semibold text-primary">Mantenimiento preventivo compresor taller</span>
-                      <span class="text-[11px] text-on-surface-variant">Cambio de filtros de aire, válvulas y aceite</span>
-                    </div>
-                  </td>
-                  <td class="px-4">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-tertiary-container font-semibold">
-                      Mantenimiento
-                    </span>
-                  </td>
-                  <td class="px-4 font-medium text-primary">Técnicos & Maquinarias Pro</td>
-                  <td class="px-4 text-[12px] text-on-surface-variant">Transferencia</td>
-                  <td class="px-4 text-right font-bold text-primary tabular-nums">$320.00</td>
-                  <td class="px-4 text-center">
-                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
-                        <span class="material-symbols-outlined text-[18px]">visibility</span>
-                      </button>
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Fila 5 -->
-                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group" data-category="logística y fletes" data-amount="145.00">
-                  <td class="px-4 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4">
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-[12px] font-bold text-primary">#EXP-2024-085</span>
-                      <span class="px-1.5 py-0.2 rounded bg-surface-container text-[10px] font-semibold text-on-tertiary-container">Fac. Electrónica</span>
-                    </div>
-                  </td>
-                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">21 Oct, 05:10 PM</td>
-                  <td class="px-4">
-                    <div class="flex flex-col">
-                      <span class="font-semibold text-primary">Flete urgente reposición de repuestos</span>
-                      <span class="text-[11px] text-on-surface-variant">Envío express ruta norte a bodega central</span>
-                    </div>
-                  </td>
-                  <td class="px-4">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container-low text-[11px] text-on-surface font-semibold">
-                      Logística y Fletes
-                    </span>
-                  </td>
-                  <td class="px-4 font-medium text-primary">Transportes Express Andina</td>
-                  <td class="px-4 text-[12px] text-on-surface-variant">Tarjeta Débito</td>
-                  <td class="px-4 text-right font-bold text-primary tabular-nums">$145.00</td>
-                  <td class="px-4 text-center">
-                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
-                        <span class="material-symbols-outlined text-[18px]">visibility</span>
-                      </button>
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Fila 6 -->
-                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group bg-surface-container-low/20" data-category="viáticos e imprevistos" data-amount="78.50">
-                  <td class="px-4 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4">
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-[12px] font-bold text-primary">#EXP-2024-084</span>
-                      <span class="px-1.5 py-0.2 rounded bg-surface-container-high text-[10px] font-semibold text-on-surface-variant">Recibo Simple</span>
-                    </div>
-                  </td>
-                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">20 Oct, 01:15 PM</td>
-                  <td class="px-4">
-                    <div class="flex flex-col">
-                      <span class="font-semibold text-primary">Alimentación jornada inventario general</span>
-                      <span class="text-[11px] text-on-surface-variant">Almuerzos equipo de conteo físico (6 pers.)</span>
-                    </div>
-                  </td>
-                  <td class="px-4">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-on-surface-variant font-semibold">
-                      Viáticos / Alim.
-                    </span>
-                  </td>
-                  <td class="px-4 font-medium text-primary">ServiCatering Express</td>
-                  <td class="px-4 text-[12px] text-on-surface-variant">Efectivo</td>
-                  <td class="px-4 text-right font-bold text-primary tabular-nums">$78.50</td>
-                  <td class="px-4 text-center">
-                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
-                        <span class="material-symbols-outlined text-[18px]">visibility</span>
-                      </button>
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Fila 7 -->
-                <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group" data-category="servicios básicos" data-amount="110.00">
-                  <td class="px-4 text-center">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4">
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-[12px] font-bold text-primary">#EXP-2024-083</span>
-                      <span class="px-1.5 py-0.2 rounded bg-surface-container text-[10px] font-semibold text-on-tertiary-container">Fac. Electrónica</span>
-                    </div>
-                  </td>
-                  <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">19 Oct, 10:00 AM</td>
-                  <td class="px-4">
-                    <div class="flex flex-col">
-                      <span class="font-semibold text-primary">Conectividad Fibra Óptica e Internet Sucursal</span>
-                      <span class="text-[11px] text-on-surface-variant">Enlace dedicado 300Mbps simétrico mensual</span>
-                    </div>
-                  </td>
-                  <td class="px-4">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container text-[11px] text-primary font-semibold">
-                      Servicios Básicos
-                    </span>
-                  </td>
-                  <td class="px-4 font-medium text-primary">Telecom Redes Globales</td>
-                  <td class="px-4 text-[12px] text-on-surface-variant">Transferencia</td>
-                  <td class="px-4 text-right font-bold text-primary tabular-nums">$110.00</td>
-                  <td class="px-4 text-center">
-                    <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Ver Comprobante" type="button">
-                        <span class="material-symbols-outlined text-[18px]">visibility</span>
-                      </button>
-                      <button class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container cursor-pointer" title="Editar" type="button" onclick="window.openExpenseModal && window.openExpenseModal()">
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                    </div>
+                <tr>
+                  <td colspan="9" class="p-8 text-center text-on-surface-variant">
+                    <span class="material-symbols-outlined text-[30px] animate-spin mb-2 block text-secondary">progress_activity</span>
+                    <span>Cargando gastos desde la base de datos...</span>
                   </td>
                 </tr>
               </tbody>
@@ -718,7 +462,7 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
           <!-- Paginación y Control de Registros -->
           <div class="p-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-on-surface-variant border-t border-surface-container/60">
             <div class="flex items-center gap-4">
-              <span>Mostrando <strong class="text-on-surface font-semibold">1-7</strong> de <strong class="text-on-surface font-semibold">42</strong> egresos</span>
+              <span id="expenses-pagination-info">Mostrando <strong class="text-on-surface font-semibold">0</strong> egresos</span>
               <div class="hidden sm:flex items-center gap-1.5">
                 <span>Filas por página:</span>
                 <select class="bg-surface text-on-surface rounded-lg px-2 py-1 border border-surface-container/60 text-[11px] focus:outline-none cursor-pointer">
@@ -767,25 +511,213 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
       showExpenseToast,
     } from "../animaciones/animaGastos.js";
 
-    window.openExpenseModal = openExpenseModal;
-    window.closeExpenseModal = closeExpenseModal;
-    window.showExpenseToast = showExpenseToast;
+    (window as any).openExpenseModal = openExpenseModal;
+    (window as any).closeExpenseModal = closeExpenseModal;
+    (window as any).showExpenseToast = showExpenseToast;
 
-    window.saveNewExpense = function() {
-      const concept = (document.getElementById("newExpenseConcept") as HTMLInputElement | null)?.value.trim();
-      const amount = (document.getElementById("newExpenseAmount") as HTMLInputElement | null)?.value.trim();
+    const BACKEND_URL = "http://localhost:3000";
+    let allGastos: any[] = [];
 
-      if (!concept || !amount) {
-        showExpenseToast("Por favor complete el concepto y el monto.", "warning");
+    // Formatear montos en COP con separador de miles en punto (sin decimales innecesarios)
+    function formatCOP(num: any) {
+      const val = Math.round(Number(num) || 0);
+      return `$${val.toLocaleString("es-CO")} COP`;
+    }
+
+    function formatDate(dateStr: string) {
+      if (!dateStr) return "-";
+      try {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString("es-CO", {
+          day: "2-digit",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      } catch (e) {
+        return dateStr;
+      }
+    }
+
+    function escapeHtml(str: any) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    // Cargar gastos de la base de datos MySQL
+    (window as any).loadGastosFromDB = async function () {
+      const tbody = document.getElementById("expenses-table-body");
+      if (!tbody) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/gastos`);
+        if (!response.ok) throw new Error("No se pudo obtener la lista de gastos.");
+
+        const resData = await response.json();
+        const data = resData.data || {};
+        allGastos = data.gastos || [];
+        const kpis = data.kpis || {};
+
+        // Actualizar KPIs de tarjetas superiores
+        const kpiTotal = document.getElementById("kpi-total-gastos");
+        const kpiFijos = document.getElementById("kpi-gastos-fijos");
+        const kpiSum = document.getElementById("kpi-compras-suministros");
+        const kpiCaja = document.getElementById("kpi-caja-chica");
+
+        if (kpiTotal) kpiTotal.textContent = formatCOP(kpis.total_gastos);
+        if (kpiFijos) kpiFijos.textContent = formatCOP(kpis.gastos_fijos);
+        if (kpiSum) kpiSum.textContent = formatCOP(kpis.compras_suministros);
+        if (kpiCaja) kpiCaja.textContent = formatCOP(kpis.caja_chica);
+
+        renderGastosTable(allGastos);
+      } catch (err: any) {
+        console.error("Error al cargar gastos:", err);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="p-8 text-center text-error">
+              <span class="material-symbols-outlined text-[32px] mb-2 block">error</span>
+              <span class="font-medium">Error al conectar con la base de datos</span>
+              <p class="text-[12px] opacity-80 mt-1">${err.message || ""}</p>
+            </td>
+          </tr>
+        `;
+      }
+    };
+
+    function renderGastosTable(gastosList: any[]) {
+      const tbody = document.getElementById("expenses-table-body");
+      const matchCountEl = document.getElementById("expense-matches-count");
+      const accumEl = document.getElementById("expense-accum-total");
+      const pagInfo = document.getElementById("expenses-pagination-info");
+
+      if (!tbody) return;
+
+      const totalAcumulado = gastosList.reduce((acc, curr) => acc + (Number(curr.total) || 0), 0);
+      if (matchCountEl) matchCountEl.textContent = `${gastosList.length} egresos`;
+      if (accumEl) accumEl.textContent = `${formatCOP(totalAcumulado)} acumulado`;
+      if (pagInfo) {
+        pagInfo.innerHTML = `Mostrando <strong class="text-on-surface font-semibold">1-${gastosList.length}</strong> de <strong class="text-on-surface font-semibold">${gastosList.length}</strong> egresos`;
+      }
+
+      if (gastosList.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="p-10 text-center text-on-surface-variant">
+              <span class="material-symbols-outlined text-[36px] mb-2 block text-on-surface-variant/40">receipt_long</span>
+              <span class="font-semibold text-[14px] text-primary">No hay gastos registrados en la base de datos</span>
+              <p class="text-[12px] text-on-surface-variant/70 mt-1">
+                Haz clic en el botón "Registrar Nuevo Gasto" para asentar el primer comprobante.
+              </p>
+            </td>
+          </tr>
+        `;
         return;
       }
 
-      closeExpenseModal();
-      showExpenseToast(`Gasto por $${amount} asentado en libros correctamente.`);
+      tbody.innerHTML = gastosList
+        .map((gasto) => {
+          const folio = gasto.comprobante_url
+            ? gasto.comprobante_url.startsWith("http")
+              ? "#COMP-DOC"
+              : gasto.comprobante_url
+            : `#EXP-${gasto.id.slice(0, 6).toUpperCase()}`;
+
+          const clasifLower = (gasto.clasificacion || "varios").toLowerCase();
+          const cleanDesc = escapeHtml(gasto.descripcion);
+          const cleanFolio = escapeHtml(folio);
+          const cleanBranch = escapeHtml(gasto.sucursal_nombre || "Central");
+          const cleanUser = escapeHtml(gasto.usuario_nombre || "Admin");
+          const cleanPayMethod = escapeHtml(gasto.metodo_pago || "EFECTIVO");
+
+          return `
+            <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group" data-category="${clasifLower}" data-amount="${gasto.total}">
+              <td class="px-4 text-center">
+                <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+              </td>
+              <td class="px-4">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[12px] font-bold text-primary font-mono">${cleanFolio}</span>
+                  <span class="px-1.5 py-0.2 rounded bg-surface-container text-[10px] font-semibold text-on-tertiary-container">${cleanBranch}</span>
+                </div>
+              </td>
+              <td class="px-4 text-[12px] text-on-surface-variant whitespace-nowrap">
+                ${formatDate(gasto.created_at)}
+              </td>
+              <td class="px-4">
+                <div class="flex flex-col">
+                  <span class="font-semibold text-primary">${cleanDesc}</span>
+                  <span class="text-[11px] text-on-surface-variant">${cleanBranch}</span>
+                </div>
+              </td>
+              <td class="px-4">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-surface-container-high text-[11px] text-secondary font-semibold">
+                  ${escapeHtml(gasto.clasificacion)}
+                </span>
+              </td>
+              <td class="px-4 font-medium text-primary text-[12px]">
+                ${cleanUser}
+              </td>
+              <td class="px-4 text-[12px] text-on-surface-variant">
+                ${cleanPayMethod}
+              </td>
+              <td class="px-4 text-right font-bold text-primary tabular-nums whitespace-nowrap">
+                ${formatCOP(gasto.total)}
+              </td>
+              <td class="px-4 text-center">
+                <div class="flex items-center justify-center gap-1">
+                  <!-- Solo botón Eliminar (se eliminó el de visualizar como solicitado) -->
+                  <button
+                    class="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors cursor-pointer"
+                    title="Eliminar Gasto"
+                    type="button"
+                    onclick="window.deleteExpense('${gasto.id}', '${cleanDesc.replace(/'/g, "\\'")}')"
+                  >
+                    <span class="material-symbols-outlined text-[18px] text-error">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    // Eliminar gasto de la base de datos
+    (window as any).deleteExpense = async function (id: string, descripcion: string) {
+      const confirmMsg = `¿Estás seguro de que deseas eliminar este gasto?\n\n"${descripcion || id}"\n\nEsta acción lo borrará permanentemente de la base de datos.`;
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/gastos/${id}`, {
+          method: "DELETE",
+        });
+        const resData = await response.json();
+
+        if (!response.ok || !resData.success) {
+          throw new Error(resData.error || "No se pudo eliminar el gasto.");
+        }
+
+        if (window.showExpenseToast) {
+          window.showExpenseToast("Gasto eliminado exitosamente de la base de datos.");
+        }
+        await (window as any).loadGastosFromDB();
+      } catch (err: any) {
+        console.error("Error al eliminar gasto:", err);
+        if (window.showExpenseToast) {
+          window.showExpenseToast(err.message || "Error al eliminar gasto.", "warning");
+        } else {
+          alert(err.message);
+        }
+      }
     };
 
     function setupGastos() {
       initGastos();
+      (window as any).loadGastosFromDB();
     }
 
     document.addEventListener("astro:page-load", setupGastos);
