@@ -1088,13 +1088,19 @@
         const res = await fetch("http://localhost:3000/api/inventario/carga-masiva", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productos }),
+          body: JSON.stringify({ items: productos, productos }),
         });
 
         const json = await res.json();
         if (json.success) {
-          alert(`¡Éxito! Se han importado correctamente ${json.data.total_importados} productos a la base de datos.`);
+          const totalInsertados = json.total_insertados ?? json.data?.total_importados ?? productos.length;
+          alert(`¡Éxito! Se han importado correctamente ${totalInsertados} productos a la base de datos.`);
+          const tbody = document.getElementById("inventory-rows");
+          if (tbody) tbody.innerHTML = "";
           (window as any).closeBulkUploadModal();
+          (window as any).updateRowIndices();
+          (window as any).updateSelectedMetrics();
+          (window as any).recalculateTotals();
           window.dispatchEvent(new CustomEvent("inventarioActualizado"));
           window.dispatchEvent(new CustomEvent("categoriaActualizada"));
         } else {
