@@ -501,7 +501,7 @@ try {
               id="drawer-sku"
               class="w-full h-9 px-3 bg-surface rounded-xl text-[13px] text-on-surface font-semibold border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary focus:bg-surface-container-lowest"
               type="text"
-              value="SKU-2024-"
+              placeholder="SKU-XXXX-PREF"
             />
           </div>
           <div class="space-y-1">
@@ -512,7 +512,7 @@ try {
               <input
                 id="drawer-ean"
                 class="w-full h-9 px-3 pr-8 bg-surface rounded-xl text-[13px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary focus:bg-surface-container-lowest"
-                placeholder="750XXXXXXXX"
+                placeholder="Opcional / Escanear"
                 type="text"
               />
               <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant pointer-events-none">
@@ -971,6 +971,18 @@ try {
 
       costInput?.addEventListener("input", updateMargin);
       priceInput?.addEventListener("input", updateMargin);
+
+      const catSelectEl = document.getElementById("drawer-category") as HTMLSelectElement | null;
+      catSelectEl?.addEventListener("change", () => {
+        const skuInput = document.getElementById("drawer-sku") as HTMLInputElement | null;
+        if (!skuInput) return;
+        const optText = catSelectEl.options[catSelectEl.selectedIndex]?.text || "";
+        const match = optText.match(/\(([^)]+)\)/);
+        const pref = match ? match[1] : "GEN";
+        const numMatch = skuInput.value.match(/\d+/);
+        const num = numMatch ? numMatch[0] : String(Math.floor(1000 + Math.random() * 9000));
+        skuInput.value = `SKU-${num}-${pref}`;
+      });
 
       if (btnSave) {
         btnSave.addEventListener("click", async () => {

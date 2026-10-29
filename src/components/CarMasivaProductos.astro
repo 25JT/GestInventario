@@ -507,7 +507,7 @@
   import gsap from "gsap";
 
   // Categorías sincronizadas dinámicamente con la base de datos
-  let availableCategories: { nombre_categoria: string }[] = [];
+  let availableCategories: { nombre_categoria: string; prefijo: string }[] = [];
 
   async function loadBulkCategories() {
     try {
@@ -517,6 +517,7 @@
         const rawList = json.data?.categorias || (Array.isArray(json.data) ? json.data : []);
         availableCategories = rawList.map((c: any) => ({
           nombre_categoria: c.nombre || c.nombre_categoria || c.name || "General",
+          prefijo: (c.prefijo || "").trim().toUpperCase() || (c.nombre || "GEN").substring(0, 3).toUpperCase(),
         }));
         updateBulkCategoryDropdowns();
       }
@@ -524,6 +525,31 @@
       console.warn("No se pudieron cargar categorías:", err);
     }
   }
+
+  function getCategoryPrefix(catName?: string): string {
+    if (!catName) return availableCategories[0]?.prefijo || "GEN";
+    const found = availableCategories.find(
+      (c) => c.nombre_categoria.toLowerCase() === catName.toLowerCase(),
+    );
+    if (found && found.prefijo) return found.prefijo;
+    return catName.substring(0, 3).toUpperCase();
+  }
+
+  function generateCategorySku(catName?: string, existingSku?: string): string {
+    const pref = getCategoryPrefix(catName);
+    const numMatch = existingSku?.match(/\d+/);
+    const num = numMatch ? numMatch[0] : String(Math.floor(1000 + Math.random() * 9000));
+    return `SKU-${num}-${pref}`;
+  }
+
+  (window as any).onRowCategoryChange = function (selectEl: HTMLSelectElement) {
+    const row = selectEl.closest("tr");
+    if (!row) return;
+    const skuInput = row.querySelector('input[placeholder="SKU-XXXX"]') as HTMLInputElement | null;
+    if (skuInput) {
+      skuInput.value = generateCategorySku(selectEl.value, skuInput.value);
+    }
+  };
 
   function buildBulkCategoryOptions(selectedCat?: string): string {
     if (!availableCategories || availableCategories.length === 0) {
@@ -771,13 +797,13 @@
   };
 
   (window as any).generateSku = function (btn: HTMLElement) {
-    const input = btn.parentElement?.querySelector(
-      "input",
-    ) as HTMLInputElement | null;
+    const row = btn.closest("tr");
+    const input = row?.querySelector('input[placeholder="SKU-XXXX"]') as HTMLInputElement | null;
+    const catSelect = row?.querySelector(".category-select") as HTMLSelectElement | null;
+    const catName = catSelect?.value;
+    const pref = getCategoryPrefix(catName);
     const randomNum = Math.floor(1000 + Math.random() * 9000);
-    const prefixes = ["EL", "RP", "CS", "HR", "AC"];
-    const p = prefixes[Math.floor(Math.random() * prefixes.length)];
-    if (input) input.value = `SKU-${randomNum}-${p}`;
+    if (input) input.value = `SKU-${randomNum}-${pref}`;
   };
 
   (window as any).addNewRow = function (data: any = {}) {
@@ -786,7 +812,8 @@
     const row = document.createElement("tr");
     row.className = "hover:bg-surface-container-low transition-colors group";
 
-    const randomSku = `SKU-${Math.floor(1000 + Math.random() * 9000)}-EL`;
+    const defaultCat = data.cat || (availableCategories[0]?.nombre_categoria || "General");
+    const randomSku = generateCategorySku(defaultCat);
 
     row.innerHTML = `
       <td class="px-3 py-2 text-center">
@@ -802,14 +829,14 @@
         </div>
       </td>
       <td class="px-3 py-2">
-        <input type="text" value="${data.barcode || "750100" + Math.floor(1000000 + Math.random() * 9000000)}" class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all" placeholder="750100234567" />
+        <input type="text" value="${data.barcode || ""}" class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg font-mono text-[12px] text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all" placeholder="Opcional / Escanear" />
       </td>
       <td class="px-3 py-2">
         <input type="text" value="${data.name || ""}" class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] font-medium text-on-surface placeholder:text-on-surface-variant/70 hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all truncate" placeholder="Descripción detallada del producto" />
       </td>
       <td class="px-3 py-2">
-        <select class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all category-select cursor-pointer">
-          ${buildBulkCategoryOptions(data.cat)}
+        <select onchange="window.onRowCategoryChange(this)" class="w-full h-8 px-2 bg-transparent border border-transparent rounded-lg text-[12px] text-on-surface hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all category-select cursor-pointer">
+          ${buildBulkCategoryOptions(data.cat || defaultCat)}
         </select>
       </td>
       <td class="px-3 py-2">
@@ -883,11 +910,13 @@
     const row = btn.closest("tr");
     if (!row) return;
     const clone = row.cloneNode(true) as HTMLElement;
+    const catSelect = clone.querySelector(".category-select") as HTMLSelectElement | null;
+    const catName = catSelect?.value;
     const skuInput = clone.querySelector(
       'input[placeholder="SKU-XXXX"]',
     ) as HTMLInputElement | null;
     if (skuInput) {
-      skuInput.value = `SKU-${Math.floor(1000 + Math.random() * 9000)}-CP`;
+      skuInput.value = generateCategorySku(catName);
     }
     const checkbox = clone.querySelector(
       ".row-checkbox",
@@ -932,11 +961,13 @@
       const row = cb.closest("tr");
       if (!row) return;
       const clone = row.cloneNode(true) as HTMLElement;
+      const catSelect = clone.querySelector(".category-select") as HTMLSelectElement | null;
+      const catName = catSelect?.value;
       const skuInput = clone.querySelector(
         'input[placeholder="SKU-XXXX"]',
       ) as HTMLInputElement | null;
       if (skuInput) {
-        skuInput.value = `SKU-${Math.floor(1000 + Math.random() * 9000)}-CP`;
+        skuInput.value = generateCategorySku(catName);
       }
       const newCb = clone.querySelector(
         ".row-checkbox",
@@ -961,10 +992,14 @@
       return;
     }
     selectedCheckboxes.forEach((cb) => {
-      const select = cb
-        .closest("tr")
-        ?.querySelector(".category-select") as HTMLSelectElement | null;
+      const row = cb.closest("tr");
+      if (!row) return;
+      const select = row.querySelector(".category-select") as HTMLSelectElement | null;
       if (select) select.value = val;
+      const skuInput = row.querySelector('input[placeholder="SKU-XXXX"]') as HTMLInputElement | null;
+      if (skuInput) {
+        skuInput.value = generateCategorySku(val, skuInput.value);
+      }
     });
   };
 
@@ -1005,7 +1040,7 @@
         (window as any).addNewRow({
           sku: parts[0] ? parts[0].trim() : undefined,
           name: parts[1] ? parts[1].trim() : "Producto Pegado",
-          cat: parts[2] ? parts[2].trim() : "Electrónicos",
+          cat: parts[2] ? parts[2].trim() : (availableCategories[0]?.nombre_categoria || "General"),
           stock: parts[3] ? parseCOP(parts[3]) : 10,
           min: parts[4] ? parseCOP(parts[4]) : 2,
           cost: parts[5] ? parseCOP(parts[5]).toLocaleString("es-CO") : "25.000",
@@ -1050,10 +1085,10 @@
         const selects = row.querySelectorAll("select");
 
         // inputs: [0: checkbox, 1: sku, 2: barcode, 3: name, 4: cost, 5: price, 6: stock, 7: min, 8: location]
-        const sku = inputs[1]?.value.trim() || `SKU-${Math.floor(1000 + Math.random() * 9000)}`;
+        const categoria = selects[0]?.value.trim() || "General";
+        const sku = inputs[1]?.value.trim() || generateCategorySku(categoria);
         const codigo_barras = inputs[2]?.value.trim() || "";
         const nombre = inputs[3]?.value.trim() || "";
-        const categoria = selects[0]?.value.trim() || "General";
         const precio_compra = parseCOP(inputs[4]?.value || "0");
         const precio_venta = parseCOP(inputs[5]?.value || "0");
         const stock_inicial = Number(inputs[6]?.value) || 0;
