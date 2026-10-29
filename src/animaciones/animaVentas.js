@@ -298,18 +298,6 @@ export function updateRowQuantity(row, delta) {
     recalcTicketTotals();
   }
 }
-  if (!qtyEl || !totalEl) return;
-
-  let currentQty = parseInt(qtyEl.textContent || "1", 10) + delta;
-
-  if (currentQty <= 0) {
-    removeRowWithAnimation(row);
-  } else {
-    qtyEl.textContent = `${currentQty}`;
-    totalEl.textContent = `$${(price * currentQty).toFixed(2)}`;
-    recalcTicketTotals();
-  }
-}
 
 /**
  * Remueve una fila del carrito con animación fluida
