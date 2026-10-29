@@ -127,6 +127,17 @@ export function filterProductsLive() {
   });
 }
 
+export function formatCOP(num) {
+  const n = Math.round(Number(num) || 0);
+  return "$ " + n.toLocaleString("es-CO");
+}
+
+export function getActivePaymentMethod() {
+  if (activePayment === "card") return "TARJETA";
+  if (activePayment === "cash") return "EFECTIVO";
+  return "TRANSFERENCIA";
+}
+
 /**
  * Recalcula subtotales, impuestos y totales de la orden
  */
@@ -143,7 +154,7 @@ export function recalcTicketTotals() {
     count += q;
   });
 
-  const tax = subtotal * 0.16;
+  const tax = 0; // Precios en COP con impuestos incluidos
   const total = subtotal + tax;
 
   const countEl = document.getElementById("cartCount");
@@ -153,37 +164,46 @@ export function recalcTicketTotals() {
   const btnCheckoutLabel = document.getElementById("btnCheckoutLabel");
 
   if (countEl) countEl.textContent = `${count}`;
-  if (subtotalEl) subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
-  if (taxEl) taxEl.textContent = `$${tax.toFixed(2)}`;
-  if (totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
-  if (btnCheckoutLabel) btnCheckoutLabel.textContent = `Cobrar y Facturar ($${total.toFixed(2)})`;
+  if (subtotalEl) subtotalEl.textContent = formatCOP(subtotal);
+  if (taxEl) taxEl.textContent = formatCOP(tax);
+  if (totalEl) totalEl.textContent = formatCOP(total);
+  if (btnCheckoutLabel) btnCheckoutLabel.textContent = `Cobrar y Facturar (${formatCOP(total)})`;
 }
 
 /**
  * Agrega un ítem al carrito o incrementa su cantidad con animación
- * @param {string} name 
- * @param {number} price 
- * @param {string} sku 
- * @param {string} category 
  */
-export function addProductToTicket(name, price, sku, category = "Producto") {
+export function addProductToTicket(name, price, sku, category = "Producto", id = null, stock = 999, tipo = "FISICO") {
   const list = document.getElementById("cartItemsList");
   if (!list) return;
 
   const rows = Array.from(list.querySelectorAll(".cart-row"));
   const existingRow = rows.find((row) => {
+    const rowId = row.getAttribute("data-id");
+    const rowSku = row.getAttribute("data-sku");
+    if (id && rowId) return rowId === id;
+    if (sku && rowSku) return rowSku === sku;
     const titleEl = row.querySelector(".cart-item-title");
     return titleEl && titleEl.textContent?.trim() === name.trim();
   });
 
+  const numericPrice = Number(price) || 0;
+  const numStock = Number(stock) || 999;
+  const isServicio = category === "Servicio" || (tipo || "").toUpperCase() === "SERVICIO";
+
   if (existingRow) {
     const qtyEl = existingRow.querySelector(".item-qty");
     if (qtyEl) {
-      let currentQty = parseInt(qtyEl.textContent || "1", 10) + 1;
+      let currentQty = parseInt(qtyEl.textContent || "1", 10);
+      if (!isServicio && currentQty >= numStock) {
+        showPosToast(`Stock máximo alcanzado (${numStock} unid.)`, "warning");
+        return;
+      }
+      currentQty += 1;
       qtyEl.textContent = `${currentQty}`;
       const itemTotalEl = existingRow.querySelector(".item-total");
       if (itemTotalEl) {
-        itemTotalEl.textContent = `$${(price * currentQty).toFixed(2)}`;
+        itemTotalEl.textContent = formatCOP(numericPrice * currentQty);
       }
       gsap.fromTo(
         existingRow,
@@ -192,19 +212,30 @@ export function addProductToTicket(name, price, sku, category = "Producto") {
       );
     }
   } else {
+    if (!isServicio && numStock <= 0) {
+      showPosToast(`Artículo sin existencias (Stock: 0)`, "warning");
+      return;
+    }
+
     const newRow = document.createElement("div");
     newRow.className =
       "cart-row flex items-center justify-between p-2 sm:p-2.5 rounded-xl bg-surface hover:bg-surface-container transition-colors border border-surface-container/50";
-    newRow.setAttribute("data-price", price.toFixed(2));
+    newRow.setAttribute("data-id", id || "");
+    newRow.setAttribute("data-sku", sku || "");
+    newRow.setAttribute("data-tipo", tipo || (isServicio ? "SERVICIO" : "FISICO"));
+    newRow.setAttribute("data-price", String(numericPrice));
+    newRow.setAttribute("data-stock", String(numStock));
+    newRow.setAttribute("data-name", name);
+
     newRow.innerHTML = `
       <div class="flex flex-col min-w-0 flex-1 pr-2">
         <div class="flex items-center gap-1.5">
           <span class="cart-item-title text-[13px] font-semibold text-on-surface truncate">${name}</span>
           <span class="text-[10px] px-1.5 py-0.2 rounded font-semibold ${
-            category === "Servicio" ? "bg-secondary-fixed text-on-secondary-fixed" : "bg-surface-container text-on-surface-variant"
-          } shrink-0">${category === "Servicio" ? "Serv" : "Prod"}</span>
+            isServicio ? "bg-secondary-fixed text-on-secondary-fixed" : "bg-surface-container text-on-surface-variant"
+          } shrink-0">${isServicio ? "Serv" : "Prod"}</span>
         </div>
-        <span class="text-[11px] text-on-surface-variant">$${price.toFixed(2)} c/u &bull; SKU: ${sku}</span>
+        <span class="text-[11px] text-on-surface-variant">${formatCOP(numericPrice)} c/u &bull; SKU: ${sku || "N/A"}</span>
       </div>
       <div class="flex items-center gap-2 shrink-0">
         <div class="flex items-center bg-surface-container-lowest rounded-lg p-0.5 shadow-2xs border border-surface-container">
@@ -212,7 +243,7 @@ export function addProductToTicket(name, price, sku, category = "Producto") {
           <span class="item-qty w-7 text-center text-[13px] font-bold text-on-surface">1</span>
           <button type="button" class="btn-qty-plus w-6 h-6 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded font-bold hover:bg-surface-container transition-colors cursor-pointer">+</button>
         </div>
-        <span class="item-total text-[13px] font-bold text-on-surface w-16 text-right">$${price.toFixed(2)}</span>
+        <span class="item-total text-[13px] font-bold text-on-surface w-20 text-right">${formatCOP(numericPrice)}</span>
         <button type="button" class="btn-remove-item p-1 text-on-surface-variant hover:text-error rounded-lg hover:bg-error-container/40 transition-colors cursor-pointer" title="Remover producto">
           <span class="material-symbols-outlined text-[16px]">close</span>
         </button>
@@ -248,6 +279,25 @@ export function updateRowQuantity(row, delta) {
   const qtyEl = row.querySelector(".item-qty");
   const totalEl = row.querySelector(".item-total");
   const price = parseFloat(row.getAttribute("data-price") || "0");
+  const maxStock = parseInt(row.getAttribute("data-stock") || "999", 10);
+  const tipo = (row.getAttribute("data-tipo") || "").toUpperCase();
+  if (!qtyEl || !totalEl) return;
+
+  let currentQty = parseInt(qtyEl.textContent || "1", 10) + delta;
+
+  if (delta > 0 && tipo !== "SERVICIO" && currentQty > maxStock) {
+    showPosToast(`Stock máximo alcanzado (${maxStock} unid.)`, "warning");
+    return;
+  }
+
+  if (currentQty <= 0) {
+    removeRowWithAnimation(row);
+  } else {
+    qtyEl.textContent = `${currentQty}`;
+    totalEl.textContent = formatCOP(price * currentQty);
+    recalcTicketTotals();
+  }
+}
   if (!qtyEl || !totalEl) return;
 
   let currentQty = parseInt(qtyEl.textContent || "1", 10) + delta;

@@ -107,8 +107,8 @@ import NavBar from "../components/Nav.astro";
               </button>
             </div>
 
-            <!-- Clean Category Filter Pills -->
-            <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+            <!-- Category Filter Pills (Generadas dinámicamente) -->
+            <div id="cat-pills-container" class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
               <button
                 class="cat-pill active-cat px-4 py-1.5 rounded-full text-[12px] font-semibold bg-primary text-on-primary shrink-0 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
                 onclick="window.selectCategory && window.selectCategory('all', this)"
@@ -117,318 +117,18 @@ import NavBar from "../components/Nav.astro";
                 <span class="material-symbols-outlined text-[16px]">apps</span>
                 <span>Todos</span>
               </button>
-              <button
-                class="cat-pill px-3.5 py-1.5 rounded-full text-[12px] font-medium bg-surface-container-lowest hover:bg-surface-container-high text-on-surface shrink-0 transition-all flex items-center gap-1.5 border border-surface-container/60 cursor-pointer"
-                onclick="window.selectCategory && window.selectCategory('inventario', this)"
-                type="button"
-              >
-                <span class="material-symbols-outlined text-[16px] text-secondary-container">inventory_2</span>
-                <span>Productos de Inventario</span>
-              </button>
-              <button
-                class="cat-pill px-3.5 py-1.5 rounded-full text-[12px] font-medium bg-surface-container-lowest hover:bg-surface-container-high text-on-surface shrink-0 transition-all flex items-center gap-1.5 border border-surface-container/60 cursor-pointer"
-                onclick="window.selectCategory && window.selectCategory('servicio', this)"
-                type="button"
-              >
-                <span class="material-symbols-outlined text-[16px] text-secondary">handyman</span>
-                <span>Servicios Técnicos</span>
-              </button>
-              <button
-                class="cat-pill px-3.5 py-1.5 rounded-full text-[12px] font-medium bg-surface-container-lowest hover:bg-surface-container-high text-on-surface shrink-0 transition-all flex items-center gap-1.5 border border-surface-container/60 cursor-pointer"
-                onclick="window.selectCategory && window.selectCategory('consumibles', this)"
-                type="button"
-              >
-                <span class="material-symbols-outlined text-[16px]">local_cafe</span>
-                <span>Bebidas y Consumibles</span>
-              </button>
-              <button
-                class="cat-pill px-3.5 py-1.5 rounded-full text-[12px] font-medium bg-surface-container-lowest hover:bg-surface-container-high text-on-surface shrink-0 transition-all flex items-center gap-1.5 border border-surface-container/60 cursor-pointer"
-                onclick="window.selectCategory && window.selectCategory('accesorios', this)"
-                type="button"
-              >
-                <span class="material-symbols-outlined text-[16px]">devices_other</span>
-                <span>Accesorios</span>
-              </button>
             </div>
 
-            <!-- Simplified, Readable Grid of Catalog Items -->
+            <!-- Grid de Catálogo de Productos y Servicios (Cargado dinámicamente de la BD) -->
             <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-              
-              <!-- Product 1 -->
-              <div
-                class="product-item bg-surface-container-lowest rounded-xl p-3 border border-surface-container/60 shadow-xs flex flex-col justify-between group hover:shadow-md transition-all"
-                data-category="inventario accesorios"
-              >
-                <div>
-                  <div class="relative w-full h-28 rounded-lg overflow-hidden bg-surface-container-low mb-2">
-                    <img
-                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      alt="Lector Láser 2D Inalámbrico"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3NC9zilWFQG7afVIZ8b8U-ro2A7K59vIsS51zes0leeIRJCrGJpEPt7glD5zlOUh5I7E-h71sSoKEZhapRIDF7H8WNu-EOamxWg3kbnahC49rZGKNtd4fRwF6eTgFOmSvZaAqLBv2OM3UCf03oPEVwSqATRRWNkgQd7QtkiLqY5_1b4A_jFcUMqMOZrbDv42Pjy24blmrESxtZGW9AxrjSqmmxTyaSpFEY6IEucX-P_u6jCtVtYqSsw"
-                    />
-                    <span class="absolute top-1.5 left-1.5 text-[10px] font-semibold bg-surface-container-lowest/90 px-1.5 py-0.5 rounded text-on-surface backdrop-blur-xs">
-                      Producto
-                    </span>
-                    <span class="absolute bottom-1.5 right-1.5 text-[10px] font-bold bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded">
-                      Stock: 18
-                    </span>
-                  </div>
-                  <div class="flex flex-col gap-0.5 mb-2">
-                    <h4 class="text-[13px] font-semibold text-on-surface line-clamp-1">Lector Láser 2D Inalámbrico</h4>
-                    <span class="text-[11px] text-on-surface-variant">SKU: BAR-204</span>
-                  </div>
-                </div>
-                <div class="flex items-center justify-between pt-2 border-t border-surface-container/40">
-                  <span class="text-[16px] text-primary font-bold">$78.50</span>
-                  <button
-                    class="h-8 px-3 rounded-lg bg-secondary-container hover:bg-secondary text-on-secondary text-[12px] font-semibold flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    onclick="window.addToTicket && window.addToTicket('Lector Láser 2D Inalámbrico', 78.50, 'BAR-204', 'Producto')"
-                    type="button"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">add</span>
-                    <span>Agregar</span>
-                  </button>
-                </div>
-              </div>
+              <!-- Cargando items de la base de datos... -->
+            </div>
 
-              <!-- Product 2 -->
-              <div
-                class="product-item bg-surface-container-lowest rounded-xl p-3 border border-surface-container/60 shadow-xs flex flex-col justify-between group hover:shadow-md transition-all"
-                data-category="inventario consumibles"
-              >
-                <div>
-                  <div class="relative w-full h-28 rounded-lg overflow-hidden bg-surface-container-low mb-2">
-                    <img
-                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      alt="Rollo Térmico 80mm"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXcHMud47RHkqAiEcJpGAEsYl4VzRgDYW3ssRN108VCxUBv_MTUfzBWCkyJgVmOz8CcJYFiAq3sH5DfiBPQ6LTWZ_UNjXswPsELp6fFJ0IccXEvTi3W8VpR1RCnIHqeznexYFUYU-7AVIEgektuTV5aL6Rl7v281oyjCOBQRxLjkVg9GIDfUgga-cuxz1qB299gqfiaRFA1x1qVzEwuI0ViZn3L9JoS6eZ4LXdprsuTE-ZpR4N2JsOQw"
-                    />
-                    <span class="absolute top-1.5 left-1.5 text-[10px] font-semibold bg-surface-container-lowest/90 px-1.5 py-0.5 rounded text-on-surface backdrop-blur-xs">
-                      Producto
-                    </span>
-                    <span class="absolute bottom-1.5 right-1.5 text-[10px] font-bold bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded">
-                      Stock: 142
-                    </span>
-                  </div>
-                  <div class="flex flex-col gap-0.5 mb-2">
-                    <h4 class="text-[13px] font-semibold text-on-surface line-clamp-1">Rollo Térmico 80mm (Pack x5)</h4>
-                    <span class="text-[11px] text-on-surface-variant">SKU: PAP-80M</span>
-                  </div>
-                </div>
-                <div class="flex items-center justify-between pt-2 border-t border-surface-container/40">
-                  <span class="text-[16px] text-primary font-bold">$12.00</span>
-                  <button
-                    class="h-8 px-3 rounded-lg bg-secondary-container hover:bg-secondary text-on-secondary text-[12px] font-semibold flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    onclick="window.addToTicket && window.addToTicket('Rollo Térmico 80mm (Pack x5)', 12.00, 'PAP-80M', 'Producto')"
-                    type="button"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">add</span>
-                    <span>Agregar</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Product 3 -->
-              <div
-                class="product-item bg-surface-container-lowest rounded-xl p-3 border border-surface-container/60 shadow-xs flex flex-col justify-between group hover:shadow-md transition-all"
-                data-category="consumibles"
-              >
-                <div>
-                  <div class="relative w-full h-28 rounded-lg overflow-hidden bg-surface-container-low mb-2">
-                    <img
-                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      alt="Café de Origen Tostado 500g"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPpzJ7xRMtGeLfLw_fOF9ZJhxhgP80j4mS7KGqesFdXQFLQmaeTRyA3DD9qF3Ja4ObzW8bdqhXi7GYa3x_accJLK6yPG0GPfqeMPVkRbUNtr2mNM4wTXFha9SpwHK1l10tnhC-fjhWqL8hLdxEurbwk39IPg_yzrYFwjR_SGrMMB9U56DvUUB2JN26WRl0bBYUCilb6vvk3huvMOuHBn9CxpTOto_17CF288K3y7JKz7wkUB4GiMiKgw"
-                    />
-                    <span class="absolute top-1.5 left-1.5 text-[10px] font-semibold bg-surface-container-lowest/90 px-1.5 py-0.5 rounded text-on-surface backdrop-blur-xs">
-                      Producto
-                    </span>
-                    <span class="absolute bottom-1.5 right-1.5 text-[10px] font-bold bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded">
-                      Stock: 45
-                    </span>
-                  </div>
-                  <div class="flex flex-col gap-0.5 mb-2">
-                    <h4 class="text-[13px] font-semibold text-on-surface line-clamp-1">Café de Origen Tostado 500g</h4>
-                    <span class="text-[11px] text-on-surface-variant">SKU: CAF-500</span>
-                  </div>
-                </div>
-                <div class="flex items-center justify-between pt-2 border-t border-surface-container/40">
-                  <span class="text-[16px] text-primary font-bold">$16.50</span>
-                  <button
-                    class="h-8 px-3 rounded-lg bg-secondary-container hover:bg-secondary text-on-secondary text-[12px] font-semibold flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    onclick="window.addToTicket && window.addToTicket('Café de Origen Tostado 500g', 16.50, 'CAF-500', 'Producto')"
-                    type="button"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">add</span>
-                    <span>Agregar</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Product 4 -->
-              <div
-                class="product-item bg-surface-container-lowest rounded-xl p-3 border border-surface-container/60 shadow-xs flex flex-col justify-between group hover:shadow-md transition-all"
-                data-category="consumibles"
-              >
-                <div>
-                  <div class="relative w-full h-28 rounded-lg overflow-hidden bg-surface-container-low flex items-center justify-center mb-2">
-                    <span class="material-symbols-outlined text-[42px] text-secondary-container">water_bottle</span>
-                    <span class="absolute top-1.5 left-1.5 text-[10px] font-semibold bg-surface-container-lowest/90 px-1.5 py-0.5 rounded text-on-surface">
-                      Producto
-                    </span>
-                    <span class="absolute bottom-1.5 right-1.5 text-[10px] font-bold bg-error-container text-error px-1.5 py-0.5 rounded">
-                      Stock: 4
-                    </span>
-                  </div>
-                  <div class="flex flex-col gap-0.5 mb-2">
-                    <h4 class="text-[13px] font-semibold text-on-surface line-clamp-1">Agua Mineral Alcalina 600ml</h4>
-                    <span class="text-[11px] text-on-surface-variant">SKU: BEB-012</span>
-                  </div>
-                </div>
-                <div class="flex items-center justify-between pt-2 border-t border-surface-container/40">
-                  <span class="text-[16px] text-primary font-bold">$2.50</span>
-                  <button
-                    class="h-8 px-3 rounded-lg bg-secondary-container hover:bg-secondary text-on-secondary text-[12px] font-semibold flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    onclick="window.addToTicket && window.addToTicket('Agua Mineral Alcalina 600ml', 2.50, 'BEB-012', 'Producto')"
-                    type="button"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">add</span>
-                    <span>Agregar</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Product 5 (Service) -->
-              <div
-                class="product-item bg-surface-container-lowest rounded-xl p-3 border border-surface-container/60 shadow-xs flex flex-col justify-between group hover:shadow-md transition-all"
-                data-category="servicio"
-              >
-                <div>
-                  <div class="relative w-full h-28 rounded-lg overflow-hidden bg-surface-container-high/40 flex items-center justify-center mb-2">
-                    <span class="material-symbols-outlined text-[46px] text-secondary">precision_manufacturing</span>
-                    <span class="absolute top-1.5 left-1.5 text-[10px] font-semibold bg-secondary-fixed text-on-secondary-fixed px-1.5 py-0.5 rounded">
-                      Servicio
-                    </span>
-                    <span class="absolute bottom-1.5 right-1.5 text-[10px] font-bold bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded">
-                      Disponible
-                    </span>
-                  </div>
-                  <div class="flex flex-col gap-0.5 mb-2">
-                    <h4 class="text-[13px] font-semibold text-on-surface line-clamp-1">Mantenimiento Preventivo POS</h4>
-                    <span class="text-[11px] text-on-surface-variant">SKU: SRV-MNT</span>
-                  </div>
-                </div>
-                <div class="flex items-center justify-between pt-2 border-t border-surface-container/40">
-                  <span class="text-[16px] text-primary font-bold">$45.00</span>
-                  <button
-                    class="h-8 px-3 rounded-lg bg-secondary-container hover:bg-secondary text-on-secondary text-[12px] font-semibold flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    onclick="window.addToTicket && window.addToTicket('Mantenimiento Preventivo POS', 45.00, 'SRV-MNT', 'Servicio')"
-                    type="button"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">add</span>
-                    <span>Agregar</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Product 6 -->
-              <div
-                class="product-item bg-surface-container-lowest rounded-xl p-3 border border-surface-container/60 shadow-xs flex flex-col justify-between group hover:shadow-md transition-all"
-                data-category="inventario accesorios"
-              >
-                <div>
-                  <div class="relative w-full h-28 rounded-lg overflow-hidden bg-surface-container-low flex items-center justify-center mb-2">
-                    <span class="material-symbols-outlined text-[42px] text-on-surface-variant">cable</span>
-                    <span class="absolute top-1.5 left-1.5 text-[10px] font-semibold bg-surface-container-lowest/90 px-1.5 py-0.5 rounded text-on-surface">
-                      Producto
-                    </span>
-                    <span class="absolute bottom-1.5 right-1.5 text-[10px] font-bold bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded">
-                      Stock: 80
-                    </span>
-                  </div>
-                  <div class="flex flex-col gap-0.5 mb-2">
-                    <h4 class="text-[13px] font-semibold text-on-surface line-clamp-1">Cable Blindado USB-C 2m</h4>
-                    <span class="text-[11px] text-on-surface-variant">SKU: CAB-USB3</span>
-                  </div>
-                </div>
-                <div class="flex items-center justify-between pt-2 border-t border-surface-container/40">
-                  <span class="text-[16px] text-primary font-bold">$8.90</span>
-                  <button
-                    class="h-8 px-3 rounded-lg bg-secondary-container hover:bg-secondary text-on-secondary text-[12px] font-semibold flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    onclick="window.addToTicket && window.addToTicket('Cable Blindado USB-C 2m', 8.90, 'CAB-USB3', 'Producto')"
-                    type="button"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">add</span>
-                    <span>Agregar</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Product 7 (Service) -->
-              <div
-                class="product-item bg-surface-container-lowest rounded-xl p-3 border border-surface-container/60 shadow-xs flex flex-col justify-between group hover:shadow-md transition-all"
-                data-category="servicio"
-              >
-                <div>
-                  <div class="relative w-full h-28 rounded-lg overflow-hidden bg-surface-container-high/40 flex items-center justify-center mb-2">
-                    <span class="material-symbols-outlined text-[46px] text-secondary">install_desktop</span>
-                    <span class="absolute top-1.5 left-1.5 text-[10px] font-semibold bg-secondary-fixed text-on-secondary-fixed px-1.5 py-0.5 rounded">
-                      Servicio
-                    </span>
-                    <span class="absolute bottom-1.5 right-1.5 text-[10px] font-bold bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded">
-                      Disponible
-                    </span>
-                  </div>
-                  <div class="flex flex-col gap-0.5 mb-2">
-                    <h4 class="text-[13px] font-semibold text-on-surface line-clamp-1">Instalación y Configuración</h4>
-                    <span class="text-[11px] text-on-surface-variant">SKU: SRV-INST</span>
-                  </div>
-                </div>
-                <div class="flex items-center justify-between pt-2 border-t border-surface-container/40">
-                  <span class="text-[16px] text-primary font-bold">$60.00</span>
-                  <button
-                    class="h-8 px-3 rounded-lg bg-secondary-container hover:bg-secondary text-on-secondary text-[12px] font-semibold flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    onclick="window.addToTicket && window.addToTicket('Instalación y Configuración', 60.00, 'SRV-INST', 'Servicio')"
-                    type="button"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">add</span>
-                    <span>Agregar</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Product 8 -->
-              <div
-                class="product-item bg-surface-container-lowest rounded-xl p-3 border border-surface-container/60 shadow-xs flex flex-col justify-between group hover:shadow-md transition-all"
-                data-category="inventario accesorios"
-              >
-                <div>
-                  <div class="relative w-full h-28 rounded-lg overflow-hidden bg-surface-container-low flex items-center justify-center mb-2">
-                    <span class="material-symbols-outlined text-[42px] text-primary">point_of_sale</span>
-                    <span class="absolute top-1.5 left-1.5 text-[10px] font-semibold bg-surface-container-lowest/90 px-1.5 py-0.5 rounded text-on-surface">
-                      Producto
-                    </span>
-                    <span class="absolute bottom-1.5 right-1.5 text-[10px] font-bold bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded">
-                      Stock: 12
-                    </span>
-                  </div>
-                  <div class="flex flex-col gap-0.5 mb-2">
-                    <h4 class="text-[13px] font-semibold text-on-surface line-clamp-1">Gaveta Metálica Automática</h4>
-                    <span class="text-[11px] text-on-surface-variant">SKU: POS-CAJ</span>
-                  </div>
-                </div>
-                <div class="flex items-center justify-between pt-2 border-t border-surface-container/40">
-                  <span class="text-[16px] text-primary font-bold">$55.00</span>
-                  <button
-                    class="h-8 px-3 rounded-lg bg-secondary-container hover:bg-secondary text-on-secondary text-[12px] font-semibold flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer"
-                    onclick="window.addToTicket && window.addToTicket('Gaveta Metálica Automática', 55.00, 'POS-CAJ', 'Producto')"
-                    type="button"
-                  >
-                    <span class="material-symbols-outlined text-[16px]">add</span>
-                    <span>Agregar</span>
-                  </button>
-                </div>
-              </div>
+            <!-- Estado Vacío cuando no hay resultados de búsqueda -->
+            <div id="catalog-empty" class="hidden flex-col items-center justify-center p-12 bg-surface-container-lowest rounded-xl border border-surface-container/60 text-center gap-2">
+              <span class="material-symbols-outlined text-[48px] text-on-surface-variant/40">inventory_2</span>
+              <h4 class="text-[15px] font-semibold text-on-surface">No se encontraron productos o servicios</h4>
+              <p class="text-[12px] text-on-surface-variant">Intenta con otro término de búsqueda o selecciona otra categoría.</p>
             </div>
           </div>
 
@@ -479,7 +179,7 @@ import NavBar from "../components/Nav.astro";
 
               <!-- Order Items Header -->
               <div class="flex items-center justify-between py-1 text-on-surface-variant text-[11px] font-semibold uppercase tracking-wider">
-                <span>PRODUCTOS (<span id="cartCount">3</span>)</span>
+                <span>PRODUCTOS (<span id="cartCount">0</span>)</span>
                 <button
                   class="text-error hover:underline flex items-center gap-0.5 text-[11px] font-normal cursor-pointer"
                   onclick="window.clearCart && window.clearCart()"
@@ -490,82 +190,14 @@ import NavBar from "../components/Nav.astro";
                 </button>
               </div>
 
-              <!-- Added Items List -->
+              <!-- Added Items List (Vacío por defecto) -->
               <div id="cartItemsList" class="flex flex-col gap-2 max-h-[250px] overflow-y-auto pr-0.5 py-1">
-                <!-- Cart Item 1 -->
-                <div
-                  class="cart-row flex items-center justify-between p-2 rounded-xl bg-surface hover:bg-surface-container transition-colors border border-surface-container/50"
-                  data-price="78.50"
-                >
-                  <div class="flex flex-col min-w-0 flex-1 pr-2">
-                    <div class="flex items-center gap-1.5">
-                      <span class="cart-item-title text-[13px] font-semibold text-on-surface truncate">Lector Láser 2D Inalámbrico</span>
-                      <span class="text-[10px] px-1.5 py-0.2 bg-surface-container text-on-surface-variant rounded shrink-0 font-semibold">Prod</span>
-                    </div>
-                    <span class="text-[11px] text-on-surface-variant">$78.50 c/u</span>
-                  </div>
-                  <div class="flex items-center gap-2 shrink-0">
-                    <div class="flex items-center bg-surface-container-lowest rounded-lg p-0.5 shadow-2xs border border-surface-container">
-                      <button type="button" class="btn-qty-minus w-6 h-6 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded font-bold hover:bg-surface-container transition-colors cursor-pointer">-</button>
-                      <span class="item-qty w-7 text-center text-[13px] font-bold text-on-surface">1</span>
-                      <button type="button" class="btn-qty-plus w-6 h-6 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded font-bold hover:bg-surface-container transition-colors cursor-pointer">+</button>
-                    </div>
-                    <span class="item-total text-[13px] font-bold text-on-surface w-16 text-right">$78.50</span>
-                    <button type="button" class="btn-remove-item p-1 text-on-surface-variant hover:text-error rounded-lg hover:bg-error-container/40 transition-colors cursor-pointer" title="Eliminar">
-                      <span class="material-symbols-outlined text-[16px]">close</span>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Cart Item 2 -->
-                <div
-                  class="cart-row flex items-center justify-between p-2 rounded-xl bg-surface hover:bg-surface-container transition-colors border border-surface-container/50"
-                  data-price="12.00"
-                >
-                  <div class="flex flex-col min-w-0 flex-1 pr-2">
-                    <div class="flex items-center gap-1.5">
-                      <span class="cart-item-title text-[13px] font-semibold text-on-surface truncate">Rollo Térmico 80mm</span>
-                      <span class="text-[10px] px-1.5 py-0.2 bg-surface-container text-on-surface-variant rounded shrink-0 font-semibold">Prod</span>
-                    </div>
-                    <span class="text-[11px] text-on-surface-variant">$12.00 c/u</span>
-                  </div>
-                  <div class="flex items-center gap-2 shrink-0">
-                    <div class="flex items-center bg-surface-container-lowest rounded-lg p-0.5 shadow-2xs border border-surface-container">
-                      <button type="button" class="btn-qty-minus w-6 h-6 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded font-bold hover:bg-surface-container transition-colors cursor-pointer">-</button>
-                      <span class="item-qty w-7 text-center text-[13px] font-bold text-on-surface">2</span>
-                      <button type="button" class="btn-qty-plus w-6 h-6 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded font-bold hover:bg-surface-container transition-colors cursor-pointer">+</button>
-                    </div>
-                    <span class="item-total text-[13px] font-bold text-on-surface w-16 text-right">$24.00</span>
-                    <button type="button" class="btn-remove-item p-1 text-on-surface-variant hover:text-error rounded-lg hover:bg-error-container/40 transition-colors cursor-pointer" title="Eliminar">
-                      <span class="material-symbols-outlined text-[16px]">close</span>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Cart Item 3 -->
-                <div
-                  class="cart-row flex items-center justify-between p-2 rounded-xl bg-surface hover:bg-surface-container transition-colors border border-surface-container/50"
-                  data-price="16.50"
-                >
-                  <div class="flex flex-col min-w-0 flex-1 pr-2">
-                    <div class="flex items-center gap-1.5">
-                      <span class="cart-item-title text-[13px] font-semibold text-on-surface truncate">Café de Origen Tostado</span>
-                      <span class="text-[10px] px-1.5 py-0.2 bg-surface-container text-on-surface-variant rounded shrink-0 font-semibold">Prod</span>
-                    </div>
-                    <span class="text-[11px] text-on-surface-variant">$16.50 c/u</span>
-                  </div>
-                  <div class="flex items-center gap-2 shrink-0">
-                    <div class="flex items-center bg-surface-container-lowest rounded-lg p-0.5 shadow-2xs border border-surface-container">
-                      <button type="button" class="btn-qty-minus w-6 h-6 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded font-bold hover:bg-surface-container transition-colors cursor-pointer">-</button>
-                      <span class="item-qty w-7 text-center text-[13px] font-bold text-on-surface">1</span>
-                      <button type="button" class="btn-qty-plus w-6 h-6 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded font-bold hover:bg-surface-container transition-colors cursor-pointer">+</button>
-                    </div>
-                    <span class="item-total text-[13px] font-bold text-on-surface w-16 text-right">$16.50</span>
-                    <button type="button" class="btn-remove-item p-1 text-on-surface-variant hover:text-error rounded-lg hover:bg-error-container/40 transition-colors cursor-pointer" title="Eliminar">
-                      <span class="material-symbols-outlined text-[16px]">close</span>
-                    </button>
-                  </div>
-                </div>
+                <!-- Se poblará en tiempo real con las selecciones -->
+              </div>
+              <div id="cartEmptyState" class="flex flex-col items-center justify-center py-6 text-center text-on-surface-variant/70 gap-1.5 border border-dashed border-surface-container rounded-xl">
+                <span class="material-symbols-outlined text-[28px] text-on-surface-variant/40">shopping_cart</span>
+                <span class="text-[12px] font-medium">Ticket sin artículos</span>
+                <span class="text-[10px] text-on-surface-variant/60">Haz clic en "Agregar" en el catálogo para registrar</span>
               </div>
 
               <!-- Simple 3-Button Payment Method Selector -->
@@ -605,15 +237,15 @@ import NavBar from "../components/Nav.astro";
               <div class="mt-3 bg-surface-container-low p-3 rounded-xl flex flex-col gap-1.5 border border-surface-container/50">
                 <div class="flex items-center justify-between text-[12px] text-on-surface-variant">
                   <span>Subtotal</span>
-                  <span id="summarySubtotal" class="font-semibold text-on-surface">$119.00</span>
+                  <span id="summarySubtotal" class="font-semibold text-on-surface">$ 0</span>
                 </div>
                 <div class="flex items-center justify-between text-[12px] text-on-surface-variant">
-                  <span>Impuestos (IVA 19%)</span>
-                  <span id="summaryTax" class="font-semibold text-on-surface">$19.04</span>
+                  <span>Impuestos (Incluidos)</span>
+                  <span id="summaryTax" class="font-semibold text-on-surface">$ 0</span>
                 </div>
                 <div class="pt-2 mt-1 border-t border-surface-container/60 flex items-baseline justify-between">
                   <span class="text-[14px] font-bold text-primary">Total a Pagar</span>
-                  <span id="summaryTotal" class="text-[24px] font-bold text-primary tracking-tight">$138.04</span>
+                  <span id="summaryTotal" class="text-[24px] font-bold text-primary tracking-tight">$ 0</span>
                 </div>
               </div>
 
@@ -626,7 +258,7 @@ import NavBar from "../components/Nav.astro";
                   type="button"
                 >
                   <span class="material-symbols-outlined text-[20px]">point_of_sale</span>
-                  <span id="btnCheckoutLabel">Cobrar y Facturar ($138.04)</span>
+                  <span id="btnCheckoutLabel">Cobrar y Facturar ($ 0)</span>
                 </button>
                 <div class="grid grid-cols-2 gap-2">
                   <button
@@ -658,42 +290,42 @@ import NavBar from "../components/Nav.astro";
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between">
               <div class="flex items-center justify-between text-on-surface-variant mb-1">
-                <span class="text-[12px] font-medium">Ventas de Hoy</span>
+                <span id="hist-period-title" class="text-[12px] font-medium">Ventas del Periodo</span>
                 <span class="text-[11px] text-on-tertiary-container bg-tertiary-container/20 px-2 py-0.5 rounded-lg font-semibold">
-                  +18.4%
+                  Sincronizado
                 </span>
               </div>
-              <span class="text-[26px] font-bold text-on-surface tracking-tight mt-1">$2,840.50</span>
-              <span class="text-[12px] text-on-surface-variant mt-1">28 transacciones completadas</span>
+              <span id="hist-total-ventas" class="text-[26px] font-bold text-on-surface tracking-tight mt-1">$ 0</span>
+              <span id="hist-count-ventas" class="text-[12px] text-on-surface-variant mt-1">0 transacciones registradas</span>
             </div>
 
             <div class="bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between">
               <div class="flex items-center justify-between text-on-surface-variant mb-1">
                 <span class="text-[12px] font-medium">Ticket Promedio</span>
                 <span class="text-[11px] text-secondary bg-secondary-fixed/50 px-2 py-0.5 rounded-lg font-semibold">
-                  +4.2%
+                  Promedio
                 </span>
               </div>
-              <span class="text-[26px] font-bold text-on-surface tracking-tight mt-1">$101.44</span>
-              <span class="text-[12px] text-on-surface-variant mt-1">Objetivo meta: $95.00</span>
+              <span id="hist-avg-ticket" class="text-[26px] font-bold text-on-surface tracking-tight mt-1">$ 0</span>
+              <span class="text-[12px] text-on-surface-variant mt-1">Monto promedio por factura</span>
             </div>
 
             <div class="bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between">
               <div class="flex items-center justify-between text-on-surface-variant mb-1">
-                <span class="text-[12px] font-medium">Facturas Fiscales</span>
-                <span class="material-symbols-outlined text-[18px] text-on-surface-variant">description</span>
+                <span class="text-[12px] font-medium">Artículos Vendidos</span>
+                <span class="material-symbols-outlined text-[18px] text-on-surface-variant">shopping_bag</span>
               </div>
-              <span class="text-[26px] font-bold text-on-surface tracking-tight mt-1">19 / 28</span>
-              <span class="text-[12px] text-on-surface-variant mt-1">68% clientes con RIF/NIT</span>
+              <span id="hist-total-items" class="text-[26px] font-bold text-on-surface tracking-tight mt-1">0</span>
+              <span class="text-[12px] text-on-surface-variant mt-1">Unidades despachadas</span>
             </div>
 
             <div class="bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between">
               <div class="flex items-center justify-between text-on-surface-variant mb-1">
-                <span class="text-[12px] font-medium">Tickets en Espera</span>
-                <span class="text-[11px] text-outline bg-surface-container px-2 py-0.5 rounded-lg font-semibold">Caja 01</span>
+                <span class="text-[12px] font-medium">Estado Operativo</span>
+                <span class="text-[11px] text-tertiary bg-tertiary-container/20 px-2 py-0.5 rounded-lg font-semibold">En Línea</span>
               </div>
-              <span class="text-[26px] font-bold text-secondary tracking-tight mt-1">3</span>
-              <span class="text-[12px] text-on-surface-variant mt-1">Total retenido: $310.20</span>
+              <span class="text-[26px] font-bold text-secondary tracking-tight mt-1">Caja Activa</span>
+              <span id="hist-active-cashier-label" class="text-[12px] text-on-surface-variant mt-1">Cajero: Activo</span>
             </div>
           </div>
 
@@ -708,41 +340,37 @@ import NavBar from "../components/Nav.astro";
                 <input
                   id="history-search"
                   class="w-full h-8 pl-8 pr-3 bg-surface rounded-xl text-[12px] text-on-surface placeholder:text-on-surface-variant/70 border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-                  placeholder="Buscar factura, cliente, ticket..."
+                  placeholder="Buscar factura o vendedor..."
                   type="text"
                 />
               </div>
 
-              <!-- Date Filter -->
+              <!-- Date Period Filter (4 periodos solicitados) -->
               <div class="flex items-center gap-1 bg-surface rounded-xl px-2 h-8 border border-surface-container/60">
                 <span class="material-symbols-outlined text-on-surface-variant text-[16px]">calendar_today</span>
-                <select class="bg-transparent text-[12px] text-on-surface focus:outline-none pr-1 cursor-pointer">
-                  <option>Hoy (24 Oct)</option>
-                  <option>Ayer (23 Oct)</option>
-                  <option>Últimos 7 días</option>
-                  <option>Mes en Curso</option>
+                <select id="history-period-select" class="bg-transparent text-[12px] text-on-surface focus:outline-none pr-1 cursor-pointer">
+                  <option value="hoy" selected>El día de hoy</option>
+                  <option value="ayer">El día anterior (Ayer)</option>
+                  <option value="semana">La semana anterior</option>
+                  <option value="mes">Lo que lleva del mes</option>
                 </select>
               </div>
 
               <!-- Seller Filter -->
               <div class="flex items-center gap-1 bg-surface rounded-xl px-2 h-8 border border-surface-container/60">
                 <span class="material-symbols-outlined text-on-surface-variant text-[16px]">person</span>
-                <select class="bg-transparent text-[12px] text-on-surface focus:outline-none pr-1 cursor-pointer">
-                  <option>Todos los Vendedores</option>
-                  <option>Luis Torres</option>
-                  <option>Carla Gutiérrez</option>
-                  <option>Carlos Mendoza (Admin)</option>
+                <select id="history-seller-select" class="bg-transparent text-[12px] text-on-surface focus:outline-none pr-1 cursor-pointer">
+                  <option value="all" selected>Todos los Vendedores</option>
                 </select>
               </div>
 
               <!-- Status Filter -->
               <div class="flex items-center gap-1 bg-surface rounded-xl px-2 h-8 border border-surface-container/60">
                 <span class="material-symbols-outlined text-on-surface-variant text-[16px]">filter_list</span>
-                <select class="bg-transparent text-[12px] text-on-surface focus:outline-none pr-1 cursor-pointer">
-                  <option>Todos los Estados</option>
-                  <option>Pagado / Completado</option>
-                  <option>En Espera</option>
-                  <option>Anulado / Reembolso</option>
+                <select id="history-status-select" class="bg-transparent text-[12px] text-on-surface focus:outline-none pr-1 cursor-pointer">
+                  <option value="all" selected>Todos los Estados</option>
+                  <option value="COMPLETADA">Completada</option>
+                  <option value="ANULADA">Anulada</option>
                 </select>
               </div>
             </div>
@@ -785,186 +413,20 @@ import NavBar from "../components/Nav.astro";
                     <th class="py-2 px-4 font-semibold text-right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-surface-container/40">
-                  <!-- Row 1 -->
-                  <tr class="hover:bg-surface-container-low transition-colors group h-12">
-                    <td class="py-2 px-4">
-                      <div class="flex flex-col">
-                        <span class="font-semibold text-primary">#FAC-2024-0841</span>
-                        <span class="text-[10px] text-on-surface-variant">Orden POS-0841</span>
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 whitespace-nowrap text-on-surface-variant">Hoy, 14:32</td>
-                    <td class="py-2 px-4">
-                      <div class="flex flex-col">
-                        <span class="font-medium text-on-surface">Inversiones Delta C.A.</span>
-                        <span class="text-[10px] text-on-surface-variant">RIF: J-30492819</span>
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 whitespace-nowrap">Luis Torres</td>
-                    <td class="py-2 px-4 whitespace-nowrap">
-                      <span class="inline-flex items-center gap-1 text-[11px] text-on-surface bg-surface-container px-2 py-0.5 rounded-lg">
-                        <span class="material-symbols-outlined text-[13px]">credit_card</span> Tarjeta Débito
-                      </span>
-                    </td>
-                    <td class="py-2 px-4 text-right font-medium">4</td>
-                    <td class="py-2 px-4 text-right font-bold text-on-surface">$248.50</td>
-                    <td class="py-2 px-4">
-                      <span class="inline-flex items-center gap-1 text-[11px] text-on-tertiary-container bg-tertiary-container/15 px-2 py-0.5 rounded-full font-semibold">
-                        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Pagado
-                      </span>
-                    </td>
-                    <td class="py-2 px-4 text-right">
-                      <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
-                        <button class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-on-surface cursor-pointer" title="Reimprimir Comprobante" type="button">
-                          <span class="material-symbols-outlined text-[18px]">receipt</span>
-                        </button>
-                        <button class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-secondary cursor-pointer" title="Ver Detalle" type="button">
-                          <span class="material-symbols-outlined text-[18px]">visibility</span>
-                        </button>
-                        <button class="p-1 hover:bg-error-container/40 rounded-lg text-on-surface-variant hover:text-error cursor-pointer" title="Anular Factura" type="button">
-                          <span class="material-symbols-outlined text-[18px]">delete</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Row 2 -->
-                  <tr class="hover:bg-surface-container-low transition-colors group h-12">
-                    <td class="py-2 px-4">
-                      <div class="flex flex-col">
-                        <span class="font-semibold text-primary">#REC-2024-0840</span>
-                        <span class="text-[10px] text-on-surface-variant">Ticket POS-0840</span>
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 whitespace-nowrap text-on-surface-variant">Hoy, 14:15</td>
-                    <td class="py-2 px-4">
-                      <span class="font-medium text-on-surface">Consumidor Final</span>
-                    </td>
-                    <td class="py-2 px-4 whitespace-nowrap">Carla Gutiérrez</td>
-                    <td class="py-2 px-4 whitespace-nowrap">
-                      <span class="inline-flex items-center gap-1 text-[11px] text-on-surface bg-surface-container px-2 py-0.5 rounded-lg">
-                        <span class="material-symbols-outlined text-[13px]">payments</span> Efectivo (COP)
-                      </span>
-                    </td>
-                    <td class="py-2 px-4 text-right font-medium">1</td>
-                    <td class="py-2 px-4 text-right font-bold text-on-surface">$16.50</td>
-                    <td class="py-2 px-4">
-                      <span class="inline-flex items-center gap-1 text-[11px] text-on-tertiary-container bg-tertiary-container/15 px-2 py-0.5 rounded-full font-semibold">
-                        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Pagado
-                      </span>
-                    </td>
-                    <td class="py-2 px-4 text-right">
-                      <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
-                        <button class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-on-surface cursor-pointer" title="Reimprimir Comprobante" type="button">
-                          <span class="material-symbols-outlined text-[18px]">receipt</span>
-                        </button>
-                        <button class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-secondary cursor-pointer" title="Ver Detalle" type="button">
-                          <span class="material-symbols-outlined text-[18px]">visibility</span>
-                        </button>
-                        <button class="p-1 hover:bg-error-container/40 rounded-lg text-on-surface-variant hover:text-error cursor-pointer" title="Anular Factura" type="button">
-                          <span class="material-symbols-outlined text-[18px]">delete</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Row 3: Held Ticket -->
-                  <tr class="hover:bg-surface-container-low transition-colors group h-12 bg-surface-container-low/30">
-                    <td class="py-2 px-4">
-                      <div class="flex flex-col">
-                        <span class="font-semibold text-primary">#ESP-2024-0839</span>
-                        <span class="text-[10px] text-outline font-medium">Ticket Retenido</span>
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 whitespace-nowrap text-on-surface-variant">Hoy, 13:50</td>
-                    <td class="py-2 px-4">
-                      <span class="font-medium text-on-surface">Distribuidora Altiplano S.A.</span>
-                    </td>
-                    <td class="py-2 px-4 whitespace-nowrap">Luis Torres</td>
-                    <td class="py-2 px-4 whitespace-nowrap text-on-surface-variant italic text-[11px]">
-                      Pendiente
-                    </td>
-                    <td class="py-2 px-4 text-right font-medium">6</td>
-                    <td class="py-2 px-4 text-right font-bold text-secondary">$185.00</td>
-                    <td class="py-2 px-4">
-                      <span class="inline-flex items-center gap-1 text-[11px] text-outline bg-surface-container px-2 py-0.5 rounded-full font-semibold">
-                        <span class="w-1.5 h-1.5 rounded-full bg-outline"></span> En Espera
-                      </span>
-                    </td>
-                    <td class="py-2 px-4 text-right">
-                      <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
-                        <button
-                          class="px-2.5 py-1 bg-secondary-container hover:bg-secondary text-on-secondary rounded-lg text-[11px] font-semibold transition-all cursor-pointer active:scale-95 shadow-2xs"
-                          onclick="window.resumeHeldTicket && window.resumeHeldTicket()"
-                          title="Reanudar en POS"
-                          type="button"
-                        >
-                          Reanudar
-                        </button>
-                        <button class="p-1 hover:bg-error-container/40 rounded-lg text-on-surface-variant hover:text-error cursor-pointer" title="Descartar" type="button">
-                          <span class="material-symbols-outlined text-[18px]">close</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Row 4 -->
-                  <tr class="hover:bg-surface-container-low transition-colors group h-12">
-                    <td class="py-2 px-4">
-                      <div class="flex flex-col">
-                        <span class="font-semibold text-primary">#FAC-2024-0838</span>
-                        <span class="text-[10px] text-on-surface-variant">Orden POS-0838</span>
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 whitespace-nowrap text-on-surface-variant">Hoy, 13:20</td>
-                    <td class="py-2 px-4">
-                      <div class="flex flex-col">
-                        <span class="font-medium text-on-surface">Carlos Mendoza (Admin)</span>
-                        <span class="text-[10px] text-on-surface-variant">Consumo Interno</span>
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 whitespace-nowrap">Carlos Mendoza</td>
-                    <td class="py-2 px-4 whitespace-nowrap">
-                      <span class="inline-flex items-center gap-1 text-[11px] text-on-surface bg-surface-container px-2 py-0.5 rounded-lg">
-                        <span class="material-symbols-outlined text-[13px]">account_balance</span> Transf. Bancaria
-                      </span>
-                    </td>
-                    <td class="py-2 px-4 text-right font-medium">2</td>
-                    <td class="py-2 px-4 text-right font-bold text-on-surface">$105.00</td>
-                    <td class="py-2 px-4">
-                      <span class="inline-flex items-center gap-1 text-[11px] text-on-tertiary-container bg-tertiary-container/15 px-2 py-0.5 rounded-full font-semibold">
-                        <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Pagado
-                      </span>
-                    </td>
-                    <td class="py-2 px-4 text-right">
-                      <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
-                        <button class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-on-surface cursor-pointer" title="Reimprimir Comprobante" type="button">
-                          <span class="material-symbols-outlined text-[18px]">receipt</span>
-                        </button>
-                        <button class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-secondary cursor-pointer" title="Ver Detalle" type="button">
-                          <span class="material-symbols-outlined text-[18px]">visibility</span>
-                        </button>
-                        <button class="p-1 hover:bg-error-container/40 rounded-lg text-on-surface-variant hover:text-error cursor-pointer" title="Anular Factura" type="button">
-                          <span class="material-symbols-outlined text-[18px]">delete</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                <tbody id="history-table-body" class="divide-y divide-surface-container/40">
+                  <!-- Se cargará dinámicamente con los registros de la base de datos -->
                 </tbody>
               </table>
             </div>
 
-            <!-- Table Pagination -->
+            <!-- Table Pagination & Metrics Info -->
             <div class="p-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-on-surface-variant border-t border-surface-container/60">
-              <span>Mostrando 1-4 de 28 transacciones registradas</span>
+              <span id="history-pagination-info">Cargando transacciones registradas...</span>
               <div class="flex items-center gap-1">
-                <button class="px-2.5 py-1 bg-surface-container-lowest rounded-lg hover:bg-surface-container text-on-surface-variant disabled:opacity-40 cursor-pointer border border-surface-container/60" disabled type="button">
-                  Anterior
+                <button class="px-2.5 py-1 bg-surface-container-lowest rounded-lg hover:bg-surface-container text-on-surface cursor-pointer border border-surface-container/60 flex items-center gap-1" type="button" onclick="window.refreshHistory && window.refreshHistory()">
+                  <span class="material-symbols-outlined text-[14px]">refresh</span>
+                  <span>Actualizar</span>
                 </button>
-                <button class="px-2.5 py-1 bg-primary text-on-primary rounded-lg font-semibold cursor-pointer" type="button">1</button>
-                <button class="px-2.5 py-1 bg-surface-container-lowest hover:bg-surface-container rounded-lg text-on-surface cursor-pointer border border-surface-container/60" type="button">2</button>
-                <button class="px-2.5 py-1 bg-surface-container-lowest hover:bg-surface-container rounded-lg text-on-surface cursor-pointer border border-surface-container/60" type="button">Siguiente</button>
               </div>
             </div>
           </div>
@@ -1085,19 +547,19 @@ import NavBar from "../components/Nav.astro";
       initVentas,
       switchPosView,
       filterCategoryPills,
-      filterProductsLive,
       addProductToTicket,
       clearActiveCart,
       selectPaymentMethod,
+      getActivePaymentMethod,
+      formatCOP,
       openCustomerModal,
       closeCustomerModal,
       showPosToast,
     } from "../animaciones/animaVentas.js";
 
-    // Exponer al scope global para enlaces HTML nativos
+    // Exponer al scope global para eventos nativos
     window.switchView = switchPosView;
     window.selectCategory = filterCategoryPills;
-    window.filterProducts = filterProductsLive;
     window.addToTicket = addProductToTicket;
     window.clearCart = clearActiveCart;
     window.setPaymentMethod = selectPaymentMethod;
@@ -1105,15 +567,228 @@ import NavBar from "../components/Nav.astro";
     window.closeNewCustomerModal = closeCustomerModal;
     window.showPosToast = showPosToast;
 
-    window.simulateBarcodeScan = function() {
-      const input = document.getElementById("productSearch") as HTMLInputElement | null;
-      if (input) {
-        input.value = "BAR-204";
-        filterProductsLive();
+    const API_BASE = "http://localhost:3000/api/ventas";
+
+    let catalogItems: any[] = [];
+    let currentFilterCat: string = "all";
+
+    // 1. Cargar catálogo de productos y servicios desde la BD
+    async function loadPosCatalog() {
+      const grid = document.getElementById("product-grid");
+      if (!grid) return;
+
+      grid.innerHTML = `
+        <div class="col-span-full py-12 flex flex-col items-center justify-center gap-2 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[32px] animate-spin text-secondary">sync</span>
+          <p class="text-[13px] font-medium">Cargando catálogo en tiempo real...</p>
+        </div>
+      `;
+
+      try {
+        const res = await fetch(`${API_BASE}/catalogo`);
+        const json = await res.json();
+
+        if (json.success && json.data) {
+          const prods = json.data.productos || [];
+          const servs = json.data.servicios || [];
+          catalogItems = [...prods, ...servs];
+
+          renderCategoryPills(catalogItems);
+          renderCatalogGrid(catalogItems);
+        } else {
+          grid.innerHTML = `<p class="col-span-full text-center text-error py-8">No se pudo cargar el catálogo.</p>`;
+        }
+      } catch (err) {
+        console.error("Error al cargar catálogo POS:", err);
+        grid.innerHTML = `<p class="col-span-full text-center text-error py-8">Error de conexión al cargar catálogo.</p>`;
       }
-      addProductToTicket("Lector Láser 2D Inalámbrico", 78.50, "BAR-204", "Producto");
-      showPosToast("Código de barras detectado: BAR-204");
+    }
+
+    // 2. Renderizar píldoras de categorías dinámicas
+    function renderCategoryPills(items: any[]) {
+      const container = document.getElementById("cat-pills-container");
+      if (!container) return;
+
+      // Obtener categorías únicas
+      const catsMap = new Map();
+      items.forEach((item) => {
+        if (item.categoria) {
+          catsMap.set(item.categoria, {
+            nombre: item.categoria,
+            icono: item.categoria_icono || (item.tipo_item === "SERVICIO" ? "handyman" : "inventory_2"),
+            prefijo: item.categoria_prefijo || "GEN"
+          });
+        }
+      });
+
+      let html = `
+        <button
+          class="cat-pill active-cat px-4 py-1.5 rounded-full text-[12px] font-semibold bg-primary text-on-primary shrink-0 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+          onclick="window.filterByCat('all', this)"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[16px]">apps</span>
+          <span>Todos (${items.length})</span>
+        </button>
+      `;
+
+      catsMap.forEach((c) => {
+        const count = items.filter((i) => i.categoria === c.nombre).length;
+        html += `
+          <button
+            class="cat-pill px-3.5 py-1.5 rounded-full text-[12px] font-medium bg-surface-container-lowest hover:bg-surface-container-high text-on-surface shrink-0 transition-all flex items-center gap-1.5 border border-surface-container/60 cursor-pointer"
+            onclick="window.filterByCat('${c.nombre}', this)"
+            type="button"
+          >
+            <span class="material-symbols-outlined text-[16px] text-secondary">${c.icono}</span>
+            <span>${c.nombre} (${count})</span>
+          </button>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    (window as any).filterByCat = function(catName: string, btn: HTMLElement) {
+      currentFilterCat = catName;
+      document.querySelectorAll(".cat-pill").forEach((el) => {
+        el.classList.remove("active-cat", "bg-primary", "text-on-primary", "shadow-xs", "font-semibold");
+        el.classList.add("bg-surface-container-lowest", "text-on-surface", "hover:bg-surface-container-high", "font-medium");
+      });
+      btn.classList.add("active-cat", "bg-primary", "text-on-primary", "shadow-xs", "font-semibold");
+      btn.classList.remove("bg-surface-container-lowest", "text-on-surface", "hover:bg-surface-container-high", "font-medium");
+
+      filterProductsLive();
     };
+
+    // 3. Renderizar las tarjetas del catálogo
+    function renderCatalogGrid(items: any[]) {
+      const grid = document.getElementById("product-grid");
+      const emptyState = document.getElementById("catalog-empty");
+      if (!grid) return;
+
+      if (items.length === 0) {
+        grid.innerHTML = "";
+        emptyState?.classList.remove("hidden");
+        emptyState?.classList.add("flex");
+        return;
+      }
+
+      emptyState?.classList.add("hidden");
+      emptyState?.classList.remove("flex");
+
+      grid.innerHTML = items.map((item) => {
+        const isServicio = item.tipo_item === "SERVICIO";
+        const stockNum = Number(item.stock) || 0;
+
+        // Semáforo de stock solicitado:
+        // 0 a 4: Rojo (Urgente / Agotado)
+        // 5 a 6: Amarillo (Próximo)
+        // 7 en adelante: Verde (Estado OK)
+        let stockBadge = "";
+        if (isServicio) {
+          stockBadge = `<span class="text-[10px] font-bold bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded-md">Servicio Técnico</span>`;
+        } else if (stockNum === 0) {
+          stockBadge = `<span class="text-[10px] font-bold bg-error-container text-error px-2 py-0.5 rounded-md">Agotado (0)</span>`;
+        } else if (stockNum <= 4) {
+          stockBadge = `<span class="text-[10px] font-bold bg-error-container/30 text-error px-2 py-0.5 rounded-md">Urgente (${stockNum} unid.)</span>`;
+        } else if (stockNum <= 6) {
+          stockBadge = `<span class="text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-md">Próximo (${stockNum} unid.)</span>`;
+        } else {
+          stockBadge = `<span class="text-[10px] font-bold bg-tertiary-container/30 text-on-tertiary-container px-2 py-0.5 rounded-md">Stock: ${stockNum}</span>`;
+        }
+
+        const iconName = item.categoria_icono || (isServicio ? "handyman" : "inventory_2");
+
+        return `
+          <div
+            class="product-item bg-surface-container-lowest rounded-xl p-3 border border-surface-container/60 shadow-xs flex flex-col justify-between group hover:shadow-md hover:border-secondary transition-all"
+            data-category="${item.categoria}"
+            data-name="${item.nombre.toLowerCase()}"
+            data-sku="${(item.sku || "").toLowerCase()}"
+            data-barcode="${(item.codigo_barras || "").toLowerCase()}"
+          >
+            <div>
+              <!-- Visual Header con icono y categoría (sin imágenes) -->
+              <div class="relative w-full h-24 rounded-lg bg-surface-container-low flex flex-col items-center justify-center mb-2.5 overflow-hidden">
+                <span class="material-symbols-outlined text-[38px] text-on-surface-variant/80 group-hover:scale-110 group-hover:text-primary transition-transform duration-300">
+                  ${iconName}
+                </span>
+                <span class="absolute top-1.5 left-1.5 text-[10px] font-semibold bg-surface-container-lowest/90 px-1.5 py-0.5 rounded text-on-surface">
+                  ${item.categoria}
+                </span>
+                <span class="absolute bottom-1.5 right-1.5">
+                  ${stockBadge}
+                </span>
+              </div>
+              
+              <!-- Info del Producto -->
+              <div class="flex flex-col gap-0.5 mb-2">
+                <h4 class="text-[13px] font-semibold text-on-surface line-clamp-1" title="${item.nombre}">${item.nombre}</h4>
+                <div class="flex items-center gap-1.5 text-[11px] text-on-surface-variant font-mono">
+                  <span>SKU: ${item.sku || "N/A"}</span>
+                  ${item.codigo_barras ? `<span class="text-[10px] text-on-surface-variant/70">&bull; ${item.codigo_barras}</span>` : ""}
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer con Precio COP y Botón Agregar -->
+            <div class="flex items-center justify-between pt-2 border-t border-surface-container/40">
+              <span class="text-[15px] text-primary font-bold tracking-tight">${formatCOP(item.precio_venta)}</span>
+              <button
+                class="h-8 px-3 rounded-lg bg-secondary-container hover:bg-secondary text-on-secondary text-[12px] font-semibold flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer ${!isServicio && stockNum === 0 ? "opacity-50 pointer-events-none" : ""}"
+                onclick="window.addProductFromCatalog('${item.id}')"
+                type="button"
+              >
+                <span class="material-symbols-outlined text-[16px]">add</span>
+                <span>Agregar</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // 4. Agregar ítem desde el catálogo al ticket
+    (window as any).addProductFromCatalog = function(itemId: string) {
+      const item = catalogItems.find((i) => i.id === itemId);
+      if (!item) return;
+
+      const isServ = item.tipo_item === "SERVICIO";
+      addProductToTicket(
+        item.nombre,
+        item.precio_venta,
+        item.sku,
+        isServ ? "Servicio" : "Producto",
+        item.id,
+        item.stock,
+        item.tipo
+      );
+
+      // Ocultar mensaje de carrito vacío si hay ítems
+      const emptyCartEl = document.getElementById("cartEmptyState");
+      if (emptyCartEl) emptyCartEl.classList.add("hidden");
+    };
+
+    // 5. Filtrar productos en vivo por búsqueda y categoría
+    function filterProductsLive() {
+      const input = document.getElementById("productSearch") as HTMLInputElement | null;
+      const q = input?.value.toLowerCase().trim() || "";
+
+      const filtered = catalogItems.filter((item) => {
+        const matchesCategory = currentFilterCat === "all" || item.categoria === currentFilterCat;
+        const matchesQuery = !q ||
+          item.nombre.toLowerCase().includes(q) ||
+          (item.sku && item.sku.toLowerCase().includes(q)) ||
+          (item.codigo_barras && item.codigo_barras.toLowerCase().includes(q));
+
+        return matchesCategory && matchesQuery;
+      });
+
+      renderCatalogGrid(filtered);
+    }
+
+    window.filterProducts = filterProductsLive;
 
     window.clearSearch = function() {
       const input = document.getElementById("productSearch") as HTMLInputElement | null;
@@ -1121,69 +796,373 @@ import NavBar from "../components/Nav.astro";
       filterProductsLive();
     };
 
-    window.saveQuickCustomer = function() {
-      const nameInput = document.getElementById("newCustName") as HTMLInputElement | null;
-      const docInput = document.getElementById("newCustDoc") as HTMLInputElement | null;
-      const name = nameInput?.value.trim() || "";
-      const doc = docInput?.value.trim() || "";
+    // 6. Simular o escanear código de barras
+    window.simulateBarcodeScan = function() {
+      const input = document.getElementById("productSearch") as HTMLInputElement | null;
+      const q = input?.value.trim();
 
-      if (!name) {
-        showPosToast("Por favor ingrese el nombre del cliente", "warning");
+      if (!q) {
+        showPosToast("Escribe un código o SKU en el buscador para escanear", "info");
         return;
       }
 
-      const currentCustEl = document.getElementById("currentCustomerName");
-      if (currentCustEl) {
-        currentCustEl.textContent = `${name}${doc ? " (" + doc + ")" : ""}`;
-      }
+      const match = catalogItems.find(
+        (i) => (i.codigo_barras && i.codigo_barras.toLowerCase() === q.toLowerCase()) ||
+               (i.sku && i.sku.toLowerCase() === q.toLowerCase())
+      );
 
-      closeCustomerModal();
-      showPosToast("Cliente asociado exitosamente.");
+      if (match) {
+        (window as any).addProductFromCatalog(match.id);
+        showPosToast(`Código detectado: ${match.nombre}`);
+        if (input) input.value = "";
+        filterProductsLive();
+      } else {
+        showPosToast(`No se encontró producto con código: ${q}`, "warning");
+      }
     };
 
-    window.processCheckout = function() {
-      const countEl = document.getElementById("cartCount");
-      const count = parseInt(countEl?.textContent || "0", 10);
-      if (count === 0) {
-        showPosToast("El ticket está vacío. Agregue productos antes de procesar.", "warning");
+    // 7. HISTORIAL DE VENTAS (4 PERIODOS SOLICITADOS)
+    async function loadSalesHistory(periodo = "hoy") {
+      const tbody = document.getElementById("history-table-body");
+      const periodSelect = document.getElementById("history-period-select") as HTMLSelectElement | null;
+      const sellerSelect = document.getElementById("history-seller-select") as HTMLSelectElement | null;
+      const statusSelect = document.getElementById("history-status-select") as HTMLSelectElement | null;
+      const searchInput = document.getElementById("history-search") as HTMLInputElement | null;
+
+      const currentPeriod = periodo || periodSelect?.value || "hoy";
+      const currentSeller = sellerSelect?.value || "all";
+      const currentStatus = statusSelect?.value || "all";
+      const currentQuery = searchInput?.value.trim() || "";
+
+      if (tbody) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="py-8 text-center text-on-surface-variant">
+              <span class="material-symbols-outlined text-[24px] animate-spin text-secondary align-middle">sync</span>
+              <span class="align-middle ml-2 text-[13px]">Consultando ventas...</span>
+            </td>
+          </tr>
+        `;
+      }
+
+      try {
+        const queryParams = new URLSearchParams({
+          periodo: currentPeriod,
+          vendedor: currentSeller,
+          estado: currentStatus,
+          busqueda: currentQuery
+        });
+
+        const res = await fetch(`${API_BASE}/historial?${queryParams.toString()}`);
+        const json = await res.json();
+
+        if (json.success) {
+          const ventas = json.ventas || [];
+          const kpis = json.kpis || {};
+
+          // Actualizar títulos y KPIs
+          const periodTitleEl = document.getElementById("hist-period-title");
+          const titles: Record<string, string> = {
+            hoy: "Ventas de Hoy",
+            ayer: "Ventas del Día Anterior",
+            semana: "Ventas de la Semana Anterior",
+            mes: "Ventas del Mes en Curso"
+          };
+          if (periodTitleEl) periodTitleEl.textContent = titles[currentPeriod] || "Ventas del Periodo";
+
+          const totalEl = document.getElementById("hist-total-ventas");
+          if (totalEl) totalEl.textContent = formatCOP(kpis.total_ventas || 0);
+
+          const countEl = document.getElementById("hist-count-ventas");
+          if (countEl) countEl.textContent = `${kpis.cantidad_transacciones || 0} transacciones completadas`;
+
+          const avgEl = document.getElementById("hist-avg-ticket");
+          if (avgEl) avgEl.textContent = formatCOP(kpis.ticket_promedio || 0);
+
+          const totalUnits = ventas.reduce((acc: number, v: any) => acc + (Number(v.total_unidades) || 0), 0);
+          const unitsEl = document.getElementById("hist-total-items");
+          if (unitsEl) unitsEl.textContent = String(totalUnits);
+
+          const infoEl = document.getElementById("history-pagination-info");
+          if (infoEl) infoEl.textContent = `Mostrando ${ventas.length} transacciones registradas (${titles[currentPeriod] || "Periodo"})`;
+
+          // Poblar desplegable de vendedores si aún está solo con "Todos"
+          if (sellerSelect && sellerSelect.options.length <= 1) {
+            const uniqueVendors = Array.from(new Set(ventas.map((v: any) => v.vendedor_nombre))).filter(Boolean);
+            uniqueVendors.forEach((vendorName: any) => {
+              const opt = document.createElement("option");
+              opt.value = vendorName;
+              opt.textContent = vendorName;
+              sellerSelect.appendChild(opt);
+            });
+          }
+
+          // Renderizar filas de la tabla
+          if (!tbody) return;
+          if (ventas.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="9" class="py-12 text-center text-on-surface-variant">
+                  <div class="flex flex-col items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[36px] text-on-surface-variant/40">receipt_long</span>
+                    <p class="text-[13px] font-medium">No se registraron ventas en este periodo seleccionado (${titles[currentPeriod] || currentPeriod}).</p>
+                  </div>
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          tbody.innerHTML = ventas.map((v: any) => {
+            const isAnulada = v.estado === "ANULADA";
+            const dateStr = new Date(v.fecha_hora).toLocaleDateString("es-CO", {
+              day: "2-digit",
+              month: "short",
+              hour: "2-digit",
+              minute: "2-digit"
+            });
+
+            let metodoIcon = "payments";
+            let metodoNombre = "Efectivo";
+            if (v.metodo_pago === "TARJETA") {
+              metodoIcon = "credit_card";
+              metodoNombre = "Tarjeta";
+            } else if (v.metodo_pago === "TRANSFERENCIA") {
+              metodoIcon = "account_balance";
+              metodoNombre = "Transf. Bancaria";
+            }
+
+            return `
+              <tr class="hover:bg-surface-container-low transition-colors group h-12 ${isAnulada ? "opacity-60 bg-error-container/5" : ""}">
+                <td class="py-2 px-4">
+                  <div class="flex flex-col">
+                    <span class="font-semibold ${isAnulada ? "line-through text-on-surface-variant" : "text-primary"}">#${v.folio_ticket}</span>
+                    <span class="text-[10px] text-on-surface-variant">${v.sucursal_nombre || "Principal"}</span>
+                  </div>
+                </td>
+                <td class="py-2 px-4 whitespace-nowrap text-on-surface-variant text-[12px]">${dateStr}</td>
+                <td class="py-2 px-4">
+                  <span class="font-medium text-on-surface">Consumidor Final</span>
+                </td>
+                <td class="py-2 px-4 whitespace-nowrap font-medium">${v.vendedor_nombre}</td>
+                <td class="py-2 px-4 whitespace-nowrap">
+                  <span class="inline-flex items-center gap-1 text-[11px] text-on-surface bg-surface-container px-2 py-0.5 rounded-lg">
+                    <span class="material-symbols-outlined text-[13px]">${metodoIcon}</span> ${metodoNombre}
+                  </span>
+                </td>
+                <td class="py-2 px-4 text-right font-medium">${v.total_unidades} unid.</td>
+                <td class="py-2 px-4 text-right font-bold ${isAnulada ? "line-through text-on-surface-variant" : "text-on-surface"}">${formatCOP(v.total)}</td>
+                <td class="py-2 px-4">
+                  ${isAnulada ? `
+                    <span class="inline-flex items-center gap-1 text-[11px] text-error bg-error-container/30 px-2 py-0.5 rounded-full font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-error"></span> Anulada
+                    </span>
+                  ` : `
+                    <span class="inline-flex items-center gap-1 text-[11px] text-on-tertiary-container bg-tertiary-container/20 px-2 py-0.5 rounded-full font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Completada
+                    </span>
+                  `}
+                </td>
+                <td class="py-2 px-4 text-right">
+                  <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
+                    <button class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-on-surface cursor-pointer" onclick="window.showPosToast('Ticket #${v.folio_ticket} impreso con éxito.', 'info')" title="Imprimir Comprobante" type="button">
+                      <span class="material-symbols-outlined text-[18px]">receipt</span>
+                    </button>
+                    ${!isAnulada ? `
+                      <button class="p-1 hover:bg-error-container/40 rounded-lg text-on-surface-variant hover:text-error cursor-pointer" onclick="window.anularVenta('${v.id}', '${v.folio_ticket}')" title="Anular Factura" type="button">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    ` : ""}
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join("");
+        }
+      } catch (err) {
+        console.error("Error al consultar historial:", err);
+      }
+    }
+
+    (window as any).refreshHistory = function() {
+      const periodSelect = document.getElementById("history-period-select") as HTMLSelectElement | null;
+      loadSalesHistory(periodSelect?.value || "hoy");
+    };
+
+    // 8. Anular venta y restituir inventario
+    (window as any).anularVenta = async function(ventaId: string, folio: string) {
+      if (!confirm(`¿Estás seguro de anular la venta #${folio}?\nEl inventario de los productos será devuelto a la base de datos automáticamente.`)) {
         return;
       }
-      showPosToast("Factura #V-0842 emitida e impresa correctamente.");
-      setTimeout(() => {
-        clearActiveCart();
-      }, 900);
+
+      try {
+        const res = await fetch(`${API_BASE}/${ventaId}/anular`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ motivo: "Anulación solicitada por usuario" })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showPosToast(`Venta #${folio} anulada y stock devuelto exitosamente.`);
+          (window as any).refreshHistory();
+          loadPosCatalog(); // Recargar stock en el POS
+        } else {
+          alert(json.error || "No se pudo anular la venta.");
+        }
+      } catch (err) {
+        console.error("Error al anular venta:", err);
+        alert("Error de conexión al anular venta.");
+      }
+    };
+
+    // 9. PROCESAR CHECKOUT (FACTURAR Y GUARDAR EN LA BD)
+    window.processCheckout = async function() {
+      const rows = document.querySelectorAll(".cart-row");
+      if (rows.length === 0) {
+        showPosToast("El ticket está vacío. Agrega productos o servicios antes de procesar.", "warning");
+        return;
+      }
+
+      const items: any[] = [];
+      let calculatedTotal = 0;
+
+      rows.forEach((row) => {
+        const id = row.getAttribute("data-id") || null;
+        const sku = row.getAttribute("data-sku") || "";
+        const tipo = row.getAttribute("data-tipo") || "FISICO";
+        const nombre = row.getAttribute("data-name") || row.querySelector(".cart-item-title")?.textContent?.trim() || "";
+        const precioUnit = parseFloat(row.getAttribute("data-price") || "0");
+        const qtyEl = row.querySelector(".item-qty");
+        const cantidad = parseInt(qtyEl?.textContent || "1", 10);
+        const subtotalItem = precioUnit * cantidad;
+
+        calculatedTotal += subtotalItem;
+        items.push({
+          id,
+          sku,
+          nombre,
+          tipo,
+          cantidad,
+          precio_unitario: precioUnit,
+          subtotal: subtotalItem
+        });
+      });
+
+      const activeCashier = loadCashierSession();
+      const metodoPago = getActivePaymentMethod();
+      const customerName = document.getElementById("currentCustomerName")?.textContent?.trim() || "Consumidor Final";
+
+      const btnCheckout = document.getElementById("btnCheckoutAction");
+      const btnCheckoutLabel = document.getElementById("btnCheckoutLabel");
+
+      try {
+        if (btnCheckout) btnCheckout.setAttribute("disabled", "true");
+        if (btnCheckoutLabel) btnCheckoutLabel.textContent = "Procesando venta...";
+
+        const res = await fetch(API_BASE, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            vendedor_nombre: activeCashier,
+            metodo_pago: metodoPago,
+            items: items,
+            subtotal: calculatedTotal,
+            impuestos: 0,
+            descuento: 0,
+            total: calculatedTotal,
+            cliente_nombre: customerName
+          })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showPosToast(`Venta #${json.data.folio_ticket} procesada y registrada con éxito!`, "success");
+          clearActiveCart();
+
+          const emptyCartEl = document.getElementById("cartEmptyState");
+          if (emptyCartEl) emptyCartEl.classList.remove("hidden");
+
+          // Recargar catálogo (actualiza existencias) e historial
+          loadPosCatalog();
+          loadSalesHistory("hoy");
+        } else {
+          alert(json.error || "No se pudo registrar la venta.");
+        }
+      } catch (err) {
+        console.error("Error al procesar venta:", err);
+        alert("Error de conexión al guardar la venta.");
+      } finally {
+        if (btnCheckout) btnCheckout.removeAttribute("disabled");
+        if (btnCheckoutLabel) btnCheckoutLabel.textContent = `Cobrar y Facturar ($ 0)`;
+      }
     };
 
     window.holdTicket = function() {
       showPosToast("Venta guardada en espera temporalmente.", "info");
       clearActiveCart();
+      const emptyCartEl = document.getElementById("cartEmptyState");
+      if (emptyCartEl) emptyCartEl.classList.remove("hidden");
     };
 
     window.resumeHeldTicket = function() {
       switchPosView("pos");
-      showPosToast("Orden #ESP-2024-0839 reanudada en terminal.");
+      showPosToast("Ticket reanudado en terminal.");
     };
 
-    // Hidratar nombre de vendedor según la sesión activa
-    function loadCashierSession() {
+    // 10. Hidratar nombre de vendedor según la sesión activa
+    function loadCashierSession(): string {
       try {
         const raw = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+        let name = "Carlos";
         if (raw) {
           const user = JSON.parse(raw);
-          const name = (user.name || user.nombre || "Luis Torres").trim();
-          const cashierEl = document.getElementById("pos-cashier-name");
-          if (cashierEl) cashierEl.textContent = name;
+          name = (user.name || user.nombre || user.usuario || "Carlos").trim();
         }
-      } catch (e) {}
+        const cashierEl = document.getElementById("pos-cashier-name");
+        if (cashierEl) cashierEl.textContent = name;
+        const ticketCashier = document.getElementById("ticket-cashier-name");
+        if (ticketCashier) ticketCashier.textContent = name;
+        const histCashier = document.getElementById("hist-active-cashier-label");
+        if (histCashier) histCashier.textContent = `Vendedor: ${name}`;
+        return name;
+      } catch (e) {
+        return "Carlos";
+      }
     }
 
-    // Inicializar eventos de teclado y componentes
+    // 11. Inicializar eventos y vistas
     function setupSales() {
       loadCashierSession();
       initVentas();
+      loadPosCatalog();
+      loadSalesHistory("hoy");
+
+      // Buscador en catálogo
       const searchInput = document.getElementById("productSearch");
       if (searchInput) {
         searchInput.addEventListener("input", filterProductsLive);
+      }
+
+      // Filtro de periodos en historial
+      const periodSelect = document.getElementById("history-period-select");
+      if (periodSelect) {
+        periodSelect.addEventListener("change", (e: any) => {
+          loadSalesHistory(e.target.value);
+        });
+      }
+
+      // Filtros de vendedor y estado en historial
+      const sellerSelect = document.getElementById("history-seller-select");
+      if (sellerSelect) {
+        sellerSelect.addEventListener("change", () => (window as any).refreshHistory());
+      }
+      const statusSelect = document.getElementById("history-status-select");
+      if (statusSelect) {
+        statusSelect.addEventListener("change", () => (window as any).refreshHistory());
+      }
+      const historySearch = document.getElementById("history-search");
+      if (historySearch) {
+        historySearch.addEventListener("input", () => (window as any).refreshHistory());
       }
     }
 
