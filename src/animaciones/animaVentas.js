@@ -149,7 +149,7 @@ export function recalcTicketTotals() {
   rows.forEach((r) => {
     const p = parseFloat(r.getAttribute("data-price") || "0");
     const qtyEl = r.querySelector(".item-qty");
-    const q = parseInt(qtyEl?.textContent || "0", 10);
+    const q = parseInt(qtyEl?.value || qtyEl?.textContent || "0", 10) || 0;
     subtotal += p * q;
     count += q;
   });
@@ -194,13 +194,17 @@ export function addProductToTicket(name, price, sku, category = "Producto", id =
   if (existingRow) {
     const qtyEl = existingRow.querySelector(".item-qty");
     if (qtyEl) {
-      let currentQty = parseInt(qtyEl.textContent || "1", 10);
+      let currentQty = parseInt(qtyEl.value || qtyEl.textContent || "1", 10);
       if (!isServicio && currentQty >= numStock) {
         showPosToast(`Stock máximo alcanzado (${numStock} unid.)`, "warning");
         return;
       }
       currentQty += 1;
-      qtyEl.textContent = `${currentQty}`;
+      if ("value" in qtyEl) {
+        qtyEl.value = String(currentQty);
+      } else {
+        qtyEl.textContent = String(currentQty);
+      }
       const itemTotalEl = existingRow.querySelector(".item-total");
       if (itemTotalEl) {
         itemTotalEl.textContent = formatCOP(numericPrice * currentQty);
@@ -239,9 +243,16 @@ export function addProductToTicket(name, price, sku, category = "Producto", id =
       </div>
       <div class="flex items-center gap-2 shrink-0">
         <div class="flex items-center bg-surface-container-lowest rounded-lg p-0.5 shadow-2xs border border-surface-container">
-          <button type="button" class="btn-qty-minus w-6 h-6 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded font-bold hover:bg-surface-container transition-colors cursor-pointer">-</button>
-          <span class="item-qty w-7 text-center text-[13px] font-bold text-on-surface">1</span>
-          <button type="button" class="btn-qty-plus w-6 h-6 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded font-bold hover:bg-surface-container transition-colors cursor-pointer">+</button>
+          <button type="button" class="btn-qty-minus w-6 h-6 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded font-bold hover:bg-surface-container transition-colors cursor-pointer select-none">-</button>
+          <input
+            type="number"
+            min="1"
+            max="${isServicio ? 9999 : numStock}"
+            value="1"
+            class="item-qty w-9 h-6 text-center text-[13px] font-bold text-on-surface bg-transparent border-0 focus:outline-none focus:bg-surface-container/40 rounded p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none cursor-text"
+            title="Ingresa cantidad (máx. ${isServicio ? 'Ilimitado' : numStock})"
+          />
+          <button type="button" class="btn-qty-plus w-6 h-6 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded font-bold hover:bg-surface-container transition-colors cursor-pointer select-none">+</button>
         </div>
         <span class="item-total text-[13px] font-bold text-on-surface w-20 text-right">${formatCOP(numericPrice)}</span>
         <button type="button" class="btn-remove-item p-1 text-on-surface-variant hover:text-error rounded-lg hover:bg-error-container/40 transition-colors cursor-pointer" title="Remover producto">
@@ -256,10 +267,19 @@ export function addProductToTicket(name, price, sku, category = "Producto", id =
     const btnMinus = newRow.querySelector(".btn-qty-minus");
     const btnPlus = newRow.querySelector(".btn-qty-plus");
     const btnRemove = newRow.querySelector(".btn-remove-item");
+    const qtyInput = newRow.querySelector(".item-qty");
 
     if (btnMinus) btnMinus.addEventListener("click", () => updateRowQuantity(newRow, -1));
     if (btnPlus) btnPlus.addEventListener("click", () => updateRowQuantity(newRow, 1));
     if (btnRemove) btnRemove.addEventListener("click", () => removeRowWithAnimation(newRow));
+
+    if (qtyInput) {
+      qtyInput.addEventListener("input", () => handleCustomQuantity(newRow, qtyInput));
+      qtyInput.addEventListener("blur", () => handleCustomQuantityBlur(newRow, qtyInput));
+      qtyInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") qtyInput.blur();
+      });
+    }
 
     gsap.fromTo(
       newRow,
@@ -273,6 +293,63 @@ export function addProductToTicket(name, price, sku, category = "Producto", id =
 }
 
 /**
+ * Valida y aplica una cantidad numérica escrita a mano por el usuario
+ */
+export function handleCustomQuantity(row, input) {
+  const totalEl = row.querySelector(".item-total");
+  const price = parseFloat(row.getAttribute("data-price") || "0");
+  const maxStock = parseInt(row.getAttribute("data-stock") || "999", 10);
+  const tipo = (row.getAttribute("data-tipo") || "").toUpperCase();
+
+  let val = parseInt(input.value, 10);
+
+  if (isNaN(val)) {
+    if (totalEl) totalEl.textContent = formatCOP(0);
+    return;
+  }
+
+  if (tipo !== "SERVICIO" && val > maxStock) {
+    val = maxStock;
+    input.value = String(val);
+    showPosToast(`Stock máximo alcanzado (${maxStock} unid.)`, "warning");
+  }
+
+  if (val < 0) {
+    val = 1;
+    input.value = "1";
+  }
+
+  if (totalEl) {
+    totalEl.textContent = formatCOP(price * val);
+  }
+  recalcTicketTotals();
+}
+
+export function handleCustomQuantityBlur(row, input) {
+  let val = parseInt(input.value, 10);
+  const maxStock = parseInt(row.getAttribute("data-stock") || "999", 10);
+  const tipo = (row.getAttribute("data-tipo") || "").toUpperCase();
+
+  if (isNaN(val) || val <= 0) {
+    val = 1;
+    input.value = "1";
+  }
+
+  if (tipo !== "SERVICIO" && val > maxStock) {
+    val = maxStock;
+    input.value = String(val);
+    showPosToast(`Stock máximo alcanzado (${maxStock} unid.)`, "warning");
+  }
+
+  const totalEl = row.querySelector(".item-total");
+  const price = parseFloat(row.getAttribute("data-price") || "0");
+  if (totalEl) {
+    totalEl.textContent = formatCOP(price * val);
+  }
+  recalcTicketTotals();
+}
+
+/**
  * Modifica la cantidad de un ítem en el carrito
  */
 export function updateRowQuantity(row, delta) {
@@ -283,18 +360,23 @@ export function updateRowQuantity(row, delta) {
   const tipo = (row.getAttribute("data-tipo") || "").toUpperCase();
   if (!qtyEl || !totalEl) return;
 
-  let currentQty = parseInt(qtyEl.textContent || "1", 10) + delta;
+  const currentVal = parseInt(qtyEl.value || qtyEl.textContent || "1", 10);
+  let nextQty = currentVal + delta;
 
-  if (delta > 0 && tipo !== "SERVICIO" && currentQty > maxStock) {
+  if (delta > 0 && tipo !== "SERVICIO" && nextQty > maxStock) {
     showPosToast(`Stock máximo alcanzado (${maxStock} unid.)`, "warning");
     return;
   }
 
-  if (currentQty <= 0) {
+  if (nextQty <= 0) {
     removeRowWithAnimation(row);
   } else {
-    qtyEl.textContent = `${currentQty}`;
-    totalEl.textContent = formatCOP(price * currentQty);
+    if ("value" in qtyEl) {
+      qtyEl.value = String(nextQty);
+    } else {
+      qtyEl.textContent = String(nextQty);
+    }
+    totalEl.textContent = formatCOP(price * nextQty);
     recalcTicketTotals();
   }
 }

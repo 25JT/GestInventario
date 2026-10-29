@@ -48,7 +48,7 @@ import NavBar from "../components/Nav.astro";
             <div class="hidden sm:flex items-center gap-1.5 bg-surface-container-low px-3 py-1.5 rounded-xl border border-surface-container/50">
               <span class="material-symbols-outlined text-[16px] text-secondary">badge</span>
               <span class="text-[11px] text-on-surface-variant">Vendedor:</span>
-              <span id="pos-cashier-name" class="text-[12px] font-semibold text-on-surface">Luis Torres</span>
+              <span id="pos-cashier-name" class="text-[12px] font-semibold text-on-surface">Cargando...</span>
               <span class="bg-tertiary-container/20 text-on-tertiary-container text-[10px] font-bold px-1.5 py-0.2 rounded-full">
                 Turno Activo
               </span>
@@ -145,7 +145,7 @@ import NavBar from "../components/Nav.astro";
                   </div>
                   <div class="flex items-center gap-1 text-[11px] text-on-surface-variant">
                     <span class="material-symbols-outlined text-[14px] text-secondary">person</span>
-                    <span>Atendido por: <strong class="text-on-surface font-semibold">Luis Torres</strong></span>
+                    <span>Atendido por: <strong id="ticket-cashier-name" class="text-on-surface font-semibold">Cargando...</strong></span>
                   </div>
                 </div>
                 <div class="flex flex-col items-end gap-0.5">
@@ -1032,8 +1032,8 @@ import NavBar from "../components/Nav.astro";
         const tipo = row.getAttribute("data-tipo") || "FISICO";
         const nombre = row.getAttribute("data-name") || row.querySelector(".cart-item-title")?.textContent?.trim() || "";
         const precioUnit = parseFloat(row.getAttribute("data-price") || "0");
-        const qtyEl = row.querySelector(".item-qty");
-        const cantidad = parseInt(qtyEl?.textContent || "1", 10);
+        const qtyEl = row.querySelector(".item-qty") as HTMLInputElement | null;
+        const cantidad = parseInt(qtyEl?.value || qtyEl?.textContent || "1", 10) || 1;
         const subtotalItem = precioUnit * cantidad;
 
         calculatedTotal += subtotalItem;
@@ -1113,11 +1113,21 @@ import NavBar from "../components/Nav.astro";
     function loadCashierSession(): string {
       try {
         const raw = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
-        let name = "Carlos";
+        let name = "";
         if (raw) {
           const user = JSON.parse(raw);
-          name = (user.name || user.nombre || user.usuario || "Carlos").trim();
+          const first = (user.name || user.nombre || (user.identifier ? user.identifier.split("@")[0] : "")).trim();
+          const last = (user.lastname || user.apellido || "").trim();
+          name = `${first} ${last}`.trim() || first;
         }
+        if (!name) {
+          const navName = document.querySelector("#user-display-name, [data-user-name]")?.textContent?.trim();
+          if (navName && !navName.includes("Cargando")) name = navName;
+        }
+        if (!name) {
+          name = "Carlos";
+        }
+
         const cashierEl = document.getElementById("pos-cashier-name");
         if (cashierEl) cashierEl.textContent = name;
         const ticketCashier = document.getElementById("ticket-cashier-name");
