@@ -348,7 +348,7 @@ const transactions = initialData?.transactions || [];
                 <div class="w-full relative pt-3">
                   <div class="flex items-center justify-between text-on-surface-variant text-[12px] mb-2 px-1">
                     <span id="chart-max-label" class="font-bold text-on-surface text-[13px]">
-                      Pico: {chartData.maxValorFormato}
+                      Pico Ventas (Mes): {chartData.picos?.ventas_formato || chartData.totales?.ventas_formato || chartData.maxValorFormato}
                     </span>
                     <div class="flex items-center gap-4 text-[12px]">
                       <div class="flex items-center gap-1.5">
@@ -408,9 +408,9 @@ const transactions = initialData?.transactions || [];
                         stroke-width="2.5"
                       ></path>
 
-                      <!-- Interactive Peak Indicators -->
-                      <circle id="peak-dot-1" cx="300" cy="55" fill="#316bf3" r="4.5" stroke="#ffffff" stroke-width="2"></circle>
-                      <circle id="peak-dot-2" cx="600" cy="20" fill="#00a472" r="5" stroke="#ffffff" stroke-width="2.5"></circle>
+                      <!-- Interactive Peak Indicators alineados al pico real -->
+                      <circle id="peak-dot-1" cx="400" cy="35" fill="#316bf3" r="4.5" stroke="#ffffff" stroke-width="2"></circle>
+                      <circle id="peak-dot-2" cx="400" cy="35" fill="#75777d" r="4" stroke="#ffffff" stroke-width="2"></circle>
                     </svg>
                   </div>
 
@@ -932,7 +932,7 @@ const transactions = initialData?.transactions || [];
         }
 
         // Animar la transición del gráfico con los datos reales del período
-        animateChartTransition(currentChartTab, chartData);
+        animateChartTransition(currentChartTab, chartData, currentPeriod);
       }
 
       // 4. Transacciones Registradas (filtradas por el período)
@@ -1043,7 +1043,7 @@ const transactions = initialData?.transactions || [];
         activeBtn.classList.remove("text-on-surface-variant");
       }
 
-      animateChartTransition(tab, lastChartData);
+      animateChartTransition(tab, lastChartData, currentPeriod);
     };
 
     // Toast de pedido rápido con GSAP

@@ -131,23 +131,28 @@ export function initDashboardAnimations() {
  * Animación suave de transición para el gráfico financiero interactivo
  * @param {'ventas' | 'gastos' | 'utilidad'} tab
  * @param {object} [dynamicData] Datos reales provenientes de la API
+ * @param {string} [currentPeriod] 'hoy' | 'semana' | 'mes'
  */
-export function animateChartTransition(tab, dynamicData = null) {
+export function animateChartTransition(tab, dynamicData = null, currentPeriod = "mes") {
   const chartSvg = document.getElementById("financial-svg-chart");
   const salesArea = document.getElementById("chart-sales-area");
   const salesLine = document.getElementById("chart-sales-line");
   const expenseArea = document.getElementById("chart-expense-area");
   const expenseLine = document.getElementById("chart-expense-line");
   const maxLabel = document.getElementById("chart-max-label");
+  const peakDot1 = document.getElementById("peak-dot-1");
+  const peakDot2 = document.getElementById("peak-dot-2");
 
   if (!chartSvg) return;
+
+  const periodoTxt = currentPeriod === "hoy" ? "Hoy" : currentPeriod === "semana" ? "Semana" : "Mes";
 
   // Curvas dinámicas si existen, o curvas de respaldo
   let salesAreaD = "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20 L 600,160 L 0,160 Z";
   let salesLineD = "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20";
   let expenseAreaD = "M 0,110 Q 75,95 150,115 T 300,105 T 450,120 T 600,95 L 600,160 L 0,160 Z";
   let expenseLineD = "M 0,110 Q 75,95 150,115 T 300,105 T 450,120 T 600,95";
-  let maxText = "$ 50.000";
+  let maxText = `Pico Ventas (${periodoTxt}): $ 50.000`;
   let showExpense = true;
 
   if (dynamicData && dynamicData.svg) {
@@ -156,38 +161,98 @@ export function animateChartTransition(tab, dynamicData = null) {
       salesLineD = dynamicData.svg.sales?.line || salesLineD;
       expenseAreaD = dynamicData.svg.expense?.area || expenseAreaD;
       expenseLineD = dynamicData.svg.expense?.line || expenseLineD;
-      maxText = `Pico: ${dynamicData.maxValorFormato}`;
+
+      const pVentas = dynamicData.picos?.ventas_formato || dynamicData.totales?.ventas_formato || "$ 0";
+      maxText = `Pico Ventas (${periodoTxt}): ${pVentas}`;
       showExpense = true;
+
+      // Colocar dot 1 exactamente sobre el pico de ventas
+      if (peakDot1) {
+        const p = dynamicData.svg.sales?.peak;
+        if (p && p.hasPeak) {
+          peakDot1.setAttribute("cx", String(p.x));
+          peakDot1.setAttribute("cy", String(p.y));
+          peakDot1.setAttribute("fill", "#316bf3");
+          peakDot1.style.display = "";
+        } else {
+          peakDot1.style.display = "none";
+        }
+      }
+
+      // Colocar dot 2 sobre el pico de gastos
+      if (peakDot2) {
+        const pG = dynamicData.svg.expense?.peak;
+        if (pG && pG.hasPeak) {
+          peakDot2.setAttribute("cx", String(pG.x));
+          peakDot2.setAttribute("cy", String(pG.y));
+          peakDot2.setAttribute("fill", "#75777d");
+          peakDot2.style.display = "";
+        } else {
+          peakDot2.style.display = "none";
+        }
+      }
     } else if (tab === "gastos") {
       salesAreaD = dynamicData.svg.expense?.area || salesAreaD;
       salesLineD = dynamicData.svg.expense?.line || salesLineD;
-      maxText = `Total Gastos: ${dynamicData.totales?.gastos_formato || dynamicData.maxValorFormato}`;
+
+      const pGastos = dynamicData.picos?.gastos_formato || dynamicData.totales?.gastos_formato || "$ 0";
+      maxText = `Pico Gastos (${periodoTxt}): ${pGastos}`;
       showExpense = false;
+
+      // Dot 1 sobre el pico de gastos
+      if (peakDot1) {
+        const p = dynamicData.svg.expense?.peak;
+        if (p && p.hasPeak) {
+          peakDot1.setAttribute("cx", String(p.x));
+          peakDot1.setAttribute("cy", String(p.y));
+          peakDot1.setAttribute("fill", "#75777d");
+          peakDot1.style.display = "";
+        } else {
+          peakDot1.style.display = "none";
+        }
+      }
+      if (peakDot2) peakDot2.style.display = "none";
     } else if (tab === "utilidad") {
       salesAreaD = dynamicData.svg.utilidad?.area || salesAreaD;
       salesLineD = dynamicData.svg.utilidad?.line || salesLineD;
       expenseAreaD = dynamicData.svg.expense?.area || expenseAreaD;
       expenseLineD = dynamicData.svg.expense?.line || expenseLineD;
-      maxText = `Balance: ${dynamicData.totales?.utilidad_formato || dynamicData.maxValorFormato}`;
+
+      const pUtilidad = dynamicData.totales?.utilidad_formato || "$ 0";
+      maxText = `Balance Neto (${periodoTxt}): ${pUtilidad}`;
       showExpense = true;
+
+      // Dot 1 sobre el pico de balance
+      if (peakDot1) {
+        const p = dynamicData.svg.utilidad?.peak;
+        if (p && p.hasPeak) {
+          peakDot1.setAttribute("cx", String(p.x));
+          peakDot1.setAttribute("cy", String(p.y));
+          peakDot1.setAttribute("fill", "#00a472");
+          peakDot1.style.display = "";
+        } else {
+          peakDot1.style.display = "none";
+        }
+      }
+      if (peakDot2) peakDot2.style.display = "none";
     }
   } else {
-    // Curvas estáticas representativas de fallback
+    // Curvas estáticas de fallback
     const curves = {
       ventas: {
-        max: "$ 50.000",
+        max: `Pico Ventas (${periodoTxt}): $ 50.000`,
         salesArea: "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20 L 600,160 L 0,160 Z",
         salesLine: "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20",
         showExpense: true,
       },
       gastos: {
-        max: "$ 25.000",
+        max: `Pico Gastos (${periodoTxt}): $ 25.000`,
         salesArea: "M 0,140 Q 80,105 160,115 T 320,85 T 460,95 T 600,70 L 600,160 L 0,160 Z",
         salesLine: "M 0,140 Q 80,105 160,115 T 320,85 T 460,95 T 600,70",
         showExpense: false,
       },
       utilidad: {
-        max: "$ 40.000",
+        max: `Balance Neto (${periodoTxt}): $ 40.000`,
         salesArea: "M 0,120 Q 80,50 160,65 T 320,30 T 460,40 T 600,15 L 600,160 L 0,160 Z",
         salesLine: "M 0,120 Q 80,50 160,65 T 320,30 T 460,40 T 600,15",
         showExpense: true,
