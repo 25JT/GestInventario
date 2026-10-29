@@ -75,7 +75,22 @@ const stockAlerts = initialData?.stockAlerts || [
 ];
 
 const chartData = initialData?.chartData || {
-  maxValorFormato: "$ 152.000",
+  picos: {
+    ventas: 34500,
+    ventas_formato: "$ 34.500",
+    gastos: 152000,
+    gastos_formato: "$ 152.000",
+    utilidad: 0,
+    utilidad_formato: "$ 0",
+  },
+  totales: {
+    ventas: 34500,
+    ventas_formato: "$ 34.500",
+    gastos: 152000,
+    gastos_formato: "$ 152.000",
+    utilidad: -117500,
+    utilidad_formato: "-$ 117.500",
+  },
   desglose: {
     productos_formato: "$ 9.500",
     servicios_formato: "$ 25.000",
@@ -348,7 +363,7 @@ const transactions = initialData?.transactions || [];
                 <div class="w-full relative pt-3">
                   <div class="flex items-center justify-between text-on-surface-variant text-[12px] mb-2 px-1">
                     <span id="chart-max-label" class="font-bold text-on-surface text-[13px]">
-                      Pico Ventas (Mes): {chartData.picos?.ventas_formato || chartData.totales?.ventas_formato || chartData.maxValorFormato}
+                      Pico: {chartData.picos?.ventas_formato || chartData.totales?.ventas_formato || "$ 0"}
                     </span>
                     <div class="flex items-center gap-4 text-[12px]">
                       <div class="flex items-center gap-1.5">
@@ -382,12 +397,12 @@ const transactions = initialData?.transactions || [];
                       <!-- Expenses Area -->
                       <path
                         id="chart-expense-area"
-                        d="M 0,110 Q 75,95 150,115 T 300,105 T 450,120 T 600,95 L 600,160 L 0,160 Z"
+                        d={chartData.svg?.expense?.area || "M 0,110 Q 75,95 150,115 T 300,105 T 450,120 T 600,95 L 600,160 L 0,160 Z"}
                         fill="url(#expenseGrad)"
                       ></path>
                       <path
                         id="chart-expense-line"
-                        d="M 0,110 Q 75,95 150,115 T 300,105 T 450,120 T 600,95"
+                        d={chartData.svg?.expense?.line || "M 0,110 Q 75,95 150,115 T 300,105 T 450,120 T 600,95"}
                         fill="none"
                         stroke="#75777d"
                         stroke-dasharray="3,3"
@@ -397,20 +412,38 @@ const transactions = initialData?.transactions || [];
                       <!-- Sales Area -->
                       <path
                         id="chart-sales-area"
-                        d="M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20 L 600,160 L 0,160 Z"
+                        d={chartData.svg?.sales?.area || "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20 L 600,160 L 0,160 Z"}
                         fill="url(#salesGrad)"
                       ></path>
                       <path
                         id="chart-sales-line"
-                        d="M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20"
+                        d={chartData.svg?.sales?.line || "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20"}
                         fill="none"
                         stroke="#316bf3"
                         stroke-width="2.5"
                       ></path>
 
                       <!-- Interactive Peak Indicators alineados al pico real -->
-                      <circle id="peak-dot-1" cx="400" cy="35" fill="#316bf3" r="4.5" stroke="#ffffff" stroke-width="2"></circle>
-                      <circle id="peak-dot-2" cx="400" cy="35" fill="#75777d" r="4" stroke="#ffffff" stroke-width="2"></circle>
+                      <circle 
+                        id="peak-dot-1" 
+                        cx={chartData.svg?.sales?.peak?.x ?? 400} 
+                        cy={chartData.svg?.sales?.peak?.y ?? 124} 
+                        fill="#316bf3" 
+                        r="4.5" 
+                        stroke="#ffffff" 
+                        stroke-width="2"
+                        style={chartData.svg?.sales?.peak?.hasPeak ? "" : "display: none;"}
+                      ></circle>
+                      <circle 
+                        id="peak-dot-2" 
+                        cx={chartData.svg?.expense?.peak?.x ?? 400} 
+                        cy={chartData.svg?.expense?.peak?.y ?? 35} 
+                        fill="#75777d" 
+                        r="4" 
+                        stroke="#ffffff" 
+                        stroke-width="2"
+                        style={chartData.svg?.expense?.peak?.hasPeak ? "" : "display: none;"}
+                      ></circle>
                     </svg>
                   </div>
 
@@ -905,9 +938,19 @@ const transactions = initialData?.transactions || [];
       if (chartData) {
         lastChartData = chartData;
 
+        // Actualizar etiqueta del pico dinámicamente según la pestaña activa y período
         const maxLabel = document.getElementById("chart-max-label");
-        if (maxLabel && chartData.maxValorFormato) {
-          maxLabel.textContent = `Pico: ${chartData.maxValorFormato}`;
+        if (maxLabel) {
+          if (currentChartTab === "ventas") {
+            const pV = chartData.picos?.ventas_formato || chartData.totales?.ventas_formato || "$ 0";
+            maxLabel.textContent = `Pico: ${pV}`;
+          } else if (currentChartTab === "gastos") {
+            const pG = chartData.picos?.gastos_formato || chartData.totales?.gastos_formato || "$ 0";
+            maxLabel.textContent = `Pico: ${pG}`;
+          } else if (currentChartTab === "utilidad") {
+            const pU = chartData.totales?.utilidad_formato || chartData.picos?.utilidad_formato || "$ 0";
+            maxLabel.textContent = `Pico: ${pU}`;
+          }
         }
 
         const prodVal = document.getElementById("chart-productos-val");
@@ -1041,6 +1084,21 @@ const transactions = initialData?.transactions || [];
       if (activeBtn) {
         activeBtn.classList.add("bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
         activeBtn.classList.remove("text-on-surface-variant");
+      }
+
+      // Actualizar el pico inmediatamente si ya tenemos datos cargados
+      const maxLabel = document.getElementById("chart-max-label");
+      if (maxLabel && lastChartData) {
+        if (tab === "ventas") {
+          const pV = lastChartData.picos?.ventas_formato || lastChartData.totales?.ventas_formato || "$ 0";
+          maxLabel.textContent = `Pico: ${pV}`;
+        } else if (tab === "gastos") {
+          const pG = lastChartData.picos?.gastos_formato || lastChartData.totales?.gastos_formato || "$ 0";
+          maxLabel.textContent = `Pico: ${pG}`;
+        } else if (tab === "utilidad") {
+          const pU = lastChartData.totales?.utilidad_formato || lastChartData.picos?.utilidad_formato || "$ 0";
+          maxLabel.textContent = `Pico: ${pU}`;
+        }
       }
 
       animateChartTransition(tab, lastChartData, currentPeriod);

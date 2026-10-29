@@ -152,7 +152,7 @@ export function animateChartTransition(tab, dynamicData = null, currentPeriod = 
   let salesLineD = "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20";
   let expenseAreaD = "M 0,110 Q 75,95 150,115 T 300,105 T 450,120 T 600,95 L 600,160 L 0,160 Z";
   let expenseLineD = "M 0,110 Q 75,95 150,115 T 300,105 T 450,120 T 600,95";
-  let maxText = `Pico Ventas (${periodoTxt}): $ 50.000`;
+  let maxText = "Pico: $ 50.000";
   let showExpense = true;
 
   if (dynamicData && dynamicData.svg) {
@@ -163,7 +163,7 @@ export function animateChartTransition(tab, dynamicData = null, currentPeriod = 
       expenseLineD = dynamicData.svg.expense?.line || expenseLineD;
 
       const pVentas = dynamicData.picos?.ventas_formato || dynamicData.totales?.ventas_formato || "$ 0";
-      maxText = `Pico Ventas (${periodoTxt}): ${pVentas}`;
+      maxText = `Pico: ${pVentas}`;
       showExpense = true;
 
       // Colocar dot 1 exactamente sobre el pico de ventas
@@ -196,7 +196,7 @@ export function animateChartTransition(tab, dynamicData = null, currentPeriod = 
       salesLineD = dynamicData.svg.expense?.line || salesLineD;
 
       const pGastos = dynamicData.picos?.gastos_formato || dynamicData.totales?.gastos_formato || "$ 0";
-      maxText = `Pico Gastos (${periodoTxt}): ${pGastos}`;
+      maxText = `Pico: ${pGastos}`;
       showExpense = false;
 
       // Dot 1 sobre el pico de gastos
@@ -218,9 +218,9 @@ export function animateChartTransition(tab, dynamicData = null, currentPeriod = 
       expenseAreaD = dynamicData.svg.expense?.area || expenseAreaD;
       expenseLineD = dynamicData.svg.expense?.line || expenseLineD;
 
-      const pUtilidad = dynamicData.totales?.utilidad_formato || "$ 0";
-      maxText = `Balance Neto (${periodoTxt}): ${pUtilidad}`;
-      showExpense = true;
+      const pUtilidad = dynamicData.totales?.utilidad_formato || dynamicData.picos?.utilidad_formato || "$ 0";
+      maxText = `Pico: ${pUtilidad}`;
+      showExpense = false;
 
       // Dot 1 sobre el pico de balance
       if (peakDot1) {
@@ -240,22 +240,22 @@ export function animateChartTransition(tab, dynamicData = null, currentPeriod = 
     // Curvas estáticas de fallback
     const curves = {
       ventas: {
-        max: `Pico Ventas (${periodoTxt}): $ 50.000`,
+        max: "Pico: $ 50.000",
         salesArea: "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20 L 600,160 L 0,160 Z",
         salesLine: "M 0,130 Q 80,70 160,80 T 320,40 T 460,55 T 600,20",
         showExpense: true,
       },
       gastos: {
-        max: `Pico Gastos (${periodoTxt}): $ 25.000`,
+        max: "Pico: $ 25.000",
         salesArea: "M 0,140 Q 80,105 160,115 T 320,85 T 460,95 T 600,70 L 600,160 L 0,160 Z",
         salesLine: "M 0,140 Q 80,105 160,115 T 320,85 T 460,95 T 600,70",
         showExpense: false,
       },
       utilidad: {
-        max: `Balance Neto (${periodoTxt}): $ 40.000`,
+        max: "Pico: $ 40.000",
         salesArea: "M 0,120 Q 80,50 160,65 T 320,30 T 460,40 T 600,15 L 600,160 L 0,160 Z",
         salesLine: "M 0,120 Q 80,50 160,65 T 320,30 T 460,40 T 600,15",
-        showExpense: true,
+        showExpense: false,
       },
     };
     const selected = curves[tab] || curves.ventas;
