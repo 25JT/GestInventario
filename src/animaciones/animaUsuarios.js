@@ -131,6 +131,46 @@ export function filterRoleTab(roleKey, btn) {
 }
 
 /**
+ * Filtrado de usuarios según buscador, sucursal y estado
+ */
+export function applyUserFilters() {
+  const searchInput = document.getElementById("user-search");
+  const branchSelect = document.getElementById("user-branch-filter");
+  const statusSelect = document.getElementById("user-status-filter");
+
+  const q = (searchInput?.value || "").toLowerCase().trim();
+  const branch = (branchSelect?.value || "").toLowerCase().trim();
+  const status = (statusSelect?.value || "").toLowerCase().trim();
+
+  const rows = document.querySelectorAll(".user-row");
+  let visibleCount = 0;
+
+  rows.forEach((row) => {
+    const text = row.textContent?.toLowerCase() || "";
+    const rowBranch = (row.getAttribute("data-branch") || "").toLowerCase();
+    const rowStatus = (row.getAttribute("data-status") || "").toLowerCase();
+
+    const matchesQ = !q || text.includes(q);
+    const matchesBranch = !branch || branch === "sucursal: todas" || rowBranch.includes(branch);
+    const matchesStatus = !status || status === "todos los estados" || rowStatus.includes(status);
+
+    if (matchesQ && matchesBranch && matchesStatus) {
+      row.style.display = "";
+      visibleCount++;
+    } else {
+      row.style.display = "none";
+    }
+  });
+
+  const countEl = document.getElementById("user-visible-count");
+  if (countEl) countEl.textContent = `${visibleCount}`;
+}
+
+if (typeof window !== "undefined") {
+  window.applyUserFilters = applyUserFilters;
+}
+
+/**
  * Inicialización de micro-animaciones, eventos y filtros
  */
 export function initUsuarios() {
@@ -151,35 +191,6 @@ export function initUsuarios() {
   const branchSelect = document.getElementById("user-branch-filter");
   const statusSelect = document.getElementById("user-status-filter");
   const resetBtn = document.getElementById("btn-reset-user-filters");
-
-  function applyUserFilters() {
-    const q = (searchInput?.value || "").toLowerCase().trim();
-    const branch = (branchSelect?.value || "").toLowerCase().trim();
-    const status = (statusSelect?.value || "").toLowerCase().trim();
-
-    const rows = document.querySelectorAll(".user-row");
-    let visibleCount = 0;
-
-    rows.forEach((row) => {
-      const text = row.textContent?.toLowerCase() || "";
-      const rowBranch = (row.getAttribute("data-branch") || "").toLowerCase();
-      const rowStatus = (row.getAttribute("data-status") || "").toLowerCase();
-
-      const matchesQ = !q || text.includes(q);
-      const matchesBranch = !branch || branch === "sucursal: todas" || rowBranch.includes(branch);
-      const matchesStatus = !status || status === "todos los estados" || rowStatus.includes(status);
-
-      if (matchesQ && matchesBranch && matchesStatus) {
-        row.style.display = "";
-        visibleCount++;
-      } else {
-        row.style.display = "none";
-      }
-    });
-
-    const countEl = document.getElementById("user-visible-count");
-    if (countEl) countEl.textContent = `${visibleCount}`;
-  }
 
   if (searchInput) searchInput.addEventListener("input", applyUserFilters);
   if (branchSelect) branchSelect.addEventListener("change", applyUserFilters);

@@ -53,18 +53,18 @@ import InvitacionToken from "../components/InvitacionToken.astro";
               <span class="text-[13px] font-medium text-on-surface-variant">Cuentas Activas</span>
               <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-surface-container-low text-on-tertiary-container text-[12px] font-medium">
                 <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container animate-pulse"></span>
-                12 en turno hoy
+                <span id="metric-en-turno-text">1 en turno hoy</span>
               </span>
             </div>
             <div class="flex items-baseline justify-between mt-3 mb-1">
-              <span class="text-[30px] font-bold text-primary tracking-tight">18</span>
+              <span id="metric-total-active" class="text-[30px] font-bold text-primary tracking-tight">3</span>
               <div class="w-9 h-9 rounded-xl bg-surface-container-low flex items-center justify-center text-secondary">
                 <span class="material-symbols-outlined text-[20px]">badge</span>
               </div>
             </div>
             <div class="flex items-center gap-1.5 text-[12px] text-on-surface-variant">
               <span class="material-symbols-outlined text-[15px] text-on-tertiary-container">check_circle</span>
-              <span>100% validadas en nómina</span>
+              <span id="metric-nomina-text">100% validadas en nómina</span>
             </div>
           </div>
 
@@ -78,36 +78,36 @@ import InvitacionToken from "../components/InvitacionToken.astro";
             </div>
             <div class="flex items-baseline justify-between mt-3 mb-1">
               <div class="flex items-baseline gap-1.5">
-                <span class="text-[30px] font-bold text-primary tracking-tight">3</span>
+                <span id="metric-niveles-count" class="text-[30px] font-bold text-primary tracking-tight">3</span>
                 <span class="text-[14px] text-on-surface-variant font-medium">Niveles</span>
               </div>
               <div class="w-9 h-9 rounded-xl bg-surface-container-low flex items-center justify-center text-secondary">
                 <span class="material-symbols-outlined text-[20px]">account_tree</span>
               </div>
             </div>
-            <div class="text-[12px] text-on-surface-variant truncate">
-              Jefe: <span class="font-semibold text-on-surface">2</span> • Admin: <span class="font-semibold text-on-surface">6</span> • POS: <span class="font-semibold text-on-surface">10</span>
+            <div id="metric-roles-breakdown" class="text-[12px] text-on-surface-variant truncate">
+              Jefe: <span class="font-semibold text-on-surface">2</span> • Admin: <span class="font-semibold text-on-surface">0</span> • POS: <span class="font-semibold text-on-surface">1</span>
             </div>
           </div>
 
           <!-- Métrica 3 -->
           <div class="user-metric-card bg-surface-container-lowest p-5 rounded-2xl border border-surface-container/60 shadow-xs flex flex-col justify-between transition-all">
             <div class="flex items-center justify-between">
-              <span class="text-[13px] font-medium text-on-surface-variant">Seguridad 2FA &amp; Sesiones</span>
+              <span class="text-[13px] font-medium text-on-surface-variant">Seguridad 2FA &amp; Tokens</span>
               <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-surface-container-low text-on-tertiary-container text-[12px] font-semibold">
                 <span class="material-symbols-outlined text-[14px]">shield</span>
                 Seguro
               </span>
             </div>
             <div class="flex items-baseline justify-between mt-3 mb-1">
-              <span class="text-[30px] font-bold text-primary tracking-tight">100%</span>
+              <span id="metric-security-pct" class="text-[30px] font-bold text-primary tracking-tight">100%</span>
               <div class="w-9 h-9 rounded-xl bg-surface-container-low flex items-center justify-center text-secondary">
                 <span class="material-symbols-outlined text-[20px]">enhanced_encryption</span>
               </div>
             </div>
             <div class="flex items-center gap-1.5 text-[12px] text-on-surface-variant">
               <span class="material-symbols-outlined text-[15px] text-on-surface-variant">key</span>
-              <span>Tokens criptográficos hardware</span>
+              <span id="metric-tokens-text">Tokens criptográficos hardware</span>
             </div>
           </div>
         </section>
@@ -122,7 +122,7 @@ import InvitacionToken from "../components/InvitacionToken.astro";
               onclick="window.filterRoleTab('all', this)"
             >
               <span>Todos los Usuarios</span>
-              <span class="px-1.5 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-[11px]">18</span>
+              <span id="tab-count-all" class="px-1.5 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-[11px]">3</span>
             </button>
             <button
               class="role-tab-btn px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface text-[12px] font-medium transition-all flex items-center gap-2 cursor-pointer"
@@ -130,7 +130,7 @@ import InvitacionToken from "../components/InvitacionToken.astro";
               onclick="window.filterRoleTab('jefe', this)"
             >
               <span>Jefes / Admins</span>
-              <span class="px-1.5 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-[11px]">2</span>
+              <span id="tab-count-jefe" class="px-1.5 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-[11px]">2</span>
             </button>
             <button
               class="role-tab-btn px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface text-[12px] font-medium transition-all flex items-center gap-2 cursor-pointer"
@@ -138,7 +138,7 @@ import InvitacionToken from "../components/InvitacionToken.astro";
               onclick="window.filterRoleTab('admin', this)"
             >
               <span>Administrativos</span>
-              <span class="px-1.5 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-[11px]">6</span>
+              <span id="tab-count-admin" class="px-1.5 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-[11px]">0</span>
             </button>
             <button
               class="role-tab-btn px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface text-[12px] font-medium transition-all flex items-center gap-2 cursor-pointer"
@@ -146,7 +146,7 @@ import InvitacionToken from "../components/InvitacionToken.astro";
               onclick="window.filterRoleTab('pos', this)"
             >
               <span>Vendedores POS</span>
-              <span class="px-1.5 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-[11px]">10</span>
+              <span id="tab-count-pos" class="px-1.5 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-[11px]">1</span>
             </button>
           </div>
 
@@ -168,10 +168,6 @@ import InvitacionToken from "../components/InvitacionToken.astro";
                   class="h-[36px] pl-3 pr-8 bg-surface text-on-surface rounded-xl text-[13px] font-medium border border-surface-container/60 appearance-none focus:outline-none cursor-pointer"
                 >
                   <option value="Sucursal: Todas">Sucursal: Todas</option>
-                  <option value="Central Sucursal 01">Central Sucursal 01</option>
-                  <option value="Punto Norte">Punto Norte</option>
-                  <option value="Depósito Central">Depósito Central</option>
-                  <option value="Sucursal Este">Sucursal Este</option>
                 </select>
                 <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px] pointer-events-none">expand_more</span>
               </div>
@@ -181,7 +177,7 @@ import InvitacionToken from "../components/InvitacionToken.astro";
                   class="h-[36px] pl-3 pr-8 bg-surface text-on-surface rounded-xl text-[13px] font-medium border border-surface-container/60 appearance-none focus:outline-none cursor-pointer"
                 >
                   <option value="Todos los estados">Todos los estados</option>
-                  <option value="activo" selected>Estado: Activo</option>
+                  <option value="activo">Estado: Activo</option>
                   <option value="inactivo">Inactivos</option>
                   <option value="bloqueado">Bloqueados</option>
                 </select>
@@ -216,564 +212,13 @@ import InvitacionToken from "../components/InvitacionToken.astro";
                   <th class="px-4 py-2 text-right font-semibold">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-surface-container/40">
-                <!-- Fila 1: Carlos Mendoza -->
-                <tr
-                  class="user-row hover:bg-surface-container-low/70 transition-colors group"
-                  data-role-type="jefe"
-                  data-branch="Central Sucursal 01"
-                  data-status="activo"
-                >
-                  <td class="px-4 py-3">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] font-semibold text-primary">Carlos Mendoza</span>
-                      <span class="text-[11px] text-on-surface-variant">@carlos.mendoza • <span class="font-mono">ID-00101</span></span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] text-on-surface font-mono">c.mendoza@stockcontrol.internal</span>
-                      <span class="text-[11px] text-on-surface-variant font-mono">+54 11 4820-9921</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary-container text-on-primary text-[11px] font-semibold shadow-xs">
-                      <span class="material-symbols-outlined text-[13px]">verified_user</span>
-                      Jefe / SuperAdmin
+              <tbody id="users-table-body" class="divide-y divide-surface-container/40">
+                <tr>
+                  <td colspan="7" class="px-4 py-8 text-center text-on-surface-variant text-[13px]">
+                    <span class="inline-flex items-center gap-2">
+                      <span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
+                      <span>Cargando directorio de usuarios y roles desde la base de datos...</span>
                     </span>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex items-center gap-1.5 text-on-surface text-[12px]">
-                      <span class="material-symbols-outlined text-[16px] text-on-surface-variant">store</span>
-                      <span>Central Sucursal 01</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 text-[11px] text-on-tertiary-container font-semibold">
-                      <span class="w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"></span>
-                      En línea ahora
-                    </span>
-                  </td>
-                  <td class="px-4 py-3 text-right">
-                    <div class="inline-flex items-center gap-1">
-                      <button
-                        onclick="window.showUserToast('Abriendo edición de Carlos Mendoza...', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Editar credenciales"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Matriz de permisos: Acceso Total SuperAdmin', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Matriz de Permisos"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">vpn_key</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Registro de auditoría verificado: 0 incidencias.', 'success')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Auditoría de seguridad"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">lock</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Fila 2: Lucía Herrera -->
-                <tr
-                  class="user-row hover:bg-surface-container-low/70 transition-colors group"
-                  data-role-type="admin"
-                  data-branch="Central Sucursal 01"
-                  data-status="activo"
-                >
-                  <td class="px-4 py-3">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] font-semibold text-primary">Lucía Herrera</span>
-                      <span class="text-[11px] text-on-surface-variant">@lucia.herrera • <span class="font-mono">ID-00104</span></span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] text-on-surface font-mono">l.herrera@stockcontrol.internal</span>
-                      <span class="text-[11px] text-on-surface-variant font-mono">+54 11 4820-9942</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-high text-secondary text-[11px] font-semibold">
-                      <span class="material-symbols-outlined text-[13px]">manage_accounts</span>
-                      Administrativo Operativo
-                    </span>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex items-center gap-1.5 text-on-surface text-[12px]">
-                      <span class="material-symbols-outlined text-[16px] text-on-surface-variant">store</span>
-                      <span>Central Sucursal 01</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 text-[11px] text-on-tertiary-container font-semibold">
-                      <span class="w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"></span>
-                      En línea ahora
-                    </span>
-                  </td>
-                  <td class="px-4 py-3 text-right">
-                    <div class="inline-flex items-center gap-1">
-                      <button
-                        onclick="window.showUserToast('Abriendo edición de Lucía Herrera...', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Editar credenciales"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Matriz de permisos: Compras e Inventario', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Matriz de Permisos"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">vpn_key</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Auditoría Lucía Herrera: 2FA Activo.', 'success')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Auditoría de seguridad"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">lock</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Fila 3: Luis Torres -->
-                <tr
-                  class="user-row hover:bg-surface-container-low/70 transition-colors group"
-                  data-role-type="pos"
-                  data-branch="Central Sucursal 01"
-                  data-status="activo"
-                >
-                  <td class="px-4 py-3">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] font-semibold text-primary">Luis Torres</span>
-                      <span class="text-[11px] text-on-surface-variant">@luis.torres • <span class="font-mono">ID-00215</span></span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] text-on-surface font-mono">l.torres@stockcontrol.internal</span>
-                      <span class="text-[11px] text-on-surface-variant font-mono">+54 11 5110-3301</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant text-[11px] font-semibold">
-                      <span class="material-symbols-outlined text-[13px]">point_of_sale</span>
-                      Vendedor POS 01
-                    </span>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex items-center gap-1.5 text-on-surface text-[12px]">
-                      <span class="material-symbols-outlined text-[16px] text-on-surface-variant">store</span>
-                      <span>Central Sucursal 01</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 text-[11px] text-on-tertiary-container font-semibold">
-                      <span class="w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"></span>
-                      En línea ahora
-                    </span>
-                  </td>
-                  <td class="px-4 py-3 text-right">
-                    <div class="inline-flex items-center gap-1">
-                      <button
-                        onclick="window.showUserToast('Abriendo edición de Luis Torres...', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Editar credenciales"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Matriz de permisos: Terminal POS y Facturación', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Matriz de Permisos"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">vpn_key</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Auditoría Luis Torres OK.', 'success')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Auditoría de seguridad"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">lock</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Fila 4: Elena Gómez -->
-                <tr
-                  class="user-row hover:bg-surface-container-low/70 transition-colors group"
-                  data-role-type="pos"
-                  data-branch="Punto Norte"
-                  data-status="activo"
-                >
-                  <td class="px-4 py-3">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] font-semibold text-primary">Elena Gómez</span>
-                      <span class="text-[11px] text-on-surface-variant">@elena.gomez • <span class="font-mono">ID-00219</span></span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] text-on-surface font-mono">e.gomez@stockcontrol.internal</span>
-                      <span class="text-[11px] text-on-surface-variant font-mono">+54 11 5110-3304</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant text-[11px] font-semibold">
-                      <span class="material-symbols-outlined text-[13px]">point_of_sale</span>
-                      Vendedor POS 02
-                    </span>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex items-center gap-1.5 text-on-surface text-[12px]">
-                      <span class="material-symbols-outlined text-[16px] text-on-surface-variant">domain</span>
-                      <span>Punto Norte</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 text-[11px] text-on-surface-variant font-medium">
-                      <span class="w-2 h-2 rounded-full bg-outline-variant"></span>
-                      Hace 45 min
-                    </span>
-                  </td>
-                  <td class="px-4 py-3 text-right">
-                    <div class="inline-flex items-center gap-1">
-                      <button
-                        onclick="window.showUserToast('Abriendo edición de Elena Gómez...', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Editar credenciales"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Matriz de permisos: Terminal POS Sucursal Norte', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Matriz de Permisos"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">vpn_key</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Auditoría Elena Gómez OK.', 'success')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Auditoría de seguridad"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">lock</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Fila 5: Martín Ramos -->
-                <tr
-                  class="user-row hover:bg-surface-container-low/70 transition-colors group"
-                  data-role-type="admin"
-                  data-branch="Depósito Central"
-                  data-status="activo"
-                >
-                  <td class="px-4 py-3">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] font-semibold text-primary">Martín Ramos</span>
-                      <span class="text-[11px] text-on-surface-variant">@martin.ramos • <span class="font-mono">ID-00108</span></span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] text-on-surface font-mono">m.ramos@stockcontrol.internal</span>
-                      <span class="text-[11px] text-on-surface-variant font-mono">+54 11 4820-9975</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-high text-secondary text-[11px] font-semibold">
-                      <span class="material-symbols-outlined text-[13px]">warehouse</span>
-                      Administrativo Logística
-                    </span>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex items-center gap-1.5 text-on-surface text-[12px]">
-                      <span class="material-symbols-outlined text-[16px] text-on-surface-variant">inventory_2</span>
-                      <span>Depósito Central</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 text-[11px] text-on-surface-variant font-medium">
-                      <span class="w-2 h-2 rounded-full bg-outline-variant"></span>
-                      Hace 3 horas
-                    </span>
-                  </td>
-                  <td class="px-4 py-3 text-right">
-                    <div class="inline-flex items-center gap-1">
-                      <button
-                        onclick="window.showUserToast('Abriendo edición de Martín Ramos...', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Editar credenciales"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Matriz de permisos: Depósito y Almacén', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Matriz de Permisos"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">vpn_key</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Auditoría Martín Ramos OK.', 'success')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Auditoría de seguridad"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">lock</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Fila 6: Rodrigo Paz -->
-                <tr
-                  class="user-row hover:bg-surface-container-low/70 transition-colors group"
-                  data-role-type="pos"
-                  data-branch="Central Sucursal 01"
-                  data-status="activo"
-                >
-                  <td class="px-4 py-3">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] font-semibold text-primary">Rodrigo Paz</span>
-                      <span class="text-[11px] text-on-surface-variant">@rodrigo.paz • <span class="font-mono">ID-00224</span></span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] text-on-surface font-mono">r.paz@stockcontrol.internal</span>
-                      <span class="text-[11px] text-on-surface-variant font-mono">+54 11 5110-3320</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant text-[11px] font-semibold">
-                      <span class="material-symbols-outlined text-[13px]">person_outline</span>
-                      Vendedor Suplente
-                    </span>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex items-center gap-1.5 text-on-surface text-[12px]">
-                      <span class="material-symbols-outlined text-[16px] text-on-surface-variant">store</span>
-                      <span>Central Sucursal 01</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 text-[11px] text-on-surface-variant font-medium">
-                      <span class="w-2 h-2 rounded-full bg-outline-variant"></span>
-                      Ayer, 19:40
-                    </span>
-                  </td>
-                  <td class="px-4 py-3 text-right">
-                    <div class="inline-flex items-center gap-1">
-                      <button
-                        onclick="window.showUserToast('Abriendo edición de Rodrigo Paz...', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Editar credenciales"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Matriz de permisos: Terminal POS Suplente', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Matriz de Permisos"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">vpn_key</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Auditoría Rodrigo Paz OK.', 'success')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Auditoría de seguridad"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">lock</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Fila 7: Sofía Valenzuela -->
-                <tr
-                  class="user-row hover:bg-surface-container-low/70 transition-colors group"
-                  data-role-type="admin"
-                  data-branch="Central Sucursal 01"
-                  data-status="activo"
-                >
-                  <td class="px-4 py-3">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] font-semibold text-primary">Sofía Valenzuela</span>
-                      <span class="text-[11px] text-on-surface-variant">@sofia.v • <span class="font-mono">ID-00112</span></span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] text-on-surface font-mono">s.valenzuela@stockcontrol.internal</span>
-                      <span class="text-[11px] text-on-surface-variant font-mono">+54 11 4820-9988</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-high text-secondary text-[11px] font-semibold">
-                      <span class="material-symbols-outlined text-[13px]">account_balance</span>
-                      Administrativo Finanzas
-                    </span>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex items-center gap-1.5 text-on-surface text-[12px]">
-                      <span class="material-symbols-outlined text-[16px] text-on-surface-variant">store</span>
-                      <span>Central Sucursal 01</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 text-[11px] text-on-surface font-semibold">
-                      <span class="w-2 h-2 rounded-full bg-outline-variant"></span>
-                      Activo
-                    </span>
-                  </td>
-                  <td class="px-4 py-3 text-right">
-                    <div class="inline-flex items-center gap-1">
-                      <button
-                        onclick="window.showUserToast('Abriendo edición de Sofía Valenzuela...', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Editar credenciales"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Matriz de permisos: Gastos y Tesorería', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Matriz de Permisos"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">vpn_key</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Auditoría Sofía Valenzuela OK.', 'success')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Auditoría de seguridad"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">lock</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Fila 8: Marcos Benítez -->
-                <tr
-                  class="user-row hover:bg-surface-container-low/70 transition-colors group"
-                  data-role-type="pos"
-                  data-branch="Sucursal Este"
-                  data-status="activo"
-                >
-                  <td class="px-4 py-3">
-                    <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] font-semibold text-primary">Marcos Benítez</span>
-                      <span class="text-[11px] text-on-surface-variant">@marcos.b • <span class="font-mono">ID-00230</span></span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-col">
-                      <span class="text-[13px] text-on-surface font-mono">m.benitez@stockcontrol.internal</span>
-                      <span class="text-[11px] text-on-surface-variant font-mono">+54 11 5110-3341</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant text-[11px] font-semibold">
-                      <span class="material-symbols-outlined text-[13px]">point_of_sale</span>
-                      Vendedor POS 03
-                    </span>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex items-center gap-1.5 text-on-surface text-[12px]">
-                      <span class="material-symbols-outlined text-[16px] text-on-surface-variant">store</span>
-                      <span>Sucursal Este</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex items-center gap-1.5 text-[11px] text-on-surface font-semibold">
-                      <span class="w-2 h-2 rounded-full bg-outline-variant"></span>
-                      Activo
-                    </span>
-                  </td>
-                  <td class="px-4 py-3 text-right">
-                    <div class="inline-flex items-center gap-1">
-                      <button
-                        onclick="window.showUserToast('Abriendo edición de Marcos Benítez...', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Editar credenciales"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Matriz de permisos: Terminal POS Sucursal Este', 'info')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Matriz de Permisos"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">vpn_key</span>
-                      </button>
-                      <button
-                        onclick="window.showUserToast('Auditoría Marcos Benítez OK.', 'success')"
-                        class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                        title="Auditoría de seguridad"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[18px]">lock</span>
-                      </button>
-                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -783,7 +228,7 @@ import InvitacionToken from "../components/InvitacionToken.astro";
           <!-- Pie de Tabla y Paginación -->
           <div class="px-4 py-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-surface-container/60">
             <span class="text-[12px] text-on-surface-variant">
-              Mostrando <span id="user-visible-count" class="font-bold text-on-surface">8</span> de <span class="font-bold text-on-surface">18</span> usuarios registrados en el clúster
+              Mostrando <span id="user-visible-count" class="font-bold text-on-surface">3</span> de <span id="user-total-count" class="font-bold text-on-surface">3</span> usuarios registrados en el clúster
             </span>
             <div class="flex items-center gap-1.5">
               <button
@@ -843,6 +288,198 @@ import InvitacionToken from "../components/InvitacionToken.astro";
   {/* Modal de Invitación RBAC y Alerta de Token */}
   <InvitacionToken />
 
+  {/* Modal de Edición de Usuario */}
+  <div
+    class="fixed inset-0 z-50 bg-primary/45 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto hidden"
+    id="editUserModalOverlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="edit-user-title"
+  >
+    <div
+      class="w-full max-w-[620px] bg-surface-container-lowest rounded-2xl shadow-2xl my-auto flex flex-col overflow-hidden border border-surface-container/70 max-h-[92vh]"
+      id="editUserModalContainer"
+    >
+      <!-- Cabecera -->
+      <div class="px-5 sm:px-6 py-4 bg-surface-container-low flex items-center justify-between border-b border-surface-container/60 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-secondary shadow-xs">
+            <span class="material-symbols-outlined text-[22px]">manage_accounts</span>
+          </div>
+          <div class="flex flex-col">
+            <h2 id="edit-user-title" class="text-[17px] font-bold text-primary tracking-tight">
+              Modificar Credenciales de Usuario
+            </h2>
+            <span class="text-[12px] text-on-surface-variant">Actualizar rol, sucursal o datos de acceso corporativo</span>
+          </div>
+        </div>
+        <button
+          class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container p-1.5 rounded-xl transition-colors cursor-pointer"
+          onclick="window.closeEditUserModal && window.closeEditUserModal()"
+          type="button"
+          title="Cerrar modal"
+        >
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Formulario -->
+      <form id="editUserForm" class="p-5 sm:p-6 flex flex-col gap-4 overflow-y-auto" onsubmit="event.preventDefault(); window.saveEditUser && window.saveEditUser();">
+        <input type="hidden" id="edit-user-id" value="" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <!-- Nombre -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[12px] font-semibold text-on-surface" for="edit-user-nombre">
+              Nombre *
+            </label>
+            <input
+              id="edit-user-nombre"
+              type="text"
+              required
+              class="w-full h-[36px] px-3 bg-surface rounded-xl text-[13px] text-on-surface border border-surface-container/70 focus:outline-none focus:border-secondary shadow-2xs"
+            />
+          </div>
+
+          <!-- Apellido -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[12px] font-semibold text-on-surface" for="edit-user-apellido">
+              Apellido
+            </label>
+            <input
+              id="edit-user-apellido"
+              type="text"
+              class="w-full h-[36px] px-3 bg-surface rounded-xl text-[13px] text-on-surface border border-surface-container/70 focus:outline-none focus:border-secondary shadow-2xs"
+            />
+          </div>
+
+          <!-- Nombre de usuario -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[12px] font-semibold text-on-surface" for="edit-user-username">
+              Usuario (@username)
+            </label>
+            <input
+              id="edit-user-username"
+              type="text"
+              readonly
+              class="w-full h-[36px] px-3 bg-surface-container-low text-on-surface-variant rounded-xl text-[13px] border border-surface-container/70 cursor-not-allowed font-mono"
+            />
+          </div>
+
+          <!-- Correo Corporativo -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[12px] font-semibold text-on-surface" for="edit-user-correo">
+              Correo Corporativo
+            </label>
+            <input
+              id="edit-user-correo"
+              type="email"
+              class="w-full h-[36px] px-3 bg-surface rounded-xl text-[13px] text-on-surface border border-surface-container/70 focus:outline-none focus:border-secondary shadow-2xs"
+            />
+          </div>
+
+          <!-- Teléfono -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[12px] font-semibold text-on-surface" for="edit-user-telefono">
+              Teléfono / WhatsApp
+            </label>
+            <input
+              id="edit-user-telefono"
+              type="text"
+              class="w-full h-[36px] px-3 bg-surface rounded-xl text-[13px] text-on-surface border border-surface-container/70 focus:outline-none focus:border-secondary shadow-2xs"
+            />
+          </div>
+
+          <!-- Rol Asignado -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[12px] font-semibold text-on-surface" for="edit-user-rol">
+              Jerarquía / Rol RBAC *
+            </label>
+            <div class="relative">
+              <select
+                id="edit-user-rol"
+                class="w-full h-[36px] pl-3 pr-8 bg-surface rounded-xl text-[13px] text-on-surface appearance-none border border-surface-container/70 focus:outline-none focus:border-secondary shadow-2xs cursor-pointer"
+              >
+                <option value="JEFE_ADMIN">Jefe / SuperAdministrador</option>
+                <option value="ADMIN">Administrador Global</option>
+                <option value="ADMINISTRATIVO">Administrativo Operativo</option>
+                <option value="CAJERO">Vendedor POS / Cajero</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+            </div>
+          </div>
+
+          <!-- Sucursal Asignada -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[12px] font-semibold text-on-surface" for="editUserBranchSelect">
+              Sucursal / Almacén *
+            </label>
+            <div class="relative">
+              <select
+                id="editUserBranchSelect"
+                class="w-full h-[36px] pl-3 pr-8 bg-surface rounded-xl text-[13px] text-on-surface appearance-none border border-surface-container/70 focus:outline-none focus:border-secondary shadow-2xs cursor-pointer"
+              >
+                <option value="">Seleccione sucursal...</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+            </div>
+          </div>
+
+          <!-- Estado -->
+          <div class="flex flex-col gap-1">
+            <label class="text-[12px] font-semibold text-on-surface" for="edit-user-estado">
+              Estado de la Cuenta *
+            </label>
+            <div class="relative">
+              <select
+                id="edit-user-estado"
+                class="w-full h-[36px] pl-3 pr-8 bg-surface rounded-xl text-[13px] text-on-surface appearance-none border border-surface-container/70 focus:outline-none focus:border-secondary shadow-2xs cursor-pointer"
+              >
+                <option value="ACTIVO">Activo</option>
+                <option value="INACTIVO">Inactivo</option>
+                <option value="BLOQUEADO">Bloqueado por Seguridad</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+            </div>
+          </div>
+
+          <!-- Nueva Contraseña (opcional) -->
+          <div class="sm:col-span-2 flex flex-col gap-1">
+            <label class="text-[12px] font-semibold text-on-surface flex items-center justify-between" for="edit-user-password">
+              <span>Nueva Contraseña (Opcional)</span>
+              <span class="text-[11px] text-on-surface-variant">Mínimo 6 caracteres</span>
+            </label>
+            <input
+              id="edit-user-password"
+              type="password"
+              placeholder="Dejar vacío para no modificar la contraseña actual"
+              class="w-full h-[36px] px-3 bg-surface rounded-xl text-[13px] text-on-surface placeholder:text-on-surface-variant/60 border border-surface-container/70 focus:outline-none focus:border-secondary shadow-2xs"
+            />
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="pt-3 border-t border-surface-container/60 flex items-center justify-end gap-2.5">
+          <button
+            type="button"
+            class="h-[36px] px-4 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-xl text-[12px] font-medium transition-colors cursor-pointer"
+            onclick="window.closeEditUserModal && window.closeEditUserModal()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            id="btnSaveEditUser"
+            class="h-[36px] px-5 bg-secondary-container hover:bg-secondary text-on-secondary rounded-xl text-[12px] font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+          >
+            <span class="material-symbols-outlined text-[17px]">save</span>
+            <span>Guardar Cambios</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   {/* Notificación Toast */}
   <div id="userToast" class="fixed bottom-6 right-6 z-50 bg-primary text-on-primary px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 hidden pointer-events-none transition-all">
     <span id="userToastIcon" class="material-symbols-outlined text-[20px]">verified_user</span>
@@ -850,6 +487,7 @@ import InvitacionToken from "../components/InvitacionToken.astro";
   </div>
 
   <script>
+    import gsap from "gsap";
     import {
       initUsuarios,
       openUserModal,
@@ -858,22 +496,382 @@ import InvitacionToken from "../components/InvitacionToken.astro";
       filterRoleTab,
     } from "../animaciones/animaUsuarios.js";
 
-    // Exponer funciones necesarias a window para atributos onclick y forms
+    const BACKEND_URL = "http://localhost:3000";
+    let cachedUsers: any[] = [];
+    let cachedBranches: any[] = [];
+
+    // Exponer funciones globales a window
     (window as any).openUserModal = openUserModal;
     (window as any).closeUserModal = closeUserModal;
     (window as any).showUserToast = showUserToast;
     (window as any).filterRoleTab = filterRoleTab;
 
-    if (!(window as any).saveNewUser) {
-      (window as any).saveNewUser = function() {
-        if ((window as any).submitGenerateToken) {
-          (window as any).submitGenerateToken();
+    // Cargar catálogo de usuarios y métricas RBAC desde la base de datos
+    async function loadUsersFromDB() {
+      const tbody = document.getElementById("users-table-body");
+      if (!tbody) return;
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/usuarios`);
+        if (!res.ok) throw new Error("Error en respuesta del servidor");
+        const json = await res.json();
+        if (!json.success || !json.data) throw new Error(json.error || "No se recibieron datos");
+
+        const { usuarios = [], metricas = {}, sucursales = [] } = json.data;
+        cachedUsers = usuarios;
+        cachedBranches = sucursales;
+
+        // Actualizar tarjetas de métricas Bento Grid
+        const elTotalActive = document.getElementById("metric-total-active");
+        const elEnTurnoText = document.getElementById("metric-en-turno-text");
+        const elRolesBreakdown = document.getElementById("metric-roles-breakdown");
+        const elTokensText = document.getElementById("metric-tokens-text");
+
+        if (elTotalActive) elTotalActive.textContent = `${metricas.cuentas_activas ?? usuarios.length}`;
+        if (elEnTurnoText) elEnTurnoText.textContent = `${metricas.en_turno_hoy ?? 1} en turno hoy`;
+        if (elRolesBreakdown && metricas.roles_conteo) {
+          elRolesBreakdown.innerHTML = `Jefe: <span class="font-semibold text-on-surface">${metricas.roles_conteo.jefe ?? 0}</span> • Admin: <span class="font-semibold text-on-surface">${metricas.roles_conteo.admin ?? 0}</span> • POS: <span class="font-semibold text-on-surface">${metricas.roles_conteo.pos ?? 0}</span>`;
         }
-      };
+        if (elTokensText) {
+          elTokensText.textContent = `${metricas.tokens_activos ?? 0} invitaciones/tokens activos`;
+        }
+
+        // Actualizar conteos de pestañas de rol
+        const tabAll = document.getElementById("tab-count-all");
+        const tabJefe = document.getElementById("tab-count-jefe");
+        const tabAdmin = document.getElementById("tab-count-admin");
+        const tabPos = document.getElementById("tab-count-pos");
+
+        if (tabAll) tabAll.textContent = `${metricas.roles_conteo?.total ?? usuarios.length}`;
+        if (tabJefe) tabJefe.textContent = `${metricas.roles_conteo?.jefe ?? 0}`;
+        if (tabAdmin) tabAdmin.textContent = `${metricas.roles_conteo?.admin ?? 0}`;
+        if (tabPos) tabPos.textContent = `${metricas.roles_conteo?.pos ?? 0}`;
+
+        // Actualizar selector de sucursales para filtro
+        const branchFilter = document.getElementById("user-branch-filter") as HTMLSelectElement | null;
+        if (branchFilter && sucursales.length > 0) {
+          const currentVal = branchFilter.value;
+          branchFilter.innerHTML = `<option value="Sucursal: Todas">Sucursal: Todas</option>` +
+            sucursales.map((s: any) => `<option value="${s.nombre}">${s.nombre}</option>`).join("");
+          if (currentVal) branchFilter.value = currentVal;
+        }
+
+        // Actualizar selector de sucursales en modal de edición
+        const editBranchSelect = document.getElementById("editUserBranchSelect") as HTMLSelectElement | null;
+        if (editBranchSelect && sucursales.length > 0) {
+          editBranchSelect.innerHTML = sucursales
+            .map((s: any) => `<option value="${s.id}">${s.nombre}</option>`)
+            .join("");
+        }
+
+        // Renderizar tabla de usuarios
+        if (usuarios.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="px-4 py-8 text-center text-on-surface-variant text-[13px]">
+                No hay usuarios registrados actualmente en la base de datos.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = usuarios
+          .map((u: any) => {
+            const statusClass =
+              u.estado === "ACTIVO"
+                ? "text-on-tertiary-container font-semibold"
+                : u.estado === "BLOQUEADO"
+                ? "text-error font-semibold"
+                : "text-on-surface-variant font-medium";
+
+            const statusDot =
+              u.estado === "ACTIVO"
+                ? `<span class="w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"></span>`
+                : u.estado === "BLOQUEADO"
+                ? `<span class="w-2 h-2 rounded-full bg-error"></span>`
+                : `<span class="w-2 h-2 rounded-full bg-outline-variant"></span>`;
+
+            const statusLabel =
+              u.estado === "ACTIVO" ? "En línea / Activo" : u.estado === "BLOQUEADO" ? "Bloqueado" : "Inactivo";
+
+            return `
+              <tr
+                class="user-row hover:bg-surface-container-low/70 transition-colors group"
+                data-role-type="${u.rol_tab || "pos"}"
+                data-branch="${u.sucursal_nombre || ""}"
+                data-status="${(u.estado || "activo").toLowerCase()}"
+                data-user-id="${u.id}"
+              >
+                <td class="px-4 py-3">
+                  <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex flex-col">
+                    <span class="text-[13px] font-semibold text-primary">${u.nombre_completo || u.nombre}</span>
+                    <span class="text-[11px] text-on-surface-variant">@${u.usuario} • <span class="font-mono">${u.codigo_interno}</span></span>
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex flex-col">
+                    <span class="text-[13px] text-on-surface font-mono">${u.correo || "Sin correo"}</span>
+                    <span class="text-[11px] text-on-surface-variant font-mono">${u.telefono || "Sin teléfono"}</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${u.rol_badge_class || "bg-surface-container text-on-surface-variant"} text-[11px] font-semibold shadow-xs">
+                    <span class="material-symbols-outlined text-[13px]">${u.rol_icon || "badge"}</span>
+                    ${u.rol_label || u.rol}
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-1.5 text-on-surface text-[12px]">
+                    <span class="material-symbols-outlined text-[16px] text-on-surface-variant">store</span>
+                    <span>${u.sucursal_nombre || "Central Sucursal 01"}</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1.5 text-[11px] ${statusClass}">
+                    ${statusDot}
+                    ${statusLabel}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-right">
+                  <div class="inline-flex items-center gap-1">
+                    <button
+                      onclick="window.openEditUserModal && window.openEditUserModal('${u.id}')"
+                      class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
+                      title="Editar credenciales"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[18px]">edit</span>
+                    </button>
+                    <button
+                      onclick="window.toggleUserStatus && window.toggleUserStatus('${u.id}', '${u.estado}')"
+                      class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
+                      title="${u.estado === 'ACTIVO' ? 'Desactivar usuario' : 'Activar usuario'}"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[18px]">${u.estado === 'ACTIVO' ? 'block' : 'check_circle'}</span>
+                    </button>
+                    <button
+                      onclick="window.deleteUser && window.deleteUser('${u.id}', '${u.nombre_completo}')"
+                      class="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/20 transition-colors cursor-pointer"
+                      title="Eliminar usuario"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        if ((window as any).applyUserFilters) {
+          (window as any).applyUserFilters();
+        }
+
+        // Actualizar conteos visibles
+        const countVisibleEl = document.getElementById("user-visible-count");
+        const countTotalEl = document.getElementById("user-total-count");
+        if (countVisibleEl) countVisibleEl.textContent = `${usuarios.length}`;
+        if (countTotalEl) countTotalEl.textContent = `${usuarios.length}`;
+      } catch (err: any) {
+        console.error("Error al cargar usuarios de la base de datos:", err);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="px-4 py-8 text-center text-error text-[13px]">
+              No se pudo conectar con el servidor backend (${err.message}).
+            </td>
+          </tr>
+        `;
+      }
     }
+
+    (window as any).loadUsersFromDB = loadUsersFromDB;
+
+    // Modal de edición de usuario
+    (window as any).openEditUserModal = function(userId: string) {
+      const user = cachedUsers.find((u) => u.id === userId);
+      if (!user) return;
+
+      const modal = document.getElementById("editUserModalOverlay");
+      const container = document.getElementById("editUserModalContainer");
+      if (!modal || !container) return;
+
+      const idInput = document.getElementById("edit-user-id") as HTMLInputElement | null;
+      const nombreInput = document.getElementById("edit-user-nombre") as HTMLInputElement | null;
+      const apellidoInput = document.getElementById("edit-user-apellido") as HTMLInputElement | null;
+      const usernameInput = document.getElementById("edit-user-username") as HTMLInputElement | null;
+      const correoInput = document.getElementById("edit-user-correo") as HTMLInputElement | null;
+      const telInput = document.getElementById("edit-user-telefono") as HTMLInputElement | null;
+      const rolSelect = document.getElementById("edit-user-rol") as HTMLSelectElement | null;
+      const branchSelect = document.getElementById("editUserBranchSelect") as HTMLSelectElement | null;
+      const estadoSelect = document.getElementById("edit-user-estado") as HTMLSelectElement | null;
+      const passInput = document.getElementById("edit-user-password") as HTMLInputElement | null;
+
+      if (idInput) idInput.value = user.id;
+      if (nombreInput) nombreInput.value = user.nombre || "";
+      if (apellidoInput) apellidoInput.value = user.apellido || "";
+      if (usernameInput) usernameInput.value = user.usuario || "";
+      if (correoInput) correoInput.value = user.correo || "";
+      if (telInput) telInput.value = user.telefono || "";
+      if (rolSelect) rolSelect.value = user.rol || "CAJERO";
+      if (branchSelect && user.sucursal_id) branchSelect.value = user.sucursal_id;
+      if (estadoSelect) estadoSelect.value = user.estado || "ACTIVO";
+      if (passInput) passInput.value = "";
+
+      modal.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+
+      gsap.killTweensOf([modal, container]);
+      gsap.fromTo(modal, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" });
+      gsap.fromTo(
+        container,
+        { scale: 0.94, y: 16, opacity: 0 },
+        { scale: 1, y: 0, opacity: 1, duration: 0.25, ease: "power2.out" }
+      );
+    };
+
+    (window as any).closeEditUserModal = function() {
+      const modal = document.getElementById("editUserModalOverlay");
+      const container = document.getElementById("editUserModalContainer");
+      if (!modal || !container) return;
+
+      document.body.style.overflow = "";
+
+      gsap.killTweensOf([modal, container]);
+      gsap.to(container, {
+        scale: 0.96,
+        opacity: 0,
+        duration: 0.16,
+        ease: "power2.in",
+      });
+      gsap.to(modal, {
+        opacity: 0,
+        duration: 0.18,
+        ease: "power2.in",
+        onComplete: () => {
+          modal.classList.add("hidden");
+        },
+      });
+    };
+
+    (window as any).saveEditUser = async function() {
+      const idInput = document.getElementById("edit-user-id") as HTMLInputElement | null;
+      const nombreInput = document.getElementById("edit-user-nombre") as HTMLInputElement | null;
+      const apellidoInput = document.getElementById("edit-user-apellido") as HTMLInputElement | null;
+      const correoInput = document.getElementById("edit-user-correo") as HTMLInputElement | null;
+      const telInput = document.getElementById("edit-user-telefono") as HTMLInputElement | null;
+      const rolSelect = document.getElementById("edit-user-rol") as HTMLSelectElement | null;
+      const branchSelect = document.getElementById("editUserBranchSelect") as HTMLSelectElement | null;
+      const estadoSelect = document.getElementById("edit-user-estado") as HTMLSelectElement | null;
+      const passInput = document.getElementById("edit-user-password") as HTMLInputElement | null;
+      const submitBtn = document.getElementById("btnSaveEditUser") as HTMLButtonElement | null;
+
+      const userId = idInput?.value;
+      if (!userId) return;
+
+      if (!nombreInput?.value.trim()) {
+        showUserToast("El nombre es obligatorio.", "warning");
+        nombreInput?.focus();
+        return;
+      }
+
+      const payload: any = {
+        nombre: nombreInput.value.trim(),
+        apellido: apellidoInput?.value.trim() || null,
+        correo: correoInput?.value.trim() || null,
+        telefono: telInput?.value.trim() || null,
+        rol: rolSelect?.value || "CAJERO",
+        sucursal_id: branchSelect?.value || null,
+        estado: estadoSelect?.value || "ACTIVO",
+      };
+
+      if (passInput?.value.trim()) {
+        payload.password = passInput.value.trim();
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add("opacity-60", "cursor-not-allowed");
+      }
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/usuarios/${userId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const resData = await res.json();
+        if (!res.ok || !resData.success) {
+          throw new Error(resData.error || "Error al actualizar usuario");
+        }
+
+        showUserToast("Usuario actualizado correctamente.", "success");
+        (window as any).closeEditUserModal();
+        await loadUsersFromDB();
+      } catch (err: any) {
+        showUserToast(err.message, "warning");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("opacity-60", "cursor-not-allowed");
+        }
+      }
+    };
+
+    // Alternar estado de usuario
+    (window as any).toggleUserStatus = async function(userId: string, currentStatus: string) {
+      const nextStatus = currentStatus === "ACTIVO" ? "INACTIVO" : "ACTIVO";
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/usuarios/${userId}/estado`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ estado: nextStatus }),
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Error al actualizar estado");
+        }
+
+        showUserToast(data.message || `Usuario marcado como ${nextStatus}.`, "success");
+        await loadUsersFromDB();
+      } catch (err: any) {
+        showUserToast(err.message, "warning");
+      }
+    };
+
+    // Eliminar usuario
+    (window as any).deleteUser = async function(userId: string, userName: string) {
+      if (!confirm(`¿Estás seguro de que deseas eliminar al usuario "${userName}" del directorio activo?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/usuarios/${userId}`, {
+          method: "DELETE",
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Error al eliminar usuario");
+        }
+
+        showUserToast(`Usuario "${userName}" eliminado correctamente.`, "success");
+        await loadUsersFromDB();
+      } catch (err: any) {
+        showUserToast(err.message, "warning");
+      }
+    };
 
     function setupUsuarios() {
       initUsuarios();
+      loadUsersFromDB();
     }
 
     document.addEventListener("astro:page-load", setupUsuarios);

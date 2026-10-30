@@ -467,15 +467,42 @@
 <script>
   import gsap from "gsap";
 
+  const BACKEND_URL = "http://localhost:3000";
+
   // Estado del rol seleccionado
   let selectedRoleName = "Vendedor POS / Mostrador";
   let selectedRoleCode = "POS";
+
+  // Cargar sucursales reales desde el backend
+  async function loadBranchesIntoSelect() {
+    const branchSelect = document.getElementById("inviteBranchSelect") as HTMLSelectElement | null;
+    if (!branchSelect) return;
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/usuarios/sucursales`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const sucursales = data.data || [];
+      if (Array.isArray(sucursales) && sucursales.length > 0) {
+        branchSelect.innerHTML = sucursales
+          .map(
+            (s: any, idx: number) =>
+              `<option value="${s.id}" ${idx === 0 ? "selected" : ""}>${s.nombre} ${s.direccion ? "- " + s.direccion : ""}</option>`
+          )
+          .join("");
+      }
+    } catch (e) {
+      console.warn("No se pudieron cargar sucursales dinámicas en InvitacionToken:", e);
+    }
+  }
 
   // 1. Apertura y Cierre del Modal de Invitación
   (window as any).openUserModal = function () {
     const modal = document.getElementById("inviteUserModalOverlay");
     const container = document.getElementById("inviteUserModalContainer");
     if (!modal || !container) return;
+
+    loadBranchesIntoSelect();
 
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
@@ -513,36 +540,77 @@
     });
   };
 
-  // 2. Generar Token y Asignar Credencial (Cierra invitación y abre alerta)
-  (window as any).submitGenerateToken = function () {
+  // 2. Generar Token y Asignar Credencial conectado a la Base de Datos
+  (window as any).submitGenerateToken = async function () {
     const branchSelect = document.getElementById("inviteBranchSelect") as HTMLSelectElement | null;
-    const branchName = branchSelect?.value || "Central Sucursal 01";
+    const branchId = branchSelect?.value || "";
+    const branchName = branchSelect?.selectedOptions?.[0]?.text?.split(" - ")[0] || branchSelect?.value || "Central Sucursal 01";
+    const submitBtn = document.getElementById("btnGenerateTokenSubmit") as HTMLButtonElement | null;
 
-    // Generar token dinámico único
-    const randNum = Math.floor(1000 + Math.random() * 9000);
-    const generatedToken = `STK-${randNum}-${selectedRoleCode}-2024`;
-
-    // Sincronizar datos con el modal de alerta
-    const tokenTextEl = document.getElementById("tokenText");
-    const roleBadgeEl = document.getElementById("tokenAssignedRoleBadge");
-    const branchTextEl = document.getElementById("tokenAssignedBranch");
-
-    if (tokenTextEl) tokenTextEl.textContent = generatedToken;
-    if (roleBadgeEl) roleBadgeEl.textContent = selectedRoleName;
-    if (branchTextEl) {
-      branchTextEl.innerHTML = `<span class="material-symbols-outlined text-[15px] text-on-surface-variant">store</span> ${branchName}`;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.classList.add("opacity-60", "cursor-not-allowed");
     }
 
-    // Cerrar modal de invitación
-    (window as any).closeUserModal();
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/usuarios/invitaciones`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sucursal_id: branchId,
+          sucursal: branchName,
+          rol: selectedRoleCode,
+          expira_horas: 72,
+        }),
+      });
 
-    // Abrir modal de token con animación tras breve transición
-    setTimeout(() => {
-      (window as any).openTokenModal();
-      if ((window as any).showUserToast) {
-        (window as any).showUserToast(`Token ${generatedToken} emitido con éxito.`, "success");
+      const resData = await response.json();
+      if (!response.ok || !resData.success) {
+        throw new Error(resData.error || "Error al generar token de invitación en la base de datos.");
       }
-    }, 220);
+
+      const generatedToken = resData.data?.token || `STK-${Math.floor(1000 + Math.random() * 9000)}-${selectedRoleCode}-2024`;
+      const finalSucursalNombre = resData.data?.sucursal_nombre || branchName;
+
+      // Sincronizar datos con el modal de alerta
+      const tokenTextEl = document.getElementById("tokenText");
+      const roleBadgeEl = document.getElementById("tokenAssignedRoleBadge");
+      const branchTextEl = document.getElementById("tokenAssignedBranch");
+
+      if (tokenTextEl) tokenTextEl.textContent = generatedToken;
+      if (roleBadgeEl) roleBadgeEl.textContent = selectedRoleName;
+      if (branchTextEl) {
+        branchTextEl.innerHTML = `<span class="material-symbols-outlined text-[15px] text-on-surface-variant">store</span> ${finalSucursalNombre}`;
+      }
+
+      // Cerrar modal de invitación
+      (window as any).closeUserModal();
+
+      // Abrir modal de token con animación tras breve transición
+      setTimeout(() => {
+        (window as any).openTokenModal();
+        if ((window as any).showUserToast) {
+          (window as any).showUserToast(`Token ${generatedToken} emitido y guardado en la base de datos.`, "success");
+        }
+      }, 220);
+
+      // Refrescar datos en la vista principal
+      if ((window as any).loadUsersFromDB) {
+        (window as any).loadUsersFromDB();
+      }
+    } catch (err: any) {
+      console.error("Error al generar token:", err);
+      if ((window as any).showUserToast) {
+        (window as any).showUserToast(err.message || "Error al conectar con el servidor.", "warning");
+      } else {
+        alert(err.message);
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-60", "cursor-not-allowed");
+      }
+    }
   };
 
   // 3. Control del Modal Flotante de Token
@@ -583,6 +651,9 @@
       ease: "power2.in",
       onComplete: () => {
         modal.classList.add("hidden");
+        if ((window as any).loadUsersFromDB) {
+          (window as any).loadUsersFromDB();
+        }
       },
     });
   };
