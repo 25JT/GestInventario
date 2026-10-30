@@ -33,8 +33,15 @@ export async function iniciarSesion({ identifier, password, role = "vendedor", r
     if (response.ok) {
       const data = await response.json();
       const storage = rememberSession ? localStorage : sessionStorage;
-      if (data.token) storage.setItem("stock_auth_token", data.token);
-      if (data.user) storage.setItem("stock_auth_user", JSON.stringify(data.user));
+      if (data.token) {
+        storage.setItem("stock_auth_token", data.token);
+        localStorage.setItem("stock_auth_token", data.token); // Mantener en localStorage para persistencia
+        localStorage.setItem("stock_auth_issued_at", String(Date.now()));
+      }
+      if (data.user) {
+        storage.setItem("stock_auth_user", JSON.stringify(data.user));
+        localStorage.setItem("stock_auth_user", JSON.stringify(data.user));
+      }
 
       return {
         success: true,
@@ -79,4 +86,71 @@ export async function iniciarSesion({ identifier, password, role = "vendedor", r
       message: `Accediendo al entorno de trabajo con credenciales autorizadas como: ${roleLabels[role] || role}.`,
     };
   }
+}
+
+/**
+ * Valida la sesión activa y renueva el token rotándolo cada 24 horas.
+ * Si el token sigue vigente, actualiza los datos y renueva la validez.
+ * Si expiró o es inválido, limpia la sesión y retorna falso.
+ */
+export async function verificarYRefrescarSesion() {
+  if (typeof window === "undefined") return { valid: false };
+
+  const token =
+    localStorage.getItem("stock_auth_token") ||
+    sessionStorage.getItem("stock_auth_token");
+
+  if (!token) {
+    return { valid: false };
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem("stock_auth_token", data.token);
+        sessionStorage.setItem("stock_auth_token", data.token);
+        localStorage.setItem("stock_auth_issued_at", String(Date.now()));
+      }
+      if (data.user) {
+        localStorage.setItem("stock_auth_user", JSON.stringify(data.user));
+        sessionStorage.setItem("stock_auth_user", JSON.stringify(data.user));
+      }
+      return { valid: true, user: data.user, token: data.token };
+    }
+
+    // Si el servidor respondió 401 o 403 (token expirado > 24h o inválido)
+    localStorage.removeItem("stock_auth_token");
+    localStorage.removeItem("stock_auth_user");
+    localStorage.removeItem("stock_auth_issued_at");
+    sessionStorage.removeItem("stock_auth_token");
+    sessionStorage.removeItem("stock_auth_user");
+    return { valid: false };
+  } catch (err) {
+    console.warn("No se pudo contactar el servidor para refrescar token, manteniendo sesión local:", err);
+    // Si no hay red momentáneamente pero tenemos usuario guardado
+    const localUser = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+    return { valid: Boolean(localUser), user: localUser ? JSON.parse(localUser) : null, token };
+  }
+}
+
+/**
+ * Cierra la sesión activa y redirige al inicio
+ */
+export function cerrarSesion() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem("stock_auth_token");
+  localStorage.removeItem("stock_auth_user");
+  localStorage.removeItem("stock_auth_issued_at");
+  sessionStorage.removeItem("stock_auth_token");
+  sessionStorage.removeItem("stock_auth_user");
+  window.location.href = "/";
 }

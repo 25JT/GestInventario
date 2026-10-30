@@ -1,4 +1,5 @@
 import gsap from "gsap";
+import { verificarYRefrescarSesion, cerrarSesion } from "../scripts/login.js";
 
 /**
  * Estado del menú lateral
@@ -118,6 +119,29 @@ export function hydrateUserSession() {
       } else if ((currentPath.includes("gastosoperativos") || currentPath.includes("controldeinventario")) && isCajero) {
         alert("Acceso restringido: Tu perfil operativo solo tiene acceso a Ventas y Catálogo.");
         window.location.href = "/RegVenta";
+      }
+
+      // Verificación y rotación automática del token cada 24h
+      const issuedAt = parseInt(localStorage.getItem("stock_auth_issued_at") || "0", 10);
+      const now = Date.now();
+      // Si el token tiene más de 12 horas o no tiene fecha registrada, rotarlo de inmediato
+      if (!issuedAt || now - issuedAt > 12 * 60 * 60 * 1000) {
+        verificarYRefrescarSesion().then((res) => {
+          if (!res || !res.valid) {
+            cerrarSesion();
+          }
+        });
+      }
+
+      // Temporizador en segundo plano para rotar el token proactivamente mientras la pestaña esté abierta
+      if (!window.__tokenRefreshInterval) {
+        window.__tokenRefreshInterval = setInterval(() => {
+          verificarYRefrescarSesion().then((res) => {
+            if (!res || !res.valid) {
+              cerrarSesion();
+            }
+          });
+        }, 30 * 60 * 1000); // Chequeo periódico cada 30 min
       }
     } else {
       // Si no hay sesión iniciada y estamos en una página protegida, redirigir a Login
@@ -394,11 +418,7 @@ export function initNavSlide() {
   logoutBtns.forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
-      localStorage.removeItem("stock_auth_user");
-      localStorage.removeItem("stock_auth_token");
-      sessionStorage.removeItem("stock_auth_user");
-      sessionStorage.removeItem("stock_auth_token");
-      window.location.href = "/";
+      cerrarSesion();
     });
   });
 }

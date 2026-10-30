@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { iniciarSesion } from "../scripts/login.js";
+import { iniciarSesion, verificarYRefrescarSesion } from "../scripts/login.js";
 import { registrarUsuario, validarTokenInvitacion } from "../scripts/registro.js";
 import {
   animateEntrance,
@@ -68,6 +68,15 @@ export default function AuthCard() {
   const orb4Ref = useRef(null);
   const rightOrb1Ref = useRef(null);
   const rightOrb2Ref = useRef(null);
+
+  // Auto-redirigir al Dashboard si ya existe una sesión activa y válida (sesión persistente sin volver a loguearse)
+  useEffect(() => {
+    verificarYRefrescarSesion().then((res) => {
+      if (res && res.valid) {
+        window.location.href = "/DashPrincipal";
+      }
+    });
+  }, []);
 
   // Entrada inicial
   useEffect(() => {
