@@ -122,11 +122,9 @@
                 class="w-full h-[38px] pl-9 pr-8 bg-surface rounded-xl text-[12px] text-on-surface focus:outline-none focus:bg-surface-container-lowest appearance-none border border-transparent hover:border-surface-container focus:border-secondary shadow-2xs transition-all cursor-pointer"
                 id="service-category"
               >
-                <option selected value="mantenimiento">Mantenimiento y Diagnóstico</option>
-                <option value="redes">Instalación y Cableado Estructurado</option>
-                <option value="pos">Soporte Hardware POS &amp; Fiscal</option>
-                <option value="laboratorio">Laboratorio Electrónico SMD</option>
-                <option value="consultoria">Consultoría IT &amp; Arquitectura</option>
+                <option value="c6b0f47b-a732-4196-bc44-2f8ae2817d6b" selected>Servicios técnicos (TEC)</option>
+                <option value="025a4c9b-53fb-44fb-a444-e9245195124c">Accesorios (ACC)</option>
+                <option value="4bf76af4-d8b2-4077-8666-6d5ea574c423">Papelería (PAP)</option>
               </select>
               <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px] pointer-events-none">expand_more</span>
             </div>
@@ -509,12 +507,12 @@
       const res = await fetch(`${BACKEND_URL}/api/categorias`);
       if (!res.ok) return;
       const data = await res.json();
-      const cats = data.categorias || data.data || [];
+      const cats = data.data?.categorias || data.categorias || data.data || [];
       if (Array.isArray(cats) && cats.length > 0) {
         select.innerHTML = cats
           .map(
-            (c: any) =>
-              `<option value="${c.id}">${c.nombre} (${c.prefijo || "SRV"})</option>`
+            (c: any, idx: number) =>
+              `<option value="${c.id}" ${idx === 0 || c.prefijo === 'TEC' ? 'selected' : ''}>${c.nombre} (${c.prefijo || "SRV"})</option>`
           )
           .join("");
       }
@@ -821,15 +819,18 @@
   document.addEventListener("astro:page-load", () => {
     initServiceCalculations();
     setupOverlayBackdrop();
+    loadCategoriesIntoSelect();
   });
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       initServiceCalculations();
       setupOverlayBackdrop();
+      loadCategoriesIntoSelect();
     });
   } else {
     initServiceCalculations();
     setupOverlayBackdrop();
+    loadCategoriesIntoSelect();
   }
 </script>
