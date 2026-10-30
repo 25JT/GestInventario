@@ -104,7 +104,8 @@
                 class="w-full h-[38px] pl-9 pr-3 bg-surface rounded-xl text-[13px] font-medium text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:bg-surface-container-lowest border border-transparent hover:border-surface-container focus:border-secondary shadow-2xs transition-all"
                 id="service-name"
                 type="text"
-                value="Mantenimiento Correctivo de Servidores y Fuentes Redundantes"
+                placeholder="Ej: Mantenimiento correctivo de equipos..."
+                value=""
               />
             </div>
             <span class="text-[11px] text-on-surface-variant">Nombre legible para el cliente final y comprobante de venta POS.</span>
@@ -258,23 +259,25 @@
         </div>
 
         <!-- Finanzas y Cálculos en tiempo real -->
-        <div class="grid grid-cols-12 gap-3 sm:gap-4 items-center">
+        <div class="grid grid-cols-12 gap-3 sm:gap-4 items-end">
           <!-- Precio Base Venta -->
           <div class="col-span-12 md:col-span-4 flex flex-col gap-1.5">
             <label class="text-[12px] text-on-surface font-semibold" for="price-sale">
               Precio de Venta Base (COP) *
             </label>
             <div class="relative">
-              <span class="font-mono text-[17px] font-bold text-secondary absolute left-3 top-1/2 -translate-y-1/2">$</span>
+              <span class="font-mono text-[17px] font-bold text-secondary absolute left-3 top-1/2 -translate-y-1/2 select-none">$</span>
               <input
                 class="w-full h-11 pl-9 pr-3 bg-surface-container-lowest rounded-xl font-mono text-[18px] font-bold text-primary focus:outline-none border border-surface-container/70 focus:border-secondary shadow-xs transition-all"
                 id="price-sale"
-                step="500"
-                type="number"
-                value="95000"
+                type="text"
+                inputmode="numeric"
+                placeholder="0"
+                value="95.000"
+                autocomplete="off"
               />
             </div>
-            <span class="text-[11px] text-on-surface-variant">Tarifa al cliente sin impuestos adicionales (Pesos COP).</span>
+            <span class="text-[11px] text-on-surface-variant truncate">Tarifa al cliente sin impuestos adicionales.</span>
           </div>
 
           <!-- Costo Interno Estimado -->
@@ -283,31 +286,37 @@
               Costo Interno (Mano de Obra COP) *
             </label>
             <div class="relative">
-              <span class="font-mono text-[17px] font-bold text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2">$</span>
+              <span class="font-mono text-[17px] font-bold text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2 select-none">$</span>
               <input
                 class="w-full h-11 pl-9 pr-3 bg-surface-container-lowest rounded-xl font-mono text-[18px] font-bold text-on-surface focus:outline-none border border-surface-container/70 focus:border-secondary shadow-xs transition-all"
                 id="price-cost"
-                step="500"
-                type="number"
-                value="35000"
+                type="text"
+                inputmode="numeric"
+                placeholder="0"
+                value="35.000"
+                autocomplete="off"
               />
             </div>
-            <span class="text-[11px] text-on-surface-variant">Asignación al técnico o costo base estimado.</span>
+            <span class="text-[11px] text-on-surface-variant truncate">Asignación al técnico o costo base estimado.</span>
           </div>
 
-          <!-- Margen Operativo Widget -->
-          <div class="col-span-12 md:col-span-4 flex flex-col justify-end">
-            <div class="h-11 bg-surface-container-lowest rounded-xl px-3 flex items-center justify-between shadow-xs border border-surface-container/70">
-              <div class="flex flex-col">
-                <span class="text-[11px] text-on-surface-variant">Margen Neto Estimado</span>
-                <span class="font-mono text-[13px] text-primary font-bold" id="label-profit">$60.000 COP de ganancia</span>
+          <!-- Margen Operativo Widget (Sin desbordes y con espaciado amplio) -->
+          <div class="col-span-12 md:col-span-4 flex flex-col gap-1.5">
+            <label class="text-[12px] text-on-surface-variant font-medium flex items-center justify-between">
+              <span>Margen Neto Estimado</span>
+              <span class="text-[10px] opacity-75">[(V - C) / V] × 100</span>
+            </label>
+            <div class="h-11 bg-surface-container-lowest rounded-xl px-3 py-1 flex items-center justify-between shadow-xs border border-surface-container/70 gap-2 overflow-hidden">
+              <div class="flex flex-col min-w-0">
+                <span class="font-mono text-[13px] text-primary font-bold truncate leading-tight" id="label-profit">+$60.000 COP</span>
+                <span class="text-[10px] text-on-surface-variant/80 font-medium">Ganancia neta</span>
               </div>
-              <div class="bg-tertiary-fixed text-on-tertiary text-[12px] px-2.5 py-1 rounded-lg font-bold flex items-center gap-1" id="badge-margin">
-                <span class="material-symbols-outlined text-[16px] text-tertiary-container">trending_up</span>
+              <div class="bg-tertiary-fixed text-on-tertiary text-[11px] px-2.5 py-1 rounded-lg font-bold flex items-center gap-1 shrink-0 shadow-2xs" id="badge-margin">
+                <span class="material-symbols-outlined text-[15px] text-tertiary-container">trending_up</span>
                 <span class="text-tertiary-container font-semibold" id="margin-value">+63.2% Margen</span>
               </div>
             </div>
-            <span class="text-[11px] text-on-surface-variant mt-1.5">Fórmula: [(Venta - Costo) / Venta] × 100</span>
+            <span class="text-[11px] text-transparent select-none hidden sm:block">.</span>
           </div>
         </div>
 
@@ -430,7 +439,7 @@
               rows="2"
               class="w-full p-3 bg-surface rounded-xl text-[12px] text-on-surface placeholder:text-on-surface-variant/70 border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary focus:bg-surface-container-lowest shadow-2xs transition-all resize-none"
               placeholder="Detalla las tareas técnicas comprendidas en la orden..."
-            >Incluye diagnóstico integral, limpieza de chasis por ultrasonido, cambio de pasta térmica de alto rendimiento, sustitución de fuentes redundantes y prueba de estrés de 2 horas con informe técnico de conformidad.</textarea>
+            ></textarea>
           </div>
         </div>
       </div>
@@ -480,11 +489,68 @@
 <script>
   import gsap from "gsap";
 
+  const BACKEND_URL = "http://localhost:3000";
+
+  function parseCOPDigits(val: string): number {
+    const digits = (val || "").replace(/\D/g, "");
+    return parseInt(digits, 10) || 0;
+  }
+
+  function formatCOPString(num: number): string {
+    return num > 0 ? num.toLocaleString("es-CO") : "";
+  }
+
+  // Cargar categorías disponibles desde la base de datos
+  async function loadCategoriesIntoSelect() {
+    const select = document.getElementById("service-category") as HTMLSelectElement | null;
+    if (!select) return;
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/categorias`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const cats = data.categorias || data.data || [];
+      if (Array.isArray(cats) && cats.length > 0) {
+        select.innerHTML = cats
+          .map(
+            (c: any) =>
+              `<option value="${c.id}">${c.nombre} (${c.prefijo || "SRV"})</option>`
+          )
+          .join("");
+      }
+    } catch (e) {
+      console.warn("No se pudieron cargar categorías dinámicas:", e);
+    }
+  }
+
   // Apertura global del modal de servicios
   (window as any).openServiceModal = function () {
     const modal = document.getElementById("serviceModalOverlay");
     const container = document.getElementById("serviceModalContainer");
     if (!modal || !container) return;
+
+    loadCategoriesIntoSelect();
+
+    // Sincronizar SKU sugerido si está vacío
+    const skuInput = document.getElementById("service-sku") as HTMLInputElement | null;
+    if (skuInput && (!skuInput.value || skuInput.value === "SRV-MNT-06")) {
+      const rand = Math.floor(10 + Math.random() * 90);
+      skuInput.value = `SRV-TEC-${rand}`;
+    }
+
+    // Refrescar display de precios iniciales formateados con puntos
+    const priceSaleInput = document.getElementById("price-sale") as HTMLInputElement | null;
+    const priceCostInput = document.getElementById("price-cost") as HTMLInputElement | null;
+    if (priceSaleInput) {
+      const saleVal = parseCOPDigits(priceSaleInput.value) || 95000;
+      priceSaleInput.value = saleVal.toLocaleString("es-CO");
+    }
+    if (priceCostInput) {
+      const costVal = parseCOPDigits(priceCostInput.value) || 35000;
+      priceCostInput.value = costVal.toLocaleString("es-CO");
+    }
+
+    updateCalculations();
 
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
@@ -523,32 +589,56 @@
     });
   };
 
-  // Sincronización y cálculo de margen en tiempo real
-  function initServiceCalculations() {
+  // Sincronización y cálculo de margen en tiempo real con formato de miles COP
+  function updateCalculations() {
     const priceSaleInput = document.getElementById("price-sale") as HTMLInputElement | null;
     const priceCostInput = document.getElementById("price-cost") as HTMLInputElement | null;
     const labelProfit = document.getElementById("label-profit");
     const marginValue = document.getElementById("margin-value");
     const btnSubmitLabel = document.getElementById("btn-submit-label");
+
+    const sale = parseCOPDigits(priceSaleInput?.value || "0");
+    const cost = parseCOPDigits(priceCostInput?.value || "0");
+    const profit = sale - cost;
+    const margin = sale > 0 ? ((profit / sale) * 100).toFixed(1) : "0.0";
+
+    const formattedProfit = Math.round(profit).toLocaleString("es-CO");
+    const formattedSale = Math.round(sale).toLocaleString("es-CO");
+
+    if (labelProfit) {
+      labelProfit.textContent = `${profit >= 0 ? "+" : ""}$${formattedProfit} COP`;
+    }
+    if (marginValue) {
+      marginValue.textContent = `${parseFloat(margin) >= 0 ? "+" : ""}${margin}% Margen`;
+    }
+    if (btnSubmitLabel) {
+      btnSubmitLabel.textContent = `Registrar Servicio ($${formattedSale} COP)`;
+    }
+  }
+
+  function handlePriceInput(inputEl: HTMLInputElement) {
+    const rawVal = inputEl.value;
+    const cleanNum = parseCOPDigits(rawVal);
+    const formatted = formatCOPString(cleanNum);
+
+    if (inputEl.value !== formatted && document.activeElement === inputEl) {
+      inputEl.value = formatted;
+    }
+    updateCalculations();
+  }
+
+  function initServiceCalculations() {
+    const priceSaleInput = document.getElementById("price-sale") as HTMLInputElement | null;
+    const priceCostInput = document.getElementById("price-cost") as HTMLInputElement | null;
     const btnGenerateSku = document.getElementById("btn-generate-sku");
     const serviceSku = document.getElementById("service-sku") as HTMLInputElement | null;
 
-    function updateCalculations() {
-      const sale = parseFloat(priceSaleInput?.value || "0") || 0;
-      const cost = parseFloat(priceCostInput?.value || "0") || 0;
-      const profit = sale - cost;
-      const margin = sale > 0 ? ((profit / sale) * 100).toFixed(1) : "0.0";
-
-      const formattedProfit = Math.round(profit).toLocaleString("es-CO");
-      const formattedSale = Math.round(sale).toLocaleString("es-CO");
-
-      if (labelProfit) labelProfit.textContent = `$${formattedProfit} COP de ganancia`;
-      if (marginValue) marginValue.textContent = `${parseFloat(margin) >= 0 ? "+" : ""}${margin}% Margen`;
-      if (btnSubmitLabel) btnSubmitLabel.textContent = `Registrar Servicio ($${formattedSale} COP)`;
+    if (priceSaleInput) {
+      priceSaleInput.addEventListener("input", () => handlePriceInput(priceSaleInput));
     }
-
-    if (priceSaleInput) priceSaleInput.addEventListener("input", updateCalculations);
-    if (priceCostInput) priceCostInput.addEventListener("input", updateCalculations);
+    if (priceCostInput) {
+      priceCostInput.addEventListener("input", () => handlePriceInput(priceCostInput));
+    }
 
     // Auto-generación de SKU
     if (btnGenerateSku && serviceSku) {
@@ -584,35 +674,124 @@
         }
       });
     });
+
+    updateCalculations();
   }
 
-  // Guardar servicio técnico (mockup reactivo)
-  (window as any).saveNewService = function (repeat = false) {
-    const sku = (document.getElementById("service-sku") as HTMLInputElement | null)?.value.trim() || "SRV-MNT-06";
-    const name = (document.getElementById("service-name") as HTMLInputElement | null)?.value.trim() || "";
-    const sale = (document.getElementById("price-sale") as HTMLInputElement | null)?.value.trim() || "95000";
-    const formattedSale = Math.round(parseFloat(sale) || 0).toLocaleString("es-CO");
+  // Guardar servicio técnico conectado a la base de datos MySQL
+  (window as any).saveNewService = async function (repeat = false) {
+    const skuInput = document.getElementById("service-sku") as HTMLInputElement | null;
+    const nameInput = document.getElementById("service-name") as HTMLInputElement | null;
+    const catSelect = document.getElementById("service-category") as HTMLSelectElement | null;
+    const priceSaleInput = document.getElementById("price-sale") as HTMLInputElement | null;
+    const priceCostInput = document.getElementById("price-cost") as HTMLInputElement | null;
+    const hoursInput = document.getElementById("service-hours") as HTMLInputElement | null;
+    const minsInput = document.getElementById("service-minutes") as HTMLInputElement | null;
+    const statusSelect = document.getElementById("service-status") as HTMLSelectElement | null;
+    const descTextarea = document.getElementById("service-description") as HTMLTextAreaElement | null;
+    const submitBtn = document.getElementById("btn-submit-service") as HTMLButtonElement | null;
+
+    const name = nameInput?.value.trim() || "";
+    const sku = skuInput?.value.trim() || `SRV-TEC-${Math.floor(10 + Math.random() * 90)}`;
+    const sale = parseCOPDigits(priceSaleInput?.value || "0");
+    const cost = parseCOPDigits(priceCostInput?.value || "0");
 
     if (!name) {
       if ((window as any).showServiceToast) {
-        (window as any).showServiceToast("Por favor ingrese el nombre del servicio técnico.", "warning");
+        (window as any).showServiceToast("Por favor ingresa el nombre comercial del servicio técnico.", "warning");
+      } else {
+        alert("Por favor ingresa el nombre comercial del servicio técnico.");
       }
+      nameInput?.focus();
       return;
     }
 
-    if ((window as any).showServiceToast) {
-      (window as any).showServiceToast(`Servicio "${name}" [${sku}] por $${formattedSale} COP incorporado exitosamente.`);
+    if (sale <= 0) {
+      if ((window as any).showServiceToast) {
+        (window as any).showServiceToast("El precio de venta debe ser mayor a 0 COP.", "warning");
+      } else {
+        alert("El precio de venta debe ser mayor a 0 COP.");
+      }
+      priceSaleInput?.focus();
+      return;
     }
 
-    if (!repeat) {
-      (window as any).closeServiceModal();
-    } else {
-      const nameInput = document.getElementById("service-name") as HTMLInputElement | null;
-      const skuInput = document.getElementById("service-sku") as HTMLInputElement | null;
-      if (nameInput) nameInput.value = "";
-      if (skuInput) {
-        const rand = Math.floor(10 + Math.random() * 90);
-        skuInput.value = `SRV-NEW-${rand}`;
+    // Modalidad activa
+    const activeBillingCard = document.querySelector(".billing-card.border-secondary\\/30, .billing-card.shadow-xs");
+    const modalidad = activeBillingCard?.getAttribute("data-mode") || "fixed";
+
+    const hours = parseInt(hoursInput?.value || "1", 10) || 0;
+    const minutes = parseInt(minsInput?.value || "0", 10) || 0;
+    const totalMinutes = hours * 60 + minutes;
+
+    const categoria_id = catSelect?.value || null;
+    const estado = statusSelect?.value === "activo" ? 1 : 0;
+    const descripcion = descTextarea?.value.trim() || "";
+
+    const payload = {
+      codigo_sku: sku,
+      nombre: name,
+      categoria_id,
+      precio: sale,
+      costo: cost,
+      tipo_tarifa: modalidad,
+      tiempo_estimado_min: totalMinutes > 0 ? totalMinutes : 60,
+      descripcion,
+      estado,
+    };
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.classList.add("opacity-60", "cursor-not-allowed");
+    }
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/servicios`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const resData = await response.json();
+
+      if (!response.ok || !resData.success) {
+        throw new Error(resData.error || "Error al guardar el servicio en la base de datos.");
+      }
+
+      const formattedSale = sale.toLocaleString("es-CO");
+      if ((window as any).showServiceToast) {
+        (window as any).showServiceToast(`Servicio "${name}" [${sku}] por $${formattedSale} COP guardado exitosamente.`);
+      }
+
+      // Refrescar tabla en la vista principal
+      if ((window as any).loadServicesFromDB) {
+        await (window as any).loadServicesFromDB();
+      }
+
+      if (!repeat) {
+        (window as any).closeServiceModal();
+      } else {
+        if (nameInput) nameInput.value = "";
+        if (descTextarea) descTextarea.value = "";
+        if (skuInput) {
+          const rand = Math.floor(10 + Math.random() * 90);
+          skuInput.value = `SRV-TEC-${rand}`;
+        }
+        nameInput?.focus();
+      }
+    } catch (err: any) {
+      console.error("Error al registrar servicio:", err);
+      if ((window as any).showServiceToast) {
+        (window as any).showServiceToast(err.message || "Error al conectar con el servidor.", "warning");
+      } else {
+        alert(err.message);
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-60", "cursor-not-allowed");
       }
     }
   };

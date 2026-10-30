@@ -54,28 +54,28 @@ import AggServicio from "../components/AggServicio.astro";
           </div>
         </div>
 
-        <!-- KPI Metrics Grid (2 Big Responsive Bento Cards) -->
+        <!-- KPI Metrics Grid (2 Big Responsive Bento Cards Conectados a la BD) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
           <!-- Card 1 -->
           <div class="service-kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
             <div class="flex items-center justify-between">
-              <span class="text-[12px] text-on-surface-variant font-medium">Servicios realizados (Mes)</span>
-              <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-tertiary-fixed text-tertiary-container flex items-center gap-0.5">
-                <span class="material-symbols-outlined text-[13px]">arrow_upward</span>
-                +18.4%
+              <span class="text-[12px] text-on-surface-variant font-medium">Servicios en Catálogo</span>
+              <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-tertiary-fixed text-tertiary-container flex items-center gap-0.5" id="kpi-activos-pill">
+                <span class="material-symbols-outlined text-[13px]">check_circle</span>
+                <span id="kpi-activos-label">Sincronizado</span>
               </span>
             </div>
             <div class="mt-3">
               <div class="flex items-baseline gap-2">
-                <span class="text-[26px] sm:text-[28px] font-bold text-on-surface">148</span>
-                <span class="text-[12px] text-on-surface-variant font-medium">prestaciones técnicas</span>
+                <span id="kpi-total-servicios" class="text-[26px] sm:text-[28px] font-bold text-on-surface">0</span>
+                <span class="text-[12px] text-on-surface-variant font-medium">servicios técnicos</span>
               </div>
               <div class="flex items-center justify-between text-on-surface-variant mt-2 pt-2 bg-surface-container-low/60 -mx-4 sm:-mx-5 -mb-4 sm:-mb-5 px-4 sm:px-5 py-2 rounded-b-xl border-t border-surface-container/50">
                 <span class="text-[11px] flex items-center gap-1.5">
                   <span class="w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
-                  32 en ejecución activa hoy
+                  <span id="kpi-servicios-disponibles">Cargando catálogo...</span>
                 </span>
-                <span class="text-[11px] font-bold text-on-surface">Meta: 160</span>
+                <span class="text-[11px] font-bold text-on-surface" id="kpi-servicios-meta">100% operativos</span>
               </div>
             </div>
           </div>
@@ -83,20 +83,20 @@ import AggServicio from "../components/AggServicio.astro";
           <!-- Card 2 -->
           <div class="service-kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all">
             <div class="flex items-center justify-between">
-              <span class="text-[12px] text-on-surface-variant font-medium">Facturación por Servicios</span>
+              <span class="text-[12px] text-on-surface-variant font-medium">Facturación Acumulada</span>
               <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-tertiary-fixed text-tertiary-container flex items-center gap-0.5">
                 <span class="material-symbols-outlined text-[13px]">trending_up</span>
-                +12.2%
+                Ventas POS
               </span>
             </div>
             <div class="mt-3">
               <div class="flex items-baseline gap-1.5">
-                <span class="text-[26px] sm:text-[28px] font-bold text-on-surface">$16.310.000</span>
-                <span class="text-[12px] text-on-surface-variant font-medium">COP Mes</span>
+                <span id="kpi-facturacion-servicios" class="text-[26px] sm:text-[28px] font-bold text-on-surface">$0</span>
+                <span class="text-[12px] text-on-surface-variant font-medium">COP</span>
               </div>
               <div class="flex items-center justify-between text-on-surface-variant mt-2 pt-2 bg-surface-container-low/60 -mx-4 sm:-mx-5 -mb-4 sm:-mb-5 px-4 sm:px-5 py-2 rounded-b-xl border-t border-surface-container/50">
-                <span class="text-[11px] truncate">+12.2% margen operacional neto</span>
-                <span class="text-[11px] font-bold text-on-surface">76.5% prom.</span>
+                <span class="text-[11px] truncate" id="kpi-prestaciones-count">0 órdenes facturadas</span>
+                <span class="text-[11px] font-bold text-on-surface" id="kpi-margen-promedio">62.0% prom.</span>
               </div>
             </div>
           </div>
@@ -116,8 +116,8 @@ import AggServicio from "../components/AggServicio.astro";
               >
                 <span class="material-symbols-outlined text-[18px]">build_circle</span>
                 <span>Catálogo de Servicios & Tarifas</span>
-                <span class="px-1.5 py-0.2 bg-secondary-fixed text-on-secondary-fixed-variant text-[11px] font-bold rounded-full">
-                  24
+                <span id="tab-services-count" class="px-1.5 py-0.2 bg-secondary-fixed text-on-secondary-fixed-variant text-[11px] font-bold rounded-full">
+                  0
                 </span>
               </button>
               <button
@@ -241,7 +241,7 @@ import AggServicio from "../components/AggServicio.astro";
 
               <div class="flex items-center gap-2 text-on-surface-variant text-[12px] shrink-0 mt-1 lg:mt-0">
                 <span class="w-2 h-2 rounded-full bg-secondary-container"></span>
-                <span>Mostrando <span id="service-visible-count" class="font-bold text-on-surface">6</span> de 24 registros</span>
+                <span>Mostrando <span id="service-visible-count" class="font-bold text-on-surface">0</span> de <span id="service-total-count">0</span> registros</span>
               </div>
             </div>
 
@@ -257,417 +257,16 @@ import AggServicio from "../components/AggServicio.astro";
                     <th class="px-3 py-2 min-w-[320px] font-semibold">NOMBRE DEL SERVICIO & DESCRIPCIÓN TÉCNICA</th>
                     <th class="px-3 py-2 font-semibold">CATEGORÍA</th>
                     <th class="px-3 py-2 font-semibold">TIPO & DURACIÓN</th>
-                    <th class="px-3 py-2 text-right font-semibold">PRECIO</th>
+                    <th class="px-3 py-2 text-right font-semibold">PRECIO (COP)</th>
                     <th class="px-3 py-2 text-center font-semibold">ESTADO</th>
                     <th class="w-24 px-4 py-2 text-center font-semibold">ACCIONES</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-surface-container/40 text-on-surface">
-                  <!-- Row 1 -->
-                  <tr
-                    class="service-row group hover:bg-surface-container-low transition-colors h-12"
-                    data-category="mantenimiento"
-                    data-rate="fija"
-                    data-status="activo"
-                  >
-                    <td class="px-4 text-center">
-                      <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 focus:outline-none cursor-pointer" type="checkbox" />
-                    </td>
-                    <td class="px-3 py-2">
-                      <span class="font-semibold text-primary px-2 py-0.5 bg-surface-container rounded-lg text-[12px]">
-                        SRV-MNT-01
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      <div class="flex flex-col">
-                        <span class="font-semibold text-on-surface group-hover:text-secondary transition-colors">
-                          Mantenimiento Preventivo Servidores y Racks
-                        </span>
-                        <span class="text-[11px] text-on-surface-variant line-clamp-1">
-                          Limpieza física interna, revisión de fuentes redundantes y firmware
-                        </span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2">
-                      <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed">
-                        <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                        Mantenimiento
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      <div class="flex items-center gap-1.5 text-on-surface-variant text-[12px]">
-                        <span class="font-semibold text-on-surface">Fijo</span>
-                        <span>•</span>
-                        <span class="flex items-center gap-0.5 text-on-surface-variant">
-                          <span class="material-symbols-outlined text-[14px]">schedule</span> ~2.5 hrs
-                        </span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2 text-right font-bold text-on-surface">$85.00</td>
-                    <td class="px-3 py-2 text-center">
-                      <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-tertiary-fixed text-tertiary-container">
-                        Activo
-                      </span>
-                    </td>
-                    <td class="px-4 py-2 text-center">
-                      <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <button
-                          class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-secondary cursor-pointer"
-                          title="Editar Servicio"
-                          type="button"
-                          onclick="window.openServiceModal && window.openServiceModal()"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">edit</span>
-                        </button>
-                        <button
-                          class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-primary cursor-pointer"
-                          title="Asignar a Orden"
-                          type="button"
-                          onclick="window.showServiceToast && window.showServiceToast('Servicio SRV-MNT-01 asignado a orden.')"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">add_task</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Row 2 -->
-                  <tr
-                    class="service-row group hover:bg-surface-container-low transition-colors h-12 bg-surface-container-low/20"
-                    data-category="instalación & redes"
-                    data-rate="punto"
-                    data-status="activo"
-                  >
-                    <td class="px-4 text-center">
-                      <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 focus:outline-none cursor-pointer" type="checkbox" />
-                    </td>
-                    <td class="px-3 py-2">
-                      <span class="font-semibold text-primary px-2 py-0.5 bg-surface-container rounded-lg text-[12px]">
-                        SRV-INST-04
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      <div class="flex flex-col">
-                        <span class="font-semibold text-on-surface group-hover:text-secondary transition-colors">
-                          Instalación y Certificación de Cableado Cat 6A
-                        </span>
-                        <span class="text-[11px] text-on-surface-variant line-clamp-1">
-                          Despliegue estructurado por punto de red, conectorización y rotulado fluke
-                        </span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2">
-                      <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface">
-                        <span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
-                        Instalación & Redes
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      <div class="flex items-center gap-1.5 text-on-surface-variant text-[12px]">
-                        <span class="font-semibold text-on-surface">Por Punto</span>
-                        <span>•</span>
-                        <span class="flex items-center gap-0.5 text-on-surface-variant">
-                          <span class="material-symbols-outlined text-[14px]">schedule</span> ~1.0 hr
-                        </span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2 text-right font-bold text-on-surface">$35.00</td>
-                    <td class="px-3 py-2 text-center">
-                      <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-tertiary-fixed text-tertiary-container">
-                        Activo
-                      </span>
-                    </td>
-                    <td class="px-4 py-2 text-center">
-                      <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <button
-                          class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-secondary cursor-pointer"
-                          title="Editar Servicio"
-                          type="button"
-                          onclick="window.openServiceModal && window.openServiceModal()"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">edit</span>
-                        </button>
-                        <button
-                          class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-primary cursor-pointer"
-                          title="Asignar a Orden"
-                          type="button"
-                          onclick="window.showServiceToast && window.showServiceToast('Servicio SRV-INST-04 asignado a orden.')"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">add_task</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Row 3 -->
-                  <tr
-                    class="service-row group hover:bg-surface-container-low transition-colors h-12"
-                    data-category="soporte pos"
-                    data-rate="fija"
-                    data-status="activo"
-                  >
-                    <td class="px-4 text-center">
-                      <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 focus:outline-none cursor-pointer" type="checkbox" />
-                    </td>
-                    <td class="px-3 py-2">
-                      <span class="font-semibold text-primary px-2 py-0.5 bg-surface-container rounded-lg text-[12px]">
-                        SRV-POS-02
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      <div class="flex flex-col">
-                        <span class="font-semibold text-on-surface group-hover:text-secondary transition-colors">
-                          Configuración y Puesta en Marcha Terminales POS
-                        </span>
-                        <span class="text-[11px] text-on-surface-variant line-clamp-1">
-                          Sincronización de periféricos lectores, gaveta electrónica e impresora fiscal
-                        </span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2">
-                      <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed">
-                        <span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
-                        Soporte POS
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      <div class="flex items-center gap-1.5 text-on-surface-variant text-[12px]">
-                        <span class="font-semibold text-on-surface">Fijo</span>
-                        <span>•</span>
-                        <span class="flex items-center gap-0.5 text-on-surface-variant">
-                          <span class="material-symbols-outlined text-[14px]">schedule</span> ~1.5 hrs
-                        </span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2 text-right font-bold text-on-surface">$50.00</td>
-                    <td class="px-3 py-2 text-center">
-                      <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-tertiary-fixed text-tertiary-container">
-                        Activo
-                      </span>
-                    </td>
-                    <td class="px-4 py-2 text-center">
-                      <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <button
-                          class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-secondary cursor-pointer"
-                          title="Editar Servicio"
-                          type="button"
-                          onclick="window.openServiceModal && window.openServiceModal()"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">edit</span>
-                        </button>
-                        <button
-                          class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-primary cursor-pointer"
-                          title="Asignar a Orden"
-                          type="button"
-                          onclick="window.showServiceToast && window.showServiceToast('Servicio SRV-POS-02 asignado a orden.')"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">add_task</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Row 4 -->
-                  <tr
-                    class="service-row group hover:bg-surface-container-low transition-colors h-12 bg-surface-container-low/20"
-                    data-category="laboratorio"
-                    data-rate="fija"
-                    data-status="activo"
-                  >
-                    <td class="px-4 text-center">
-                      <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 focus:outline-none cursor-pointer" type="checkbox" />
-                    </td>
-                    <td class="px-3 py-2">
-                      <span class="font-semibold text-primary px-2 py-0.5 bg-surface-container rounded-lg text-[12px]">
-                        SRV-CAL-08
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      <div class="flex flex-col">
-                        <span class="font-semibold text-on-surface group-hover:text-secondary transition-colors">
-                          Calibración Óptica y Alineación Lectores Láser
-                        </span>
-                        <span class="text-[11px] text-on-surface-variant line-clamp-1">
-                          Ajuste micrométrico de lentes, test de campo y decodificación 2D de alta densidad
-                        </span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2">
-                      <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface">
-                        <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                        Laboratorio
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      <div class="flex items-center gap-1.5 text-on-surface-variant text-[12px]">
-                        <span class="font-semibold text-on-surface">Fijo</span>
-                        <span>•</span>
-                        <span class="flex items-center gap-0.5 text-on-surface-variant">
-                          <span class="material-symbols-outlined text-[14px]">schedule</span> ~45 min
-                        </span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2 text-right font-bold text-on-surface">$42.00</td>
-                    <td class="px-3 py-2 text-center">
-                      <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-tertiary-fixed text-tertiary-container">
-                        Activo
-                      </span>
-                    </td>
-                    <td class="px-4 py-2 text-center">
-                      <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <button
-                          class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-secondary cursor-pointer"
-                          title="Editar Servicio"
-                          type="button"
-                          onclick="window.openServiceModal && window.openServiceModal()"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">edit</span>
-                        </button>
-                        <button
-                          class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-primary cursor-pointer"
-                          title="Asignar a Orden"
-                          type="button"
-                          onclick="window.showServiceToast && window.showServiceToast('Servicio SRV-CAL-08 asignado a orden.')"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">add_task</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Row 5 -->
-                  <tr
-                    class="service-row group hover:bg-surface-container-low transition-colors h-12"
-                    data-category="soporte remoto"
-                    data-rate="hora"
-                    data-status="activo"
-                  >
-                    <td class="px-4 text-center">
-                      <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 focus:outline-none cursor-pointer" type="checkbox" />
-                    </td>
-                    <td class="px-3 py-2">
-                      <span class="font-semibold text-primary px-2 py-0.5 bg-surface-container rounded-lg text-[12px]">
-                        SRV-RMT-03
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      <div class="flex flex-col">
-                        <span class="font-semibold text-on-surface group-hover:text-secondary transition-colors">
-                          Soporte Remoto Helpdesk Nivel 2
-                        </span>
-                        <span class="text-[11px] text-on-surface-variant line-clamp-1">
-                          Atención de incidencias de software ERP, conexión a bases de datos y respaldos
-                        </span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2">
-                      <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed">
-                        <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                        Soporte Remoto
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      <div class="flex items-center gap-1.5 text-on-surface-variant text-[12px]">
-                        <span class="font-semibold text-on-surface">Por Hora</span>
-                        <span>•</span>
-                        <span class="flex items-center gap-0.5 text-on-surface-variant">
-                          <span class="material-symbols-outlined text-[14px]">schedule</span> 60 min
-                        </span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2 text-right font-bold text-on-surface">$28.00/h</td>
-                    <td class="px-3 py-2 text-center">
-                      <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-tertiary-fixed text-tertiary-container">
-                        Activo
-                      </span>
-                    </td>
-                    <td class="px-4 py-2 text-center">
-                      <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <button
-                          class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-secondary cursor-pointer"
-                          title="Editar Servicio"
-                          type="button"
-                          onclick="window.openServiceModal && window.openServiceModal()"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">edit</span>
-                        </button>
-                        <button
-                          class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-primary cursor-pointer"
-                          title="Asignar a Orden"
-                          type="button"
-                          onclick="window.showServiceToast && window.showServiceToast('Servicio SRV-RMT-03 asignado a orden.')"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">add_task</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Row 6 -->
-                  <tr
-                    class="service-row group hover:bg-surface-container-low transition-colors h-12 bg-surface-container-low/20"
-                    data-category="consultoría"
-                    data-rate="proyecto"
-                    data-status="activo"
-                  >
-                    <td class="px-4 text-center">
-                      <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 focus:outline-none cursor-pointer" type="checkbox" />
-                    </td>
-                    <td class="px-3 py-2">
-                      <span class="font-semibold text-primary px-2 py-0.5 bg-surface-container rounded-lg text-[12px]">
-                        SRV-AUD-07
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      <div class="flex flex-col">
-                        <span class="font-semibold text-on-surface group-hover:text-secondary transition-colors">
-                          Auditoría de Seguridad y Respaldo Local/Nube
-                        </span>
-                        <span class="text-[11px] text-on-surface-variant line-clamp-1">
-                          Análisis de vulnerabilidades, verificación de redundancia y pruebas de restauración
-                        </span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2">
-                      <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface">
-                        <span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
-                        Consultoría
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      <div class="flex items-center gap-1.5 text-on-surface-variant text-[12px]">
-                        <span class="font-semibold text-on-surface">Por Proyecto</span>
-                        <span>•</span>
-                        <span class="flex items-center gap-0.5 text-on-surface-variant">
-                          <span class="material-symbols-outlined text-[14px]">schedule</span> ~4.0 hrs
-                        </span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2 text-right font-bold text-on-surface">$195.00</td>
-                    <td class="px-3 py-2 text-center">
-                      <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-tertiary-fixed text-tertiary-container">
-                        Activo
-                      </span>
-                    </td>
-                    <td class="px-4 py-2 text-center">
-                      <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <button
-                          class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-secondary cursor-pointer"
-                          title="Editar Servicio"
-                          type="button"
-                          onclick="window.openServiceModal && window.openServiceModal()"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">edit</span>
-                        </button>
-                        <button
-                          class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-primary cursor-pointer"
-                          title="Asignar a Orden"
-                          type="button"
-                          onclick="window.showServiceToast && window.showServiceToast('Servicio SRV-AUD-07 asignado a orden.')"
-                        >
-                          <span class="material-symbols-outlined text-[18px]">add_task</span>
-                        </button>
-                      </div>
+                <tbody id="services-table-body" class="divide-y divide-surface-container/40 text-on-surface">
+                  <tr>
+                    <td colspan="8" class="p-8 text-center text-on-surface-variant">
+                      <span class="material-symbols-outlined text-[32px] animate-spin mb-2 block text-secondary">progress_activity</span>
+                      <span>Cargando servicios técnicos desde la base de datos...</span>
                     </td>
                   </tr>
                 </tbody>
@@ -677,7 +276,7 @@ import AggServicio from "../components/AggServicio.astro";
             <!-- Table Footer / Pagination -->
             <div class="p-3 bg-surface-container-low/30 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-surface-container/60 text-[12px] text-on-surface-variant">
               <div class="flex items-center gap-4">
-                <span>Mostrando <strong class="text-on-surface font-semibold">1-6</strong> de <strong class="text-on-surface font-semibold">24</strong> servicios</span>
+                <span id="services-pagination-info">Mostrando <strong class="text-on-surface font-semibold">0</strong> servicios</span>
                 <div class="flex items-center gap-1.5">
                   <span>Filas:</span>
                   <select class="bg-surface text-on-surface rounded-lg px-2 py-1 text-[11px] border border-surface-container focus:outline-none cursor-pointer">
@@ -757,28 +356,306 @@ import AggServicio from "../components/AggServicio.astro";
       showServiceToast,
     } from "../animaciones/animaServicios.js";
 
-    window.switchServiceTab = switchServiceTab;
-    window.openServiceModal = openServiceModal;
-    window.closeServiceModal = closeServiceModal;
-    window.showServiceToast = showServiceToast;
+    (window as any).switchServiceTab = switchServiceTab;
+    (window as any).openServiceModal = openServiceModal;
+    (window as any).closeServiceModal = closeServiceModal;
+    (window as any).showServiceToast = showServiceToast;
 
-    if (!window.saveNewService) {
-      window.saveNewService = function() {
-        const name = (document.getElementById("service-name") as HTMLInputElement | null)?.value.trim();
-        const price = (document.getElementById("price-sale") as HTMLInputElement | null)?.value.trim();
+    const BACKEND_URL = "http://localhost:3000";
+    let allServicios: any[] = [];
 
-        if (!name || !price) {
-          showServiceToast("Por favor complete el nombre y el precio del servicio.", "warning");
-          return;
+    function formatCOP(num: any) {
+      const val = Math.round(Number(num) || 0);
+      return `$${val.toLocaleString("es-CO")} COP`;
+    }
+
+    function formatDuration(minutes: number) {
+      if (!minutes || minutes <= 0) return "~45 min";
+      if (minutes >= 60) {
+        const h = (minutes / 60).toFixed(1).replace(".0", "");
+        return `~${h} hrs`;
+      }
+      return `~${minutes} min`;
+    }
+
+    function escapeHtml(str: any) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    // Cargar servicios técnicos desde la base de datos MySQL
+    (window as any).loadServicesFromDB = async function () {
+      const tbody = document.getElementById("services-table-body");
+      if (!tbody) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/servicios`);
+        if (!response.ok) throw new Error("No se pudo obtener el catálogo de servicios.");
+
+        const resData = await response.json();
+        const data = resData.data || {};
+        allServicios = data.servicios || [];
+        const kpis = data.kpis || {};
+
+        // Actualizar KPIs superiores
+        const kpiTotal = document.getElementById("kpi-total-servicios");
+        const kpiDisp = document.getElementById("kpi-servicios-disponibles");
+        const kpiFact = document.getElementById("kpi-facturacion-servicios");
+        const kpiPrest = document.getElementById("kpi-prestaciones-count");
+        const kpiMargen = document.getElementById("kpi-margen-promedio");
+        const tabCount = document.getElementById("tab-services-count");
+
+        if (kpiTotal) kpiTotal.textContent = String(kpis.total_servicios || allServicios.length);
+        if (kpiDisp) kpiDisp.textContent = `${kpis.servicios_activos || 0} activos en catálogo`;
+        if (kpiFact) kpiFact.textContent = `$${Math.round(kpis.facturacion_mes || 0).toLocaleString("es-CO")}`;
+        if (kpiPrest) kpiPrest.textContent = `${kpis.total_prestaciones_mes || 0} prestaciones facturadas`;
+        if (kpiMargen) kpiMargen.textContent = `${kpis.margen_promedio || 62}% prom.`;
+        if (tabCount) tabCount.textContent = String(allServicios.length);
+
+        renderServicesTable(allServicios);
+      } catch (err: any) {
+        console.error("Error al cargar servicios:", err);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="p-8 text-center text-error">
+              <span class="material-symbols-outlined text-[32px] mb-2 block">error</span>
+              <span class="font-medium">Error al conectar con la base de datos</span>
+              <p class="text-[12px] opacity-80 mt-1">${err.message || ""}</p>
+            </td>
+          </tr>
+        `;
+      }
+    };
+
+    function renderServicesTable(list: any[]) {
+      const tbody = document.getElementById("services-table-body");
+      const visibleCountEl = document.getElementById("service-visible-count");
+      const totalCountEl = document.getElementById("service-total-count");
+      const pagInfo = document.getElementById("services-pagination-info");
+
+      if (!tbody) return;
+
+      if (visibleCountEl) visibleCountEl.textContent = String(list.length);
+      if (totalCountEl) totalCountEl.textContent = String(allServicios.length);
+      if (pagInfo) {
+        pagInfo.innerHTML = `Mostrando <strong class="text-on-surface font-semibold">1-${list.length}</strong> de <strong class="text-on-surface font-semibold">${allServicios.length}</strong> servicios`;
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="p-10 text-center text-on-surface-variant">
+              <span class="material-symbols-outlined text-[38px] mb-2 block text-on-surface-variant/40">home_repair_service</span>
+              <span class="font-semibold text-[14px] text-primary">No se encontraron servicios en el catálogo</span>
+              <p class="text-[12px] text-on-surface-variant/70 mt-1">
+                Haz clic en "Registrar Nuevo Servicio" para dar de alta una nueva prestación técnica.
+              </p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = list
+        .map((srv, idx) => {
+          const sku = srv.codigo_sku || `SRV-${srv.id.slice(0, 6).toUpperCase()}`;
+          const catName = srv.categoria_nombre || "Servicios técnicos";
+          const desc = srv.descripcion || "Prestación técnica y mano de obra especializada";
+          const cleanName = escapeHtml(srv.nombre);
+          const cleanDesc = escapeHtml(desc);
+          const cleanCat = escapeHtml(catName);
+          const cleanTarifa = escapeHtml(srv.tipo_tarifa || "fija");
+          const bgAlt = idx % 2 === 1 ? "bg-surface-container-low/20" : "";
+
+          // Formateo de tarifa
+          let tipoLabel = "Fijo";
+          if (cleanTarifa.includes("hora") || cleanTarifa.includes("hourly")) tipoLabel = "Por Hora";
+          else if (cleanTarifa.includes("punto") || cleanTarifa.includes("unit")) tipoLabel = "Por Punto";
+          else if (cleanTarifa.includes("proyecto") || cleanTarifa.includes("custom")) tipoLabel = "Por Proyecto";
+
+          const statusBadge = srv.estado
+            ? `<button onclick="window.toggleServiceStatus('${srv.id}')" title="Clic para pausar" class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-tertiary-fixed text-tertiary-container hover:opacity-80 transition-opacity cursor-pointer">Activo</button>`
+            : `<button onclick="window.toggleServiceStatus('${srv.id}')" title="Clic para activar" class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-surface-container text-on-surface-variant hover:opacity-80 transition-opacity cursor-pointer">Inactivo</button>`;
+
+          return `
+            <tr
+              class="service-row group hover:bg-surface-container-low transition-colors h-12 ${bgAlt}"
+              data-category="${cleanCat.toLowerCase()}"
+              data-rate="${cleanTarifa.toLowerCase()}"
+              data-status="${srv.estado ? "activo" : "inactivo"}"
+            >
+              <td class="px-4 text-center">
+                <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 focus:outline-none cursor-pointer" type="checkbox" />
+              </td>
+              <td class="px-3 py-2">
+                <span class="font-semibold text-primary px-2 py-0.5 bg-surface-container rounded-lg text-[12px] font-mono">
+                  ${escapeHtml(sku)}
+                </span>
+              </td>
+              <td class="px-3 py-2">
+                <div class="flex flex-col">
+                  <span class="font-semibold text-on-surface group-hover:text-secondary transition-colors">
+                    ${cleanName}
+                  </span>
+                  <span class="text-[11px] text-on-surface-variant line-clamp-1">
+                    ${cleanDesc}
+                  </span>
+                </div>
+              </td>
+              <td class="px-3 py-2">
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed">
+                  <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  ${cleanCat}
+                </span>
+              </td>
+              <td class="px-3 py-2">
+                <div class="flex items-center gap-1.5 text-on-surface-variant text-[12px]">
+                  <span class="font-semibold text-on-surface">${tipoLabel}</span>
+                  <span>•</span>
+                  <span class="flex items-center gap-0.5 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-[14px]">schedule</span> ${formatDuration(srv.tiempo_estimado_min)}
+                  </span>
+                </div>
+              </td>
+              <td class="px-3 py-2 text-right font-bold text-on-surface font-mono whitespace-nowrap">
+                ${formatCOP(srv.precio)}
+              </td>
+              <td class="px-3 py-2 text-center">
+                ${statusBadge}
+              </td>
+              <td class="px-4 py-2 text-center">
+                <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                  <button
+                    class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-secondary transition-colors cursor-pointer"
+                    title="Editar Servicio"
+                    type="button"
+                    onclick="window.openServiceModal && window.openServiceModal()"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                  </button>
+                  <button
+                    class="p-1 hover:bg-error-container/30 rounded-lg text-on-surface-variant hover:text-error transition-colors cursor-pointer"
+                    title="Eliminar Servicio"
+                    type="button"
+                    onclick="window.deleteService('${srv.id}', '${cleanName.replace(/'/g, "\\'")}')"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    // Alternar estado de servicio activo/inactivo
+    (window as any).toggleServiceStatus = async function (id: string) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/servicios/${id}/toggle`, {
+          method: "PATCH",
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || "No se pudo cambiar el estado.");
+
+        if ((window as any).showServiceToast) {
+          (window as any).showServiceToast(data.message || "Estado actualizado con éxito.");
+        }
+        await (window as any).loadServicesFromDB();
+      } catch (err: any) {
+        console.error("Error al alternar estado:", err);
+        if ((window as any).showServiceToast) {
+          (window as any).showServiceToast(err.message, "warning");
+        }
+      }
+    };
+
+    // Eliminar servicio de la base de datos
+    (window as any).deleteService = async function (id: string, name: string) {
+      const confirmMsg = `¿Estás seguro de que deseas eliminar permanentemente el servicio:\n\n"${name}"?\n\nEsta acción lo borrará de la base de datos y no se podrá recuperar.`;
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/servicios/${id}`, {
+          method: "DELETE",
+        });
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "No se pudo eliminar el servicio.");
         }
 
-        closeServiceModal();
-        showServiceToast(`Servicio "${name}" incorporado al catálogo exitosamente.`);
-      };
+        if ((window as any).showServiceToast) {
+          (window as any).showServiceToast(`Servicio "${name}" eliminado correctamente.`);
+        }
+        await (window as any).loadServicesFromDB();
+      } catch (err: any) {
+        console.error("Error al eliminar servicio:", err);
+        if ((window as any).showServiceToast) {
+          (window as any).showServiceToast(err.message || "Error al eliminar servicio.", "warning");
+        } else {
+          alert(err.message);
+        }
+      }
+    };
+
+    function setupFilters() {
+      const searchInput = document.getElementById("service-search-input") as HTMLInputElement | null;
+      const categoryFilter = document.getElementById("service-category-filter") as HTMLSelectElement | null;
+      const rateFilter = document.getElementById("service-rate-filter") as HTMLSelectElement | null;
+      const statusFilter = document.getElementById("service-status-filter") as HTMLSelectElement | null;
+      const resetBtn = document.getElementById("btn-reset-service-filters");
+
+      function applyFilters() {
+        const q = (searchInput?.value || "").toLowerCase().trim();
+        const cat = (categoryFilter?.value || "").toLowerCase().trim();
+        const rate = (rateFilter?.value || "").toLowerCase().trim();
+        const status = (statusFilter?.value || "").toLowerCase().trim();
+
+        const filtered = allServicios.filter((srv) => {
+          const name = (srv.nombre || "").toLowerCase();
+          const sku = (srv.codigo_sku || "").toLowerCase();
+          const desc = (srv.descripcion || "").toLowerCase();
+          const catName = (srv.categoria_nombre || "").toLowerCase();
+          const srvRate = (srv.tipo_tarifa || "").toLowerCase();
+          const srvStatus = srv.estado ? "activo" : "inactivo";
+
+          const matchesQ = !q || name.includes(q) || sku.includes(q) || desc.includes(q);
+          const matchesCat = !cat || cat.includes("todas") || catName.includes(cat);
+          const matchesRate = !rate || rate.includes("todas") || srvRate.includes(rate);
+          const matchesStatus = !status || status.includes("todos") || srvStatus === status;
+
+          return matchesQ && matchesCat && matchesRate && matchesStatus;
+        });
+
+        renderServicesTable(filtered);
+      }
+
+      if (searchInput) searchInput.addEventListener("input", applyFilters);
+      if (categoryFilter) categoryFilter.addEventListener("change", applyFilters);
+      if (rateFilter) rateFilter.addEventListener("change", applyFilters);
+      if (statusFilter) statusFilter.addEventListener("change", applyFilters);
+
+      if (resetBtn) {
+        resetBtn.addEventListener("click", () => {
+          if (searchInput) searchInput.value = "";
+          if (categoryFilter) categoryFilter.value = "Categoría: Todas";
+          if (rateFilter) rateFilter.value = "Tarifa: Todas";
+          if (statusFilter) statusFilter.value = "Estado: Todos";
+          applyFilters();
+          showServiceToast("Filtros restablecidos.", "info");
+        });
+      }
     }
 
     function setupServicios() {
       initServicios();
+      setupFilters();
+      (window as any).loadServicesFromDB();
     }
 
     document.addEventListener("astro:page-load", setupServicios);
