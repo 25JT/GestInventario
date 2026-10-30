@@ -529,6 +529,7 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
       try {
         const d = new Date(dateStr);
         return d.toLocaleDateString("es-CO", {
+          timeZone: "America/Bogota",
           day: "2-digit",
           month: "short",
           hour: "2-digit",

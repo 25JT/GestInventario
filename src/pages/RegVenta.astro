@@ -916,6 +916,7 @@ import NavBar from "../components/Nav.astro";
           tbody.innerHTML = ventas.map((v: any) => {
             const isAnulada = v.estado === "ANULADA";
             const dateStr = new Date(v.fecha_hora).toLocaleDateString("es-CO", {
+              timeZone: "America/Bogota",
               day: "2-digit",
               month: "short",
               hour: "2-digit",
