@@ -23,12 +23,13 @@ export function hydrateUserSession() {
 
       // Nombre
       const name = (
+        user.nombreCompleto ||
         user.name ||
         user.nombre ||
         (user.identifier ? user.identifier.split("@")[0] : "Colaborador")
       ).trim();
       const lastname = (user.lastname || user.apellido || "").trim();
-      const fullName = `${name} ${lastname}`.trim();
+      const fullName = user.nombreCompleto || `${name} ${lastname}`.trim();
 
       document
         .querySelectorAll("#user-display-name, [data-user-name]")
@@ -38,19 +39,13 @@ export function hydrateUserSession() {
 
       const welcomeName = document.getElementById("welcome-name");
       if (welcomeName) {
-        welcomeName.textContent = name;
+        welcomeName.textContent = user.nombre || name;
       }
 
       // Nombre de usuario corporativo (@usuario)
-      let generated = (
-        name.slice(0, 2) + (lastname ? lastname.slice(0, 3) : "usr")
-      )
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, "");
-
-      let rawUsername = (user.username || "").trim().replace(/^@+/, "");
+      let rawUsername = (user.usuario || user.username || "").trim().replace(/^@+/, "");
       if (!rawUsername || rawUsername === "." || rawUsername.length < 2) {
-        rawUsername = generated || "colaborador";
+        rawUsername = "admin";
       }
 
       document
@@ -60,13 +55,17 @@ export function hydrateUserSession() {
         });
 
       // Rol
-      const role =
-        user.roleName ||
-        (user.role === "admin"
-          ? "Jefe / Administrador"
-          : user.role === "administrativo"
-          ? "Administrativo"
-          : "Vendedor POS");
+      const roleMap = {
+        JEFE_ADMIN: "Jefe / SuperAdmin",
+        ADMIN: "Administrador General",
+        ADMINISTRATIVO: "Administrativo Operativo",
+        CAJERO: "Vendedor POS",
+        vendedor: "Vendedor POS",
+        administrativo: "Administrativo",
+        admin: "Jefe / SuperAdmin",
+      };
+
+      const role = user.roleName || roleMap[user.rol] || roleMap[user.role] || "Colaborador";
 
       document
         .querySelectorAll("#user-role-badge, #user-display-role, [data-user-role]")
@@ -75,16 +74,58 @@ export function hydrateUserSession() {
         });
 
       // Iniciales Avatar
-      const initials =
-        (
-          name.charAt(0) + (lastname.charAt(0) || name.charAt(1) || "")
-        ).toUpperCase() || "OP";
+      const initials = (
+        (user.nombre ? user.nombre.charAt(0) : name.charAt(0)) +
+        (user.apellido ? user.apellido.charAt(0) : lastname.charAt(0) || name.charAt(1) || "")
+      ).toUpperCase() || "AD";
 
       document
         .querySelectorAll("#user-avatar, [data-user-avatar]")
         .forEach((el) => {
           el.textContent = initials;
         });
+
+      // RBAC: Control de Acceso y Visibilidad de Módulos según Rol
+      const rawRol = String(user.rol || user.role || "CAJERO").toUpperCase();
+      const isSuperAdmin = rawRol === "JEFE_ADMIN" || rawRol === "ADMIN";
+      const isAdministrativo = rawRol === "ADMINISTRATIVO";
+      const isCajero = rawRol === "CAJERO" || rawRol === "VENDEDOR" || rawRol === "POS";
+
+      // Módulos visibles en el Sidebar:
+      // JEFE_ADMIN: todos ('principal', 'inventario', 'ventas', 'gastos', 'servicios', 'usuarios')
+      // ADMINISTRATIVO: 'principal', 'inventario', 'ventas', 'gastos', 'servicios' (NO 'usuarios')
+      // CAJERO: 'principal', 'ventas', 'servicios' (NO 'inventario', 'gastos', 'usuarios')
+      document.querySelectorAll("#main-sidebar nav a[data-path]").forEach((link) => {
+        const path = link.getAttribute("data-path");
+        let visible = true;
+        if (path === "usuarios" && !isSuperAdmin) {
+          visible = false;
+        }
+        if (path === "gastos" && isCajero) {
+          visible = false;
+        }
+        if (path === "inventario" && isCajero) {
+          visible = false;
+        }
+        link.style.display = visible ? "" : "none";
+      });
+
+      // Protección de Rutas por Rol en el Cliente
+      const currentPath = window.location.pathname.toLowerCase().replace(/\/$/, "");
+      if (currentPath.includes("usuariosroles") && !isSuperAdmin) {
+        alert("Acceso denegado: Tu rol no tiene permisos para el módulo de Usuarios y Roles.");
+        window.location.href = "/DashPrincipal";
+      } else if ((currentPath.includes("gastosoperativos") || currentPath.includes("controldeinventario")) && isCajero) {
+        alert("Acceso restringido: Tu perfil operativo solo tiene acceso a Ventas y Catálogo.");
+        window.location.href = "/RegVenta";
+      }
+    } else {
+      // Si no hay sesión iniciada y estamos en una página protegida, redirigir a Login
+      const currentPath = window.location.pathname.toLowerCase().replace(/\/$/, "");
+      const isPublic = currentPath === "" || currentPath === "/" || currentPath.includes("primer-acceso");
+      if (!isPublic) {
+        window.location.href = "/";
+      }
     }
   } catch (err) {
     console.error("Error al hidratar sesión en sidebar:", err);
