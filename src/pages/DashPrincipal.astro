@@ -197,12 +197,12 @@ const transactions = initialData?.transactions || [];
         </div>
 
         <!-- Row 1: KPI Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div id="kpi-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <!-- KPI 1: Ventas Totales -->
-          <div class="kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div id="kpi-card-ventas" class="kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
             <div class="flex items-start justify-between">
               <div class="flex flex-col">
-                <span class="text-[12px] text-on-surface-variant uppercase tracking-wider font-semibold">
+                <span id="kpi-ventas-title" class="text-[12px] text-on-surface-variant uppercase tracking-wider font-semibold">
                   Ventas Totales (COP)
                 </span>
                 <span id="kpi-ventas-val" class="text-[24px] sm:text-[26px] text-on-surface tracking-tight mt-1 font-bold">
@@ -224,7 +224,7 @@ const transactions = initialData?.transactions || [];
           </div>
 
           <!-- KPI 2: Gastos Operativos -->
-          <div class="kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div id="kpi-card-gastos" class="kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
             <div class="flex items-start justify-between">
               <div class="flex flex-col">
                 <span class="text-[12px] text-on-surface-variant uppercase tracking-wider font-semibold">
@@ -249,7 +249,7 @@ const transactions = initialData?.transactions || [];
           </div>
 
           <!-- KPI 3: Dinero Total / Utilidad -->
-          <div class="kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div id="kpi-card-utilidad" class="kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
             <div class="flex items-start justify-between">
               <div class="flex flex-col">
                 <span class="text-[12px] text-on-surface-variant uppercase tracking-wider font-semibold">
@@ -274,7 +274,7 @@ const transactions = initialData?.transactions || [];
           </div>
 
           <!-- KPI 4: Estado de Inventario y Escala de Faltantes -->
-          <div class="kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div id="kpi-card-inventario" class="kpi-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl shadow-xs border border-surface-container/60 flex flex-col justify-between hover:shadow-md transition-shadow">
             <div class="flex items-start justify-between">
               <div class="flex flex-col">
                 <span class="text-[12px] text-on-surface-variant uppercase tracking-wider font-semibold">
@@ -370,7 +370,7 @@ const transactions = initialData?.transactions || [];
                         <span class="w-2.5 h-2.5 rounded-full bg-secondary-container"></span>
                         <span class="font-medium">Ventas registradas</span>
                       </div>
-                      <div class="flex items-center gap-1.5">
+                      <div class="flex items-center gap-1.5" id="chart-legend-gastos">
                         <span class="w-2.5 h-2.5 rounded-full bg-outline-variant"></span>
                         <span class="font-medium">Gastos operativos</span>
                       </div>
@@ -1062,6 +1062,18 @@ const transactions = initialData?.transactions || [];
     // Filtros de tiempo: Hoy / Esta semana / Este mes
     // Afecta ventas, gastos, balance y gráfica sin alterar inventario
     (window as any).setTimeFilter = function(btn: HTMLElement, filter: string) {
+      // Bloquear periodos no autorizados para el rol cajero
+      const storedUser = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+      if (storedUser) {
+        try {
+          const u = JSON.parse(storedUser);
+          const r = String(u.rol || u.role || "").toUpperCase();
+          if ((r === "CAJERO" || r === "VENDEDOR" || r === "POS") && filter !== "hoy") {
+            return;
+          }
+        } catch(e) {}
+      }
+
       currentPeriod = filter;
       document.querySelectorAll("#time-filter-group .time-tab").forEach((tab) => {
         tab.classList.remove("active", "bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
@@ -1157,12 +1169,78 @@ const transactions = initialData?.transactions || [];
       }
     }
 
+    // Aplicar restricciones de visualización para rol Cajero / Vendedor POS
+    function applyRoleRestrictions() {
+      const storedUser = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+      let isCajero = false;
+      if (storedUser) {
+        try {
+          const u = JSON.parse(storedUser);
+          const r = String(u.rol || u.role || "").toUpperCase();
+          if (r === "CAJERO" || r === "VENDEDOR" || r === "POS") {
+            isCajero = true;
+          }
+        } catch (e) {}
+      }
+
+      if (isCajero) {
+        // En el principal solo tendrá habilitada la venta del día (no podrá ver venta de mes ni gastos)
+        currentPeriod = "hoy";
+
+        // Ocultar botones de semana y mes
+        const btnSemana = document.querySelector('#time-filter-group button[data-period="semana"]') as HTMLElement | null;
+        const btnMes = document.querySelector('#time-filter-group button[data-period="mes"]') as HTMLElement | null;
+        if (btnSemana) btnSemana.style.display = "none";
+        if (btnMes) btnMes.style.display = "none";
+
+        // Activar visualmente 'Hoy' y desmarcar otros
+        document.querySelectorAll("#time-filter-group .time-tab").forEach((tab) => {
+          tab.classList.remove("active", "bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+          tab.classList.add("text-on-surface-variant");
+        });
+        const btnHoy = document.querySelector('#time-filter-group button[data-period="hoy"]') as HTMLElement | null;
+        if (btnHoy) {
+          btnHoy.classList.add("active", "bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+          btnHoy.classList.remove("text-on-surface-variant");
+        }
+
+        // Título del KPI 1: Ventas del Día
+        const vTitle = document.getElementById("kpi-ventas-title");
+        if (vTitle) vTitle.textContent = "Ventas del Día (Hoy)";
+
+        // Ocultar tarjetas de Gastos Operativos y Dinero Total
+        const kpiGastos = document.getElementById("kpi-card-gastos");
+        const kpiUtilidad = document.getElementById("kpi-card-utilidad");
+        if (kpiGastos) kpiGastos.style.display = "none";
+        if (kpiUtilidad) kpiUtilidad.style.display = "none";
+
+        // Reconfigurar rejilla de KPIs para mostrar únicamente Ventas y Stock
+        const kpiGrid = document.getElementById("kpi-cards-grid");
+        if (kpiGrid) {
+          kpiGrid.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6";
+        }
+
+        // En la gráfica: ocultar pestañas de Gastos y Utilidad
+        const tabGastos = document.getElementById("tab-gastos");
+        const tabUtilidad = document.getElementById("tab-utilidad");
+        if (tabGastos) tabGastos.style.display = "none";
+        if (tabUtilidad) tabUtilidad.style.display = "none";
+
+        // Ocultar leyenda de gastos en la gráfica
+        const legendGastos = document.getElementById("chart-legend-gastos");
+        if (legendGastos) legendGastos.style.display = "none";
+      }
+
+      return isCajero;
+    }
+
     // Inicializar carga de datos y animaciones GSAP
     function setupDash() {
       loadSessionData();
+      const isCajero = applyRoleRestrictions();
       initDashboardAnimations();
       setupSearchFilter();
-      fetchDashboardData(currentPeriod);
+      fetchDashboardData(isCajero ? "hoy" : currentPeriod);
     }
 
     document.addEventListener("astro:page-load", setupDash);

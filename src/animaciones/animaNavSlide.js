@@ -95,7 +95,7 @@ export function hydrateUserSession() {
       // Módulos visibles en el Sidebar:
       // JEFE_ADMIN: todos ('principal', 'inventario', 'ventas', 'gastos', 'servicios', 'usuarios')
       // ADMINISTRATIVO: 'principal', 'inventario', 'ventas', 'gastos', 'servicios' (NO 'usuarios')
-      // CAJERO: 'principal', 'ventas', 'servicios' (NO 'inventario', 'gastos', 'usuarios')
+      // CAJERO: 'principal', 'ventas' (NO 'inventario', 'gastos', 'servicios', 'usuarios')
       document.querySelectorAll("#main-sidebar nav a[data-path]").forEach((link) => {
         const path = link.getAttribute("data-path");
         let visible = true;
@@ -108,6 +108,9 @@ export function hydrateUserSession() {
         if (path === "inventario" && isCajero) {
           visible = false;
         }
+        if (path === "servicios" && isCajero) {
+          visible = false;
+        }
         link.style.display = visible ? "" : "none";
       });
 
@@ -116,8 +119,8 @@ export function hydrateUserSession() {
       if (currentPath.includes("usuariosroles") && !isSuperAdmin) {
         alert("Acceso denegado: Tu rol no tiene permisos para el módulo de Usuarios y Roles.");
         window.location.href = "/DashPrincipal";
-      } else if ((currentPath.includes("gastosoperativos") || currentPath.includes("controldeinventario")) && isCajero) {
-        alert("Acceso restringido: Tu perfil operativo solo tiene acceso a Ventas y Catálogo.");
+      } else if ((currentPath.includes("gastosoperativos") || currentPath.includes("controldeinventario") || currentPath.includes("servicios")) && isCajero) {
+        alert("Acceso restringido: Tu perfil operativo de Vendedor POS no tiene permisos para este módulo.");
         window.location.href = "/RegVenta";
       }
 

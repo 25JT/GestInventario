@@ -478,6 +478,17 @@ try {
 
       <!-- Drawer Body (Form Fields) -->
       <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+        <!-- Banner Informativo de Producto Existente (Auto-Detección) -->
+        <div id="drawer-existing-alert" class="hidden p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-950 text-[12px] space-y-1">
+          <div class="flex items-center gap-2 font-bold text-amber-900">
+            <span class="material-symbols-outlined text-[18px] text-amber-700">inventory_2</span>
+            <span>¡Producto existente en base de datos!</span>
+          </div>
+          <p id="drawer-existing-desc" class="text-[11.5px] leading-snug text-amber-900/90">
+            Modo Reabastecimiento: Este artículo ya está registrado. Los datos maestros están protegidos. Solo puedes modificar: <strong>Cantidad a ingresar</strong>, <strong>Precio de compra</strong>, <strong>Precio de venta</strong> y <strong>Proveedor asignado</strong>.
+          </p>
+        </div>
+
         <!-- Nombre del Producto -->
         <div class="space-y-1">
           <label class="text-[12px] font-semibold text-on-surface uppercase tracking-wide">
@@ -558,7 +569,7 @@ try {
           </span>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div class="space-y-1">
-              <label class="text-[11px] font-semibold text-on-surface">Cantidad Inicial (Ingreso)</label>
+              <label id="drawer-stock-label" class="text-[11px] font-semibold text-on-surface">Cantidad Inicial (Ingreso)</label>
               <input
                 id="drawer-stock-initial"
                 class="w-full h-9 px-3 bg-surface-container-lowest rounded-xl text-[13px] text-primary font-bold border border-surface-container/60 focus:outline-none focus:border-secondary"
@@ -950,12 +961,132 @@ try {
       }
     };
 
-    // 6. Guardar nuevo producto desde el Drawer
+    // 6. Guardar / Reabastecer producto desde el Drawer con validación de existencia
     function setupDrawerForm() {
       const btnSave = document.getElementById("btn-save-drawer");
       const costInput = document.getElementById("drawer-cost") as HTMLInputElement | null;
       const priceInput = document.getElementById("drawer-price") as HTMLInputElement | null;
       const marginEl = document.getElementById("drawer-margin");
+      const skuInput = document.getElementById("drawer-sku") as HTMLInputElement | null;
+      const eanInput = document.getElementById("drawer-ean") as HTMLInputElement | null;
+      const nameInput = document.getElementById("drawer-name") as HTMLInputElement | null;
+      const catSelect = document.getElementById("drawer-category") as HTMLSelectElement | null;
+      const locInput = document.getElementById("drawer-location") as HTMLInputElement | null;
+      const stockInput = document.getElementById("drawer-stock-initial") as HTMLInputElement | null;
+      const minInput = document.getElementById("drawer-stock-min") as HTMLInputElement | null;
+      const stockLabel = document.getElementById("drawer-stock-label");
+      const alertBox = document.getElementById("drawer-existing-alert");
+      const descEl = document.getElementById("drawer-existing-desc");
+
+      let existingProduct: any = null;
+
+      // Restablecer modo normal de creación
+      function resetExistingMode() {
+        existingProduct = null;
+        if (alertBox) alertBox.classList.add("hidden");
+
+        if (nameInput) {
+          nameInput.readOnly = false;
+          nameInput.classList.remove("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+        if (catSelect) {
+          catSelect.disabled = false;
+          catSelect.classList.remove("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+        if (locInput) {
+          locInput.readOnly = false;
+          locInput.classList.remove("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+        if (minInput) {
+          minInput.readOnly = false;
+          minInput.classList.remove("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+        if (stockLabel) {
+          stockLabel.textContent = "Cantidad Inicial (Ingreso)";
+        }
+        if (btnSave) {
+          btnSave.innerHTML = `<span class="material-symbols-outlined text-[18px]">save</span><span>Guardar Producto</span>`;
+          btnSave.classList.remove("bg-emerald-600", "hover:bg-emerald-700");
+          btnSave.classList.add("bg-secondary-container", "hover:bg-secondary");
+        }
+      }
+
+      // Averigua con la BD si el producto ya existe por SKU o Código de Barras
+      async function checkForExistingProduct(code: string) {
+        const clean = (code || "").trim();
+        if (!clean || clean.length < 3 || clean === "SKU-" || clean === "SKU-2024-") {
+          return;
+        }
+
+        try {
+          const res = await fetch(`${API_BASE}/inventario/producto/verificar-codigo?codigo=${encodeURIComponent(clean)}`);
+          if (!res.ok) return;
+          const json = await res.json();
+
+          if (json.exists && json.producto) {
+            existingProduct = json.producto;
+
+            // Mostrar banner informativo
+            if (alertBox) alertBox.classList.remove("hidden");
+            if (descEl) {
+              descEl.innerHTML = `Producto <strong>"${existingProduct.nombre}"</strong> (SKU: ${existingProduct.sku}) ya existe en catálogo. Los datos maestros están protegidos. <strong>Solo puedes modificar:</strong> Cantidad a Ingresar, Precio de Compra, Precio de Venta y Proveedor Asignado.`;
+            }
+
+            // Llenar campos y bloquear los que no deben ser editados
+            if (nameInput) {
+              nameInput.value = existingProduct.nombre;
+              nameInput.readOnly = true;
+              nameInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
+            }
+            if (skuInput && existingProduct.sku) {
+              skuInput.value = existingProduct.sku;
+            }
+            if (eanInput && existingProduct.codigo_barras) {
+              eanInput.value = existingProduct.codigo_barras;
+            }
+            if (catSelect) {
+              catSelect.value = existingProduct.categoria_id;
+              catSelect.disabled = true;
+              catSelect.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
+            }
+            if (locInput) {
+              locInput.value = existingProduct.ubicacion || "";
+              locInput.readOnly = true;
+              locInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
+            }
+            if (minInput) {
+              minInput.value = String(existingProduct.stock_minimo || 5);
+              minInput.readOnly = true;
+              minInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
+            }
+            if (costInput && (!costInput.value || costInput.value === "0")) {
+              costInput.value = String(existingProduct.precio_compra || 0);
+            }
+            if (priceInput && (!priceInput.value || priceInput.value === "0")) {
+              priceInput.value = String(existingProduct.precio_venta || 0);
+            }
+
+            // Actualizar etiqueta de cantidad
+            if (stockLabel) {
+              stockLabel.innerHTML = `Cantidad a Ingresar / Reabastecer <span class="text-secondary font-bold">(Stock actual: ${existingProduct.stock_actual} unid.)</span> *`;
+            }
+            if (stockInput && (!stockInput.value || stockInput.value === "10")) {
+              stockInput.value = "1";
+            }
+
+            updateMargin();
+
+            // Cambiar botón a modo reabastecimiento
+            if (btnSave) {
+              btnSave.innerHTML = `<span class="material-symbols-outlined text-[18px]">add_circle</span><span>Reabastecer / Actualizar Producto</span>`;
+              btnSave.classList.remove("bg-secondary-container", "hover:bg-secondary");
+              btnSave.classList.add("bg-emerald-600", "hover:bg-emerald-700");
+            }
+          }
+        } catch (e) {
+          console.warn("Error al verificar código de producto:", e);
+        }
+      }
 
       // Cálculo de margen en tiempo real en el Drawer
       const updateMargin = () => {
@@ -972,9 +1103,28 @@ try {
       costInput?.addEventListener("input", updateMargin);
       priceInput?.addEventListener("input", updateMargin);
 
+      // Verificación en tiempo real al escribir o escanear
+      skuInput?.addEventListener("blur", () => {
+        if (skuInput.value && skuInput.value.trim().length >= 4) {
+          checkForExistingProduct(skuInput.value);
+        }
+      });
+
+      eanInput?.addEventListener("blur", () => {
+        if (eanInput.value && eanInput.value.trim().length >= 3) {
+          checkForExistingProduct(eanInput.value);
+        }
+      });
+
+      eanInput?.addEventListener("change", () => {
+        if (eanInput.value && eanInput.value.trim().length >= 3) {
+          checkForExistingProduct(eanInput.value);
+        }
+      });
+
       const catSelectEl = document.getElementById("drawer-category") as HTMLSelectElement | null;
       catSelectEl?.addEventListener("change", () => {
-        const skuInput = document.getElementById("drawer-sku") as HTMLInputElement | null;
+        if (existingProduct) return;
         if (!skuInput) return;
         const optText = catSelectEl.options[catSelectEl.selectedIndex]?.text || "";
         const match = optText.match(/\(([^)]+)\)/);
@@ -984,25 +1134,25 @@ try {
         skuInput.value = `SKU-${num}-${pref}`;
       });
 
+      // Botón cancelar / cerrar
+      document.getElementById("btn-cancel-drawer")?.addEventListener("click", () => {
+        resetExistingMode();
+      });
+      document.getElementById("btn-close-drawer")?.addEventListener("click", () => {
+        resetExistingMode();
+      });
+
       if (btnSave) {
         btnSave.addEventListener("click", async () => {
-          const nameInput = document.getElementById("drawer-name") as HTMLInputElement | null;
-          const skuInput = document.getElementById("drawer-sku") as HTMLInputElement | null;
-          const eanInput = document.getElementById("drawer-ean") as HTMLInputElement | null;
-          const catSelect = document.getElementById("drawer-category") as HTMLSelectElement | null;
-          const locInput = document.getElementById("drawer-location") as HTMLInputElement | null;
-          const stockInput = document.getElementById("drawer-stock-initial") as HTMLInputElement | null;
-          const minInput = document.getElementById("drawer-stock-min") as HTMLInputElement | null;
-
-          const nombre = nameInput?.value.trim();
-          const sku = skuInput?.value.trim();
-          const categoria_id = catSelect?.value;
+          const nombre = nameInput?.value.trim() || existingProduct?.nombre;
+          const sku = skuInput?.value.trim() || existingProduct?.sku;
+          const categoria_id = catSelect?.value || existingProduct?.categoria_id;
           const precio_compra = Number(costInput?.value) || 0;
           const precio_venta = Number(priceInput?.value) || 0;
           const stock_inicial = Number(stockInput?.value) || 0;
           const stock_minimo = Number(minInput?.value) || 5;
-          const ubicacion = locInput?.value.trim() || "";
-          const codigo_barras = eanInput?.value.trim() || "";
+          const ubicacion = locInput?.value.trim() || existingProduct?.ubicacion || "";
+          const codigo_barras = eanInput?.value.trim() || existingProduct?.codigo_barras || "";
 
           if (!nombre) {
             alert("Por favor ingrese el nombre del producto.");
@@ -1042,8 +1192,13 @@ try {
 
             const json = await res.json();
             if (json.success) {
-              showInventoryToast(`Producto "${nombre}" registrado con éxito.`);
+              if (json.reabastecido) {
+                showInventoryToast(json.message || `Producto "${nombre}" reabastecido con éxito.`);
+              } else {
+                showInventoryToast(`Producto "${nombre}" registrado con éxito en el catálogo.`);
+              }
               closeProductDrawer();
+              resetExistingMode();
               // Limpiar formulario
               if (nameInput) nameInput.value = "";
               if (skuInput) skuInput.value = "SKU-";
@@ -1051,19 +1206,22 @@ try {
               if (costInput) costInput.value = "";
               if (priceInput) priceInput.value = "";
               if (locInput) locInput.value = "";
+              if (stockInput) stockInput.value = "10";
               // Refrescar inventario y métricas
               fetchInventory();
               fetchKpis();
               fetchCategories();
             } else {
-              alert(json.error || "No se pudo registrar el producto.");
+              alert(json.error || "No se pudo procesar el producto.");
             }
           } catch (err) {
             console.error("Error al registrar producto:", err);
             alert("Error al conectar con el servidor.");
           } finally {
             btnSave.removeAttribute("disabled");
-            btnSave.innerHTML = `<span class="material-symbols-outlined text-[18px]">save</span><span>Guardar Producto</span>`;
+            if (!existingProduct) {
+              btnSave.innerHTML = `<span class="material-symbols-outlined text-[18px]">save</span><span>Guardar Producto</span>`;
+            }
           }
         });
       }

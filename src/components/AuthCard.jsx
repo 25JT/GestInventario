@@ -26,6 +26,15 @@ export default function AuthCard() {
   const [regStep, setRegStep] = useState(1); // 1: Validación, 2: Datos, 3: Seguridad
   const [regToken, setRegToken] = useState("");
   const [tokenStatus, setTokenStatus] = useState({ valid: false, text: "" });
+  const [tokenInfo, setTokenInfo] = useState({
+    valid: false,
+    text: "",
+    rol_asignado: "",
+    roleTitle: "Esperando token de invitación...",
+    branch: "Sucursal por asignar",
+    description: "Ingresa tu token de primer acceso para visualizar el rol y la sucursal preconfigurados por Jefatura.",
+    icon: "lock_open"
+  });
   const [regName, setRegName] = useState("");
   const [regLastname, setRegLastname] = useState("");
   const [regPhone, setRegPhone] = useState("");
@@ -220,6 +229,17 @@ export default function AuthCard() {
         );
         return;
       }
+      if (!tokenStatus.valid) {
+        shakeElement(stepContainerRef.current);
+        openModal(
+          "error",
+          "bg-error-container",
+          "text-on-error-container",
+          "Token No Verificado",
+          "El token ingresado no es válido o ya fue utilizado. Verifíquelo antes de continuar."
+        );
+        return;
+      }
       animateStepTransition(stepContainerRef.current, "next", () => {
         setRegStep(2);
       });
@@ -286,18 +306,79 @@ export default function AuthCard() {
     }
   };
 
-  // Validación de Token al escribir
+  // Validación de Token al escribir en tiempo real
   const handleTokenChange = async (e) => {
-    const value = e.target.value;
+    const value = e.target.value.trim().toUpperCase();
     setRegToken(value);
-    if (value.trim().length >= 5) {
+    if (value.length >= 4) {
+      setTokenStatus({ valid: false, text: "Verificando..." });
       const res = await validarTokenInvitacion(value);
-      setTokenStatus({
-        valid: res.valid,
-        text: res.valid ? "Verificado ✓" : "Inválido ✗",
-      });
+      if (res && res.valid) {
+        setTokenStatus({
+          valid: true,
+          text: "Verificado ✓",
+        });
+
+        const roleLabels = {
+          JEFE_ADMIN: "Jefe / SuperAdmin",
+          ADMIN: "Administrador General",
+          ADMINISTRATIVO: "Administrativo Operativo",
+          CAJERO: "Vendedor POS",
+          vendedor: "Vendedor POS",
+          administrativo: "Administrativo",
+          admin: "Jefe / SuperAdmin",
+        };
+
+        const roleIcons = {
+          JEFE_ADMIN: "admin_panel_settings",
+          ADMIN: "manage_accounts",
+          ADMINISTRATIVO: "inventory_2",
+          CAJERO: "point_of_sale",
+          vendedor: "point_of_sale",
+          administrativo: "inventory_2",
+          admin: "admin_panel_settings",
+        };
+
+        const rawRole = (res.rol_asignado || res.role || "CAJERO").toUpperCase();
+        const displayRoleName = roleLabels[rawRole] || res.role || "Colaborador Operativo";
+        const icon = roleIcons[rawRole] || "verified_user";
+        const branchName = res.branch || res.sucursal_nombre || "Sucursal Central";
+
+        setTokenInfo({
+          valid: true,
+          text: "Verificado ✓",
+          rol_asignado: rawRole,
+          roleTitle: `${displayRoleName} · ${branchName}`,
+          branch: branchName,
+          description: `Perfil configurado por Administración. Asignación directa con permisos operativos para ${displayRoleName}.`,
+          icon: icon,
+        });
+      } else {
+        setTokenStatus({
+          valid: false,
+          text: "Inválido ✗",
+        });
+        setTokenInfo({
+          valid: false,
+          text: "Inválido ✗",
+          rol_asignado: "",
+          roleTitle: "Token inválido o expirado",
+          branch: "Sin sucursal",
+          description: res.message || "El token ingresado no existe, fue revocado o ya fue utilizado.",
+          icon: "error_outline",
+        });
+      }
     } else {
       setTokenStatus({ valid: false, text: "Pendiente" });
+      setTokenInfo({
+        valid: false,
+        text: "Pendiente",
+        rol_asignado: "",
+        roleTitle: "Esperando token de invitación...",
+        branch: "Sucursal por asignar",
+        description: "Ingresa tu token de primer acceso para visualizar el rol y la sucursal preconfigurados por Jefatura.",
+        icon: "lock_open",
+      });
     }
   };
 
@@ -868,80 +949,6 @@ export default function AuthCard() {
                   </div>
                 </div>
 
-                {/* Selección de Rol Operativo */}
-                <div className="pt-1">
-                  <label className="block font-label-sm text-[12px] text-on-surface font-semibold mb-2 flex items-center justify-between">
-                    <span>Rol Operativo (Diagrama de Flujo)</span>
-                    <span className="font-label-sm text-[11px] text-on-surface-variant font-normal">
-                      Nivel jerárquico
-                    </span>
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                    {/* Opción 1: Vendedor */}
-                    <label className="cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="user-role"
-                        value="vendedor"
-                        checked={selectedRole === "vendedor"}
-                        onChange={() => setSelectedRole("vendedor")}
-                        className="peer sr-only"
-                      />
-                      <div className="p-3 rounded-xl border border-surface-container bg-surface-container-low peer-checked:border-secondary peer-checked:bg-secondary-container peer-checked:text-on-secondary-container transition-all flex flex-col h-full shadow-2xs hover:bg-surface-container">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="font-label-sm text-[12px] font-semibold">1. Vendedor</span>
-                          <span className="material-symbols-outlined text-[18px]">point_of_sale</span>
-                        </div>
-                        <p className="font-body-sm text-[11px] leading-snug opacity-80">
-                          Restringido: Registro de ventas y consulta rápida de disponibilidad.
-                        </p>
-                      </div>
-                    </label>
-
-                    {/* Opción 2: Administrativo */}
-                    <label className="cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="user-role"
-                        value="administrativo"
-                        checked={selectedRole === "administrativo"}
-                        onChange={() => setSelectedRole("administrativo")}
-                        className="peer sr-only"
-                      />
-                      <div className="p-3 rounded-xl border border-surface-container bg-surface-container-low peer-checked:border-secondary peer-checked:bg-secondary-container peer-checked:text-on-secondary-container transition-all flex flex-col h-full shadow-2xs hover:bg-surface-container">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="font-label-sm text-[12px] font-semibold">2. Administrativo</span>
-                          <span className="material-symbols-outlined text-[18px]">inventory_2</span>
-                        </div>
-                        <p className="font-body-sm text-[11px] leading-snug opacity-80">
-                          Operativo: Inventario, altas, gastos y ventas. Sin gestión de usuarios.
-                        </p>
-                      </div>
-                    </label>
-
-                    {/* Opción 3: Jefe / Admin */}
-                    <label className="cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="user-role"
-                        value="admin"
-                        checked={selectedRole === "admin"}
-                        onChange={() => setSelectedRole("admin")}
-                        className="peer sr-only"
-                      />
-                      <div className="p-3 rounded-xl border border-surface-container bg-surface-container-low peer-checked:border-secondary peer-checked:bg-secondary-container peer-checked:text-on-secondary-container transition-all flex flex-col h-full shadow-2xs hover:bg-surface-container">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="font-label-sm text-[12px] font-semibold">3. Jefe / Admin</span>
-                          <span className="material-symbols-outlined text-[18px]">admin_panel_settings</span>
-                        </div>
-                        <p className="font-body-sm text-[11px] leading-snug opacity-80">
-                          Permisos totales: Auditoría integral, parámetros y asignación de roles.
-                        </p>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-
                 <div className="flex items-center justify-between pt-1">
                   <label className="flex items-center gap-2.5 cursor-pointer">
                     <input
@@ -1120,25 +1127,53 @@ export default function AuthCard() {
                         </div>
                       </div>
 
-                      {/* Card de Rol Preconfigurado (Solo lectura) */}
-                      <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-secondary-fixed/30 border border-secondary/20 text-on-secondary-fixed">
-                        <div className="p-2.5 rounded-lg bg-secondary-container text-on-secondary shrink-0 shadow-xs">
-                          <span className="material-symbols-outlined text-[22px]">point_of_sale</span>
+                      {/* Card de Rol Preconfigurado (En Tiempo Real) */}
+                      <div
+                        className={`flex items-center gap-3.5 p-3.5 rounded-xl border transition-all ${
+                          tokenInfo.valid
+                            ? "bg-emerald-500/10 border-emerald-500/30 text-on-surface shadow-xs"
+                            : "bg-surface-container-low border-surface-container/70 text-on-surface-variant"
+                        }`}
+                      >
+                        <div
+                          className={`p-2.5 rounded-lg shrink-0 shadow-xs transition-colors ${
+                            tokenInfo.valid
+                              ? "bg-emerald-600 text-white"
+                              : "bg-surface-container text-outline"
+                          }`}
+                        >
+                          <span className="material-symbols-outlined text-[22px]">
+                            {tokenInfo.icon || "lock_open"}
+                          </span>
                         </div>
-                        <div className="flex flex-col">
+                        <div className="flex flex-col flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="font-label-sm text-[11px] uppercase tracking-wider font-bold text-secondary">
+                            <span
+                              className={`font-label-sm text-[11px] uppercase tracking-wider font-bold ${
+                                tokenInfo.valid ? "text-emerald-700" : "text-outline"
+                              }`}
+                            >
                               ROL PRECONFIGURADO
                             </span>
-                            <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-secondary text-on-secondary tracking-wide">
-                              SOLO LECTURA
+                            <span
+                              className={`px-2 py-0.5 rounded text-[9px] font-bold tracking-wide ${
+                                tokenInfo.valid
+                                  ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                                  : "bg-surface-container-high text-on-surface-variant"
+                              }`}
+                            >
+                              {tokenInfo.valid ? "ASIGNADO EN TIEMPO REAL ✓" : "PENDIENTE"}
                             </span>
                           </div>
-                          <span className="font-label-md text-[13px] font-semibold text-on-surface mt-0.5">
-                            Vendedor POS (Terminal 01) - Sucursal Central
+                          <span
+                            className={`font-label-md text-[13px] font-bold mt-0.5 truncate ${
+                              tokenInfo.valid ? "text-on-surface" : "text-on-surface-variant font-medium"
+                            }`}
+                          >
+                            {tokenInfo.roleTitle}
                           </span>
                           <span className="font-body-sm text-[11px] text-on-surface-variant leading-snug">
-                            Facultades y límites operativos asignados conforme a la directiva de Jefatura / Admin.
+                            {tokenInfo.description}
                           </span>
                         </div>
                       </div>
