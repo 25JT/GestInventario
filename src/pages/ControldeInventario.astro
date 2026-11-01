@@ -373,11 +373,11 @@ try {
                         <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                           <button
                             class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
-                            title="Ajustar Stock Rápido"
+                            title="Actualizar Producto"
                             type="button"
-                            onclick={`window.quickAdjustStock && window.quickAdjustStock('${item.id}', '${item.sku}', ${item.stock_actual})`}
+                            onclick={`window.openEditProductDrawer && window.openEditProductDrawer('${item.id}')`}
                           >
-                            <span class="material-symbols-outlined text-[18px]">tune</span>
+                            <span class="material-symbols-outlined text-[18px]">edit</span>
                           </button>
                           <button
                             class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
@@ -462,8 +462,8 @@ try {
             <span class="material-symbols-outlined text-[20px]">add_box</span>
           </div>
           <div>
-            <h2 class="text-[17px] font-bold text-primary leading-tight">Agregar Producto</h2>
-            <p class="text-[12px] text-on-surface-variant">Flujo de alta en catálogo maestro de almacén</p>
+            <h2 id="drawer-header-title" class="text-[17px] font-bold text-primary leading-tight">Agregar Producto</h2>
+            <p id="drawer-header-subtitle" class="text-[12px] text-on-surface-variant">Flujo de alta en catálogo maestro de almacén</p>
           </div>
         </div>
         <button
@@ -875,11 +875,11 @@ try {
                 <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                   <button
                     class="p-1 text-on-surface-variant hover:text-secondary-container hover:bg-surface-container rounded-lg cursor-pointer"
-                    title="Ajustar Stock Rápido"
+                    title="Actualizar Producto"
                     type="button"
-                    onclick="window.quickAdjustStock && window.quickAdjustStock('${item.id}', '${item.sku}', ${item.stock_actual})"
+                    onclick="window.openEditProductDrawer && window.openEditProductDrawer('${item.id}')"
                   >
-                    <span class="material-symbols-outlined text-[18px]">tune</span>
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
                   </button>
                   <button
                     class="p-1 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg cursor-pointer"
@@ -977,6 +977,9 @@ try {
       const stockLabel = document.getElementById("drawer-stock-label");
       const alertBox = document.getElementById("drawer-existing-alert");
       const descEl = document.getElementById("drawer-existing-desc");
+      const supplierSelect = document.getElementById("drawer-supplier") as HTMLSelectElement | null;
+      const hTitle = document.getElementById("drawer-header-title");
+      const hSub = document.getElementById("drawer-header-subtitle");
 
       let existingProduct: any = null;
 
@@ -984,10 +987,20 @@ try {
       function resetExistingMode() {
         existingProduct = null;
         if (alertBox) alertBox.classList.add("hidden");
+        if (hTitle) hTitle.textContent = "Agregar Producto";
+        if (hSub) hSub.textContent = "Flujo de alta en catálogo maestro de almacén";
 
         if (nameInput) {
           nameInput.readOnly = false;
           nameInput.classList.remove("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+        if (skuInput) {
+          skuInput.readOnly = false;
+          skuInput.classList.remove("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+        if (eanInput) {
+          eanInput.readOnly = false;
+          eanInput.classList.remove("bg-surface-container", "opacity-75", "cursor-not-allowed");
         }
         if (catSelect) {
           catSelect.disabled = false;
@@ -1011,6 +1024,89 @@ try {
         }
       }
 
+      // Aplica un producto existente al Drawer en modo actualización/reabastecimiento
+      function applyProductToDrawer(p: any) {
+        existingProduct = p;
+
+        if (hTitle) hTitle.textContent = "Actualizar Producto";
+        if (hSub) hSub.textContent = "Edición y reabastecimiento de existencias";
+
+        if (alertBox) alertBox.classList.remove("hidden");
+        if (descEl) {
+          descEl.innerHTML = `Producto <strong>"${p.nombre}"</strong> (SKU: ${p.sku}) ya existe en catálogo. Los datos maestros están protegidos. <strong>Solo puedes modificar:</strong> Cantidad a Ingresar, Precio de Compra, Precio de Venta y Proveedor Asignado.`;
+        }
+
+        // Bloquear datos maestros
+        if (nameInput) {
+          nameInput.value = p.nombre || "";
+          nameInput.readOnly = true;
+          nameInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+        if (skuInput) {
+          skuInput.value = p.sku || "";
+          skuInput.readOnly = true;
+          skuInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+        if (eanInput) {
+          eanInput.value = p.codigo_barras || "";
+          eanInput.readOnly = true;
+          eanInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+        if (catSelect) {
+          catSelect.value = p.categoria_id || "";
+          catSelect.disabled = true;
+          catSelect.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+        if (locInput) {
+          locInput.value = p.ubicacion || "";
+          locInput.readOnly = true;
+          locInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+        if (minInput) {
+          minInput.value = String(p.stock_minimo || 5);
+          minInput.readOnly = true;
+          minInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+
+        // Habilitados para modificar
+        if (costInput) costInput.value = String(p.precio_compra ?? 0);
+        if (priceInput) priceInput.value = String(p.precio_venta ?? 0);
+
+        if (stockLabel) {
+          stockLabel.innerHTML = `Cantidad a Ingresar / Reabastecer <span class="text-secondary font-bold">(Stock actual: ${p.stock_actual ?? 0} unid.)</span> *`;
+        }
+        if (stockInput) stockInput.value = "1";
+
+        updateMargin();
+
+        // Botón: '+' dentro del círculo con el texto 'Actualizar Producto'
+        if (btnSave) {
+          btnSave.innerHTML = `<span class="material-symbols-outlined text-[18px]">add_circle</span><span>Actualizar Producto</span>`;
+          btnSave.classList.remove("bg-secondary-container", "hover:bg-secondary");
+          btnSave.classList.add("bg-emerald-600", "hover:bg-emerald-700");
+        }
+      }
+
+      // Exponer apertura en modo edición/actualización por ID para las acciones de la tabla
+      (window as any).openEditProductDrawer = async function(productId: string) {
+        if (!productId) return;
+        resetExistingMode();
+        openProductDrawer();
+        try {
+          const res = await fetch(`${API_BASE}/inventario/producto/${productId}`);
+          const json = await res.json();
+          if (json.success && json.data) {
+            applyProductToDrawer(json.data);
+          } else {
+            alert(json.error || "No se pudo obtener la información del producto.");
+          }
+        } catch (err) {
+          console.error("Error al cargar producto para edición:", err);
+          alert("Error de conexión al cargar el producto.");
+        }
+      };
+      (window as any).quickAdjustStock = (window as any).openEditProductDrawer;
+
       // Averigua con la BD si el producto ya existe por SKU o Código de Barras
       async function checkForExistingProduct(code: string) {
         const clean = (code || "").trim();
@@ -1024,64 +1120,7 @@ try {
           const json = await res.json();
 
           if (json.exists && json.producto) {
-            existingProduct = json.producto;
-
-            // Mostrar banner informativo
-            if (alertBox) alertBox.classList.remove("hidden");
-            if (descEl) {
-              descEl.innerHTML = `Producto <strong>"${existingProduct.nombre}"</strong> (SKU: ${existingProduct.sku}) ya existe en catálogo. Los datos maestros están protegidos. <strong>Solo puedes modificar:</strong> Cantidad a Ingresar, Precio de Compra, Precio de Venta y Proveedor Asignado.`;
-            }
-
-            // Llenar campos y bloquear los que no deben ser editados
-            if (nameInput) {
-              nameInput.value = existingProduct.nombre;
-              nameInput.readOnly = true;
-              nameInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
-            }
-            if (skuInput && existingProduct.sku) {
-              skuInput.value = existingProduct.sku;
-            }
-            if (eanInput && existingProduct.codigo_barras) {
-              eanInput.value = existingProduct.codigo_barras;
-            }
-            if (catSelect) {
-              catSelect.value = existingProduct.categoria_id;
-              catSelect.disabled = true;
-              catSelect.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
-            }
-            if (locInput) {
-              locInput.value = existingProduct.ubicacion || "";
-              locInput.readOnly = true;
-              locInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
-            }
-            if (minInput) {
-              minInput.value = String(existingProduct.stock_minimo || 5);
-              minInput.readOnly = true;
-              minInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
-            }
-            if (costInput && (!costInput.value || costInput.value === "0")) {
-              costInput.value = String(existingProduct.precio_compra || 0);
-            }
-            if (priceInput && (!priceInput.value || priceInput.value === "0")) {
-              priceInput.value = String(existingProduct.precio_venta || 0);
-            }
-
-            // Actualizar etiqueta de cantidad
-            if (stockLabel) {
-              stockLabel.innerHTML = `Cantidad a Ingresar / Reabastecer <span class="text-secondary font-bold">(Stock actual: ${existingProduct.stock_actual} unid.)</span> *`;
-            }
-            if (stockInput && (!stockInput.value || stockInput.value === "10")) {
-              stockInput.value = "1";
-            }
-
-            updateMargin();
-
-            // Cambiar botón a modo reabastecimiento
-            if (btnSave) {
-              btnSave.innerHTML = `<span class="material-symbols-outlined text-[18px]">add_circle</span><span>Reabastecer / Actualizar Producto</span>`;
-              btnSave.classList.remove("bg-secondary-container", "hover:bg-secondary");
-              btnSave.classList.add("bg-emerald-600", "hover:bg-emerald-700");
-            }
+            applyProductToDrawer(json.producto);
           }
         } catch (e) {
           console.warn("Error al verificar código de producto:", e);
@@ -1134,6 +1173,20 @@ try {
         skuInput.value = `SKU-${num}-${pref}`;
       });
 
+      // Apertura desde botón "+ Agregar Producto"
+      document.getElementById("btn-open-drawer")?.addEventListener("click", () => {
+        resetExistingMode();
+        if (nameInput) nameInput.value = "";
+        if (skuInput) skuInput.value = "SKU-";
+        if (eanInput) eanInput.value = "";
+        if (costInput) costInput.value = "";
+        if (priceInput) priceInput.value = "";
+        if (locInput) locInput.value = "";
+        if (stockInput) stockInput.value = "10";
+        if (catSelect) catSelect.value = "";
+        updateMargin();
+      });
+
       // Botón cancelar / cerrar
       document.getElementById("btn-cancel-drawer")?.addEventListener("click", () => {
         resetExistingMode();
@@ -1141,9 +1194,13 @@ try {
       document.getElementById("btn-close-drawer")?.addEventListener("click", () => {
         resetExistingMode();
       });
+      document.getElementById("drawer-backdrop")?.addEventListener("click", () => {
+        resetExistingMode();
+      });
 
       if (btnSave) {
         btnSave.addEventListener("click", async () => {
+          const id = existingProduct?.id || null;
           const nombre = nameInput?.value.trim() || existingProduct?.nombre;
           const sku = skuInput?.value.trim() || existingProduct?.sku;
           const categoria_id = catSelect?.value || existingProduct?.categoria_id;
@@ -1153,6 +1210,7 @@ try {
           const stock_minimo = Number(minInput?.value) || 5;
           const ubicacion = locInput?.value.trim() || existingProduct?.ubicacion || "";
           const codigo_barras = eanInput?.value.trim() || existingProduct?.codigo_barras || "";
+          const proveedor = supplierSelect?.value || "";
 
           if (!nombre) {
             alert("Por favor ingrese el nombre del producto.");
@@ -1178,6 +1236,7 @@ try {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
+                id,
                 nombre,
                 sku,
                 categoria_id,
@@ -1187,13 +1246,14 @@ try {
                 stock_minimo,
                 ubicacion,
                 codigo_barras,
+                proveedor,
               }),
             });
 
             const json = await res.json();
             if (json.success) {
               if (json.reabastecido) {
-                showInventoryToast(json.message || `Producto "${nombre}" reabastecido con éxito.`);
+                showInventoryToast(json.message || `Producto "${nombre}" actualizado con éxito.`);
               } else {
                 showInventoryToast(`Producto "${nombre}" registrado con éxito en el catálogo.`);
               }
@@ -1221,6 +1281,8 @@ try {
             btnSave.removeAttribute("disabled");
             if (!existingProduct) {
               btnSave.innerHTML = `<span class="material-symbols-outlined text-[18px]">save</span><span>Guardar Producto</span>`;
+            } else {
+              btnSave.innerHTML = `<span class="material-symbols-outlined text-[18px]">add_circle</span><span>Actualizar Producto</span>`;
             }
           }
         });

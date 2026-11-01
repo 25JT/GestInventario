@@ -248,12 +248,7 @@ export function initInventoryAnimations() {
     });
   }
 
-  if (btnSaveDrawer) {
-    btnSaveDrawer.addEventListener("click", () => {
-      closeProductDrawer();
-      showInventoryToast("Producto guardado con éxito. Existencias sincronizadas.");
-    });
-  }
+  // Nota: El guardado del Drawer se gestiona directamente en ControldeInventario.astro para conectar con la API real.
 
   // 7. Acciones rápidas de fila (Ajuste rápido, kardex, eliminar)
   document.querySelectorAll("[data-action='quick-adjust']").forEach((btn) => {
