@@ -594,23 +594,27 @@ try {
         <!-- Precios y Márgenes con cálculo dinámico -->
         <div class="grid grid-cols-3 gap-2">
           <div class="space-y-1">
-            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">P. Compra (COP $)</label>
+            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">P. Compra (COP $) *</label>
             <input
               id="drawer-cost"
               class="w-full h-9 px-2.5 bg-surface rounded-xl text-[13px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-              placeholder="0"
+              placeholder="Ej: 4500"
               type="number"
+              min="1"
               step="100"
+              required
             />
           </div>
           <div class="space-y-1">
-            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">P. Venta (COP $)</label>
+            <label class="text-[11px] font-semibold text-on-surface uppercase tracking-wide">P. Venta (COP $) *</label>
             <input
               id="drawer-price"
               class="w-full h-9 px-2.5 bg-surface rounded-xl text-[13px] text-primary font-bold border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-              placeholder="0"
+              placeholder="Ej: 6500"
               type="number"
+              min="1"
               step="100"
+              required
             />
           </div>
           <div class="space-y-1">
@@ -1225,6 +1229,16 @@ try {
           if (!categoria_id) {
             alert("Por favor seleccione una categoría.");
             catSelect?.focus();
+            return;
+          }
+          if (!precio_compra || precio_compra <= 0) {
+            alert("El precio de compra es obligatorio y debe ser mayor a 0.");
+            costInput?.focus();
+            return;
+          }
+          if (!precio_venta || precio_venta <= 0) {
+            alert("El precio de venta es obligatorio y debe ser mayor a 0.");
+            priceInput?.focus();
             return;
           }
 
