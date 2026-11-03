@@ -14,10 +14,10 @@ const formatCOP = (val: number | string) => {
   }).format(num);
 };
 
-// Carga inicial de datos desde la API del servidor local
+// Carga inicial de datos desde la API del servidor en la nube
 let initialData: any = null;
 try {
-  const res = await fetch("http://localhost:3000/api/dashboard?period=mes", {
+  const res = await fetch("https://guileless-custard-bb32da.netlify.app/api/dashboard?period=mes", {
     signal: AbortSignal.timeout(2000),
   });
   if (res.ok) {
@@ -1192,7 +1192,7 @@ const transactions = initialData?.transactions || [];
       showRestockToast,
     } from "../animaciones/animaDashboard.js";
 
-    const API_URL = "http://localhost:3000/api/dashboard";
+    const API_URL = "https://guileless-custard-bb32da.netlify.app/api/dashboard";
     let currentPeriod = "mes";
     let lastChartData: any = null;
     let currentChartTab: "ventas" | "gastos" | "utilidad" = "ventas";

@@ -23,9 +23,9 @@ let totalItemsCount = 0;
 
 try {
   const [resKpis, resInv, resCat] = await Promise.all([
-    fetch("http://localhost:3000/api/inventario/kpis", { signal: AbortSignal.timeout(2000) }),
-    fetch("http://localhost:3000/api/inventario?limit=50", { signal: AbortSignal.timeout(2000) }),
-    fetch("http://localhost:3000/api/categorias", { signal: AbortSignal.timeout(2000) }),
+    fetch("https://guileless-custard-bb32da.netlify.app/api/inventario/kpis", { signal: AbortSignal.timeout(2000) }),
+    fetch("https://guileless-custard-bb32da.netlify.app/api/inventario?limit=50", { signal: AbortSignal.timeout(2000) }),
+    fetch("https://guileless-custard-bb32da.netlify.app/api/categorias", { signal: AbortSignal.timeout(2000) }),
   ]);
   if (resKpis.ok) {
     const jsonK = await resKpis.json();
@@ -689,7 +689,7 @@ try {
       showInventoryToast,
     } from "../animaciones/animaInventario.js";
 
-    const API_BASE = "http://localhost:3000/api";
+    const API_BASE = "https://guileless-custard-bb32da.netlify.app/api";
 
     // Exponer funciones necesarias al scope global
     (window as any).openProductDrawer = openProductDrawer;

@@ -511,7 +511,7 @@
 
   async function loadBulkCategories() {
     try {
-      const res = await fetch("http://localhost:3000/api/categorias");
+      const res = await fetch("https://guileless-custard-bb32da.netlify.app/api/categorias");
       const json = await res.json();
       if (json.success) {
         const rawList = json.data?.categorias || (Array.isArray(json.data) ? json.data : []);
@@ -1120,7 +1120,7 @@
         const originalText = saveBatchBtn.innerHTML;
         saveBatchBtn.innerHTML = `<span class="material-symbols-outlined text-[17px] animate-spin">sync</span><span>Guardando lote...</span>`;
 
-        const res = await fetch("http://localhost:3000/api/inventario/carga-masiva", {
+        const res = await fetch("https://guileless-custard-bb32da.netlify.app/api/inventario/carga-masiva", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ items: productos, productos }),
