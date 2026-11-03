@@ -405,38 +405,22 @@ try {
           <!-- Ergonomic Pagination Footer -->
           <div class="p-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-surface-container/60">
             <div class="flex items-center gap-4 text-[12px] text-on-surface-variant">
-              <span>
-                Mostrando <span id="inventory-visible-count" class="text-on-surface font-semibold">{initialProducts.length}</span> de <span id="inventory-total-count" class="text-on-surface font-semibold">{totalItemsCount}</span> artículos
+              <span id="inventory-pagination-info">
+                Mostrando <strong class="text-on-surface font-semibold">{initialProducts.length > 0 ? "1-" + Math.min(10, initialProducts.length) : "0"}</strong> de <strong class="text-on-surface font-semibold">{totalItemsCount}</strong> artículos
               </span>
               <div class="flex items-center gap-1.5">
                 <span>Filas:</span>
-                <select class="h-6 px-1.5 bg-surface text-on-surface rounded text-[11px] border border-surface-container focus:outline-none cursor-pointer">
-                  <option>10</option>
-                  <option>25</option>
-                  <option>50</option>
-                  <option>100</option>
+                <select id="inventory-page-size" class="h-6 px-1.5 bg-surface text-on-surface rounded text-[11px] border border-surface-container focus:outline-none cursor-pointer">
+                  <option value="10" selected>10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
                 </select>
               </div>
             </div>
 
-            <div class="flex items-center gap-1">
-              <button class="h-7 w-7 rounded-lg bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest flex items-center justify-center transition-colors disabled:opacity-40 cursor-pointer" disabled type="button">
-                <span class="material-symbols-outlined text-[16px]">first_page</span>
-              </button>
-              <button class="h-7 w-7 rounded-lg bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest flex items-center justify-center transition-colors disabled:opacity-40 cursor-pointer" disabled type="button">
-                <span class="material-symbols-outlined text-[16px]">chevron_left</span>
-              </button>
-              <button class="h-7 px-2.5 rounded-lg bg-primary-container text-on-primary text-[12px] font-semibold cursor-pointer" type="button">1</button>
-              <button class="h-7 px-2.5 rounded-lg bg-surface hover:bg-surface-container-lowest text-on-surface text-[12px] font-medium cursor-pointer" type="button">2</button>
-              <button class="h-7 px-2.5 rounded-lg bg-surface hover:bg-surface-container-lowest text-on-surface text-[12px] font-medium cursor-pointer" type="button">3</button>
-              <span class="text-[12px] text-on-surface-variant px-1">...</span>
-              <button class="h-7 px-2.5 rounded-lg bg-surface hover:bg-surface-container-lowest text-on-surface text-[12px] font-medium cursor-pointer" type="button">86</button>
-              <button class="h-7 w-7 rounded-lg bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest flex items-center justify-center transition-colors cursor-pointer" type="button">
-                <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-              </button>
-              <button class="h-7 w-7 rounded-lg bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest flex items-center justify-center transition-colors cursor-pointer" type="button">
-                <span class="material-symbols-outlined text-[16px]">last_page</span>
-              </button>
+            <div id="inventory-pagination-controls" class="flex items-center gap-1">
+              <!-- Botones generados dinámicamente -->
             </div>
           </div>
         </div>
@@ -736,6 +720,10 @@ try {
       }).format(num);
     }
 
+    let allInventoryItems: any[] = [];
+    let inventoryCurrentPage = 1;
+    let inventoryPageSize = 10;
+
     // 1. Cargar productos desde la base de datos
     async function fetchInventory(search = "", category = "", status = "") {
       try {
@@ -743,22 +731,131 @@ try {
         if (search) params.append("q", search);
         if (category) params.append("categoria", category);
         if (status) params.append("salud", status);
-        params.append("limit", "100");
+        params.append("limit", "500");
 
         const res = await fetch(`${API_BASE}/inventario?${params.toString()}`);
         if (!res.ok) throw new Error("HTTP error " + res.status);
         const json = await res.json();
         if (json.success && json.data) {
-          renderTableRows(json.data.items || []);
-          const visibleCountEl = document.getElementById("inventory-visible-count");
-          const totalCountEl = document.getElementById("inventory-total-count");
-          if (visibleCountEl) visibleCountEl.textContent = String(json.data.items?.length || 0);
-          if (totalCountEl) totalCountEl.textContent = String(json.data.total || 0);
+          allInventoryItems = json.data.items || [];
+          inventoryCurrentPage = 1;
+          renderPaginatedInventory();
         }
       } catch (err) {
         console.error("Error al cargar inventario:", err);
       }
     }
+
+    function renderPaginatedInventory() {
+      const totalItems = allInventoryItems.length;
+      const totalPages = Math.ceil(totalItems / inventoryPageSize) || 1;
+
+      if (inventoryCurrentPage > totalPages) inventoryCurrentPage = totalPages;
+      if (inventoryCurrentPage < 1) inventoryCurrentPage = 1;
+
+      const startIndex = (inventoryCurrentPage - 1) * inventoryPageSize;
+      const endIndex = Math.min(startIndex + inventoryPageSize, totalItems);
+      const pageItems = allInventoryItems.slice(startIndex, endIndex);
+
+      renderTableRows(pageItems);
+
+      const pagInfo = document.getElementById("inventory-pagination-info");
+      if (pagInfo) {
+        if (totalItems === 0) {
+          pagInfo.innerHTML = `Mostrando <strong class="text-on-surface font-semibold">0</strong> de <strong class="text-on-surface font-semibold">0</strong> artículos`;
+        } else {
+          pagInfo.innerHTML = `Mostrando <strong class="text-on-surface font-semibold">${startIndex + 1}-${endIndex}</strong> de <strong class="text-on-surface font-semibold">${totalItems}</strong> artículos`;
+        }
+      }
+
+      const controls = document.getElementById("inventory-pagination-controls");
+      if (!controls) return;
+
+      if (totalItems === 0) {
+        controls.innerHTML = "";
+        return;
+      }
+
+      let html = "";
+      const isFirst = inventoryCurrentPage === 1;
+      const isLast = inventoryCurrentPage === totalPages;
+
+      // First page
+      html += `
+        <button
+          class="h-7 w-7 rounded-lg bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          ${isFirst ? "disabled" : ""}
+          onclick="window.goToInventoryPage(1)"
+          title="Primera página"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[16px]">first_page</span>
+        </button>
+      `;
+
+      // Prev
+      html += `
+        <button
+          class="h-7 w-7 rounded-lg bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          ${isFirst ? "disabled" : ""}
+          onclick="window.goToInventoryPage(${inventoryCurrentPage - 1})"
+          title="Página anterior"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+        </button>
+      `;
+
+      // Page numbers (smart window)
+      for (let p = 1; p <= totalPages; p++) {
+        if (totalPages <= 7 || p === 1 || p === totalPages || (p >= inventoryCurrentPage - 1 && p <= inventoryCurrentPage + 1)) {
+          if (p === inventoryCurrentPage) {
+            html += `
+              <button class="h-7 px-2.5 rounded-lg bg-primary text-on-primary text-[12px] font-bold shadow-xs cursor-default" type="button">${p}</button>
+            `;
+          } else {
+            html += `
+              <button class="h-7 px-2.5 rounded-lg bg-surface hover:bg-surface-container-lowest text-on-surface text-[12px] font-medium cursor-pointer transition-colors" onclick="window.goToInventoryPage(${p})" type="button">${p}</button>
+            `;
+          }
+        } else if (p === inventoryCurrentPage - 2 || p === inventoryCurrentPage + 2) {
+          html += `<span class="text-[12px] text-on-surface-variant px-1 select-none">...</span>`;
+        }
+      }
+
+      // Next
+      html += `
+        <button
+          class="h-7 w-7 rounded-lg bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          ${isLast ? "disabled" : ""}
+          onclick="window.goToInventoryPage(${inventoryCurrentPage + 1})"
+          title="Página siguiente"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+        </button>
+      `;
+
+      // Last page
+      html += `
+        <button
+          class="h-7 w-7 rounded-lg bg-surface text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          ${isLast ? "disabled" : ""}
+          onclick="window.goToInventoryPage(${totalPages})"
+          title="Última página"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[16px]">last_page</span>
+        </button>
+      `;
+
+      controls.innerHTML = html;
+    }
+
+    (window as any).goToInventoryPage = function(page: number) {
+      inventoryCurrentPage = page;
+      renderPaginatedInventory();
+    };
 
     // 2. Cargar KPIs desde la base de datos
     async function fetchKpis() {
@@ -1308,6 +1405,7 @@ try {
       const searchInput = document.getElementById("inventory-search") as HTMLInputElement | null;
       const catSelect = document.getElementById("filter-category") as HTMLSelectElement | null;
       const statusSelect = document.getElementById("filter-status") as HTMLSelectElement | null;
+      const pageSizeSelect = document.getElementById("inventory-page-size") as HTMLSelectElement | null;
       const btnReset = document.getElementById("btn-reset-filters");
 
       let debounceTimer: any = null;
@@ -1326,6 +1424,12 @@ try {
 
       catSelect?.addEventListener("change", triggerFilter);
       statusSelect?.addEventListener("change", triggerFilter);
+
+      pageSizeSelect?.addEventListener("change", (e: any) => {
+        inventoryPageSize = parseInt(e.target.value, 10) || 10;
+        inventoryCurrentPage = 1;
+        renderPaginatedInventory();
+      });
 
       btnReset?.addEventListener("click", () => {
         if (searchInput) searchInput.value = "";

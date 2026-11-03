@@ -279,34 +279,20 @@ import AggServicio from "../components/AggServicio.astro";
                 <span id="services-pagination-info">Mostrando <strong class="text-on-surface font-semibold">0</strong> servicios</span>
                 <div class="flex items-center gap-1.5">
                   <span>Filas:</span>
-                  <select class="bg-surface text-on-surface rounded-lg px-2 py-1 text-[11px] border border-surface-container focus:outline-none cursor-pointer">
-                    <option>10</option>
-                    <option>25</option>
-                    <option>50</option>
+                  <select
+                    id="services-page-size"
+                    class="bg-surface text-on-surface rounded-lg px-2 py-1 text-[11px] border border-surface-container focus:outline-none cursor-pointer"
+                  >
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
                   </select>
                 </div>
               </div>
 
               <!-- Pagination Controls -->
-              <div class="flex items-center gap-1">
-                <button class="h-7 w-7 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface hover:bg-surface-container border border-surface-container/60 transition-colors disabled:opacity-40 cursor-pointer" disabled type="button">
-                  <span class="material-symbols-outlined text-[16px]">chevron_left</span>
-                </button>
-                <button class="h-7 w-7 rounded-lg font-semibold bg-secondary-container text-on-secondary shadow-xs cursor-pointer" type="button">
-                  1
-                </button>
-                <button class="h-7 w-7 rounded-lg text-on-surface bg-surface hover:bg-surface-container border border-surface-container/60 transition-colors cursor-pointer" type="button">
-                  2
-                </button>
-                <button class="h-7 w-7 rounded-lg text-on-surface bg-surface hover:bg-surface-container border border-surface-container/60 transition-colors cursor-pointer" type="button">
-                  3
-                </button>
-                <button class="h-7 w-7 rounded-lg text-on-surface bg-surface hover:bg-surface-container border border-surface-container/60 transition-colors cursor-pointer" type="button">
-                  4
-                </button>
-                <button class="h-7 w-7 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface hover:bg-surface-container border border-surface-container/60 transition-colors cursor-pointer" type="button">
-                  <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-                </button>
+              <div id="services-pagination-controls" class="flex items-center gap-1">
+                <!-- Generado dinámicamente -->
               </div>
             </div>
           </div>
@@ -363,6 +349,9 @@ import AggServicio from "../components/AggServicio.astro";
 
     const BACKEND_URL = "http://localhost:3000";
     let allServicios: any[] = [];
+    let filteredServicios: any[] = [];
+    let servicesCurrentPage = 1;
+    let servicesPageSize = 10;
 
     function formatCOP(num: any) {
       const val = Math.round(Number(num) || 0);
@@ -416,7 +405,13 @@ import AggServicio from "../components/AggServicio.astro";
         if (kpiMargen) kpiMargen.textContent = `${kpis.margen_promedio || 62}% prom.`;
         if (tabCount) tabCount.textContent = String(allServicios.length);
 
-        renderServicesTable(allServicios);
+        filteredServicios = [...allServicios];
+        if (typeof (window as any).applyServiceFilters === "function") {
+          (window as any).applyServiceFilters();
+        } else {
+          servicesCurrentPage = 1;
+          renderPaginatedServices();
+        }
       } catch (err: any) {
         console.error("Error al cargar servicios:", err);
         tbody.innerHTML = `
@@ -431,36 +426,52 @@ import AggServicio from "../components/AggServicio.astro";
       }
     };
 
-    function renderServicesTable(list: any[]) {
+    function renderPaginatedServices() {
       const tbody = document.getElementById("services-table-body");
       const visibleCountEl = document.getElementById("service-visible-count");
       const totalCountEl = document.getElementById("service-total-count");
       const pagInfo = document.getElementById("services-pagination-info");
+      const controls = document.getElementById("services-pagination-controls");
 
       if (!tbody) return;
 
-      if (visibleCountEl) visibleCountEl.textContent = String(list.length);
+      const totalItems = filteredServicios.length;
+      const totalPages = Math.ceil(totalItems / servicesPageSize) || 1;
+
+      if (servicesCurrentPage > totalPages) servicesCurrentPage = totalPages;
+      if (servicesCurrentPage < 1) servicesCurrentPage = 1;
+
+      const startIndex = (servicesCurrentPage - 1) * servicesPageSize;
+      const endIndex = Math.min(startIndex + servicesPageSize, totalItems);
+      const pageList = filteredServicios.slice(startIndex, endIndex);
+
+      if (visibleCountEl) visibleCountEl.textContent = String(totalItems);
       if (totalCountEl) totalCountEl.textContent = String(allServicios.length);
       if (pagInfo) {
-        pagInfo.innerHTML = `Mostrando <strong class="text-on-surface font-semibold">1-${list.length}</strong> de <strong class="text-on-surface font-semibold">${allServicios.length}</strong> servicios`;
+        if (totalItems === 0) {
+          pagInfo.innerHTML = `Mostrando <strong class="text-on-surface font-semibold">0</strong> de <strong class="text-on-surface font-semibold">${allServicios.length}</strong> servicios`;
+        } else {
+          pagInfo.innerHTML = `Mostrando <strong class="text-on-surface font-semibold">${startIndex + 1}-${endIndex}</strong> de <strong class="text-on-surface font-semibold">${totalItems}</strong> servicios`;
+        }
       }
 
-      if (list.length === 0) {
+      if (totalItems === 0) {
         tbody.innerHTML = `
           <tr>
             <td colspan="8" class="p-10 text-center text-on-surface-variant">
               <span class="material-symbols-outlined text-[38px] mb-2 block text-on-surface-variant/40">home_repair_service</span>
               <span class="font-semibold text-[14px] text-primary">No se encontraron servicios en el catálogo</span>
               <p class="text-[12px] text-on-surface-variant/70 mt-1">
-                Haz clic en "Registrar Nuevo Servicio" para dar de alta una nueva prestación técnica.
+                Haz clic en "Registrar Nuevo Servicio" para dar de alta una nueva prestación técnica o ajusta los filtros.
               </p>
             </td>
           </tr>
         `;
+        if (controls) controls.innerHTML = "";
         return;
       }
 
-      tbody.innerHTML = list
+      tbody.innerHTML = pageList
         .map((srv, idx) => {
           const sku = srv.codigo_sku || `SRV-${srv.id.slice(0, 6).toUpperCase()}`;
           const catName = srv.categoria_nombre || "Servicios técnicos";
@@ -551,7 +562,60 @@ import AggServicio from "../components/AggServicio.astro";
           `;
         })
         .join("");
+
+      if (controls) {
+        let html = "";
+        const isFirst = servicesCurrentPage === 1;
+        const isLast = servicesCurrentPage === totalPages;
+
+        html += `
+          <button
+            class="h-7 w-7 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface hover:bg-surface-container border border-surface-container/60 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            ${isFirst ? "disabled" : ""}
+            onclick="window.goToServicesPage(${servicesCurrentPage - 1})"
+            title="Página anterior"
+            type="button"
+          >
+            <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+          </button>
+        `;
+
+        for (let p = 1; p <= totalPages; p++) {
+          if (p === servicesCurrentPage) {
+            html += `
+              <button class="h-7 w-7 rounded-lg font-bold bg-secondary-container text-on-secondary shadow-xs cursor-default text-[12px]" type="button">
+                ${p}
+              </button>
+            `;
+          } else {
+            html += `
+              <button class="h-7 w-7 rounded-lg text-on-surface bg-surface hover:bg-surface-container border border-surface-container/60 transition-colors cursor-pointer text-[12px]" onclick="window.goToServicesPage(${p})" type="button">
+                ${p}
+              </button>
+            `;
+          }
+        }
+
+        html += `
+          <button
+            class="h-7 w-7 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface hover:bg-surface-container border border-surface-container/60 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            ${isLast ? "disabled" : ""}
+            onclick="window.goToServicesPage(${servicesCurrentPage + 1})"
+            title="Página siguiente"
+            type="button"
+          >
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+          </button>
+        `;
+
+        controls.innerHTML = html;
+      }
     }
+
+    (window as any).goToServicesPage = function (page: number) {
+      servicesCurrentPage = page;
+      renderPaginatedServices();
+    };
 
     // Alternar estado de servicio activo/inactivo
     (window as any).toggleServiceStatus = async function (id: string) {
@@ -608,6 +672,7 @@ import AggServicio from "../components/AggServicio.astro";
       const categoryFilter = document.getElementById("service-category-filter") as HTMLSelectElement | null;
       const rateFilter = document.getElementById("service-rate-filter") as HTMLSelectElement | null;
       const statusFilter = document.getElementById("service-status-filter") as HTMLSelectElement | null;
+      const pageSizeSelect = document.getElementById("services-page-size") as HTMLSelectElement | null;
       const resetBtn = document.getElementById("btn-reset-service-filters");
 
       function applyFilters() {
@@ -616,7 +681,7 @@ import AggServicio from "../components/AggServicio.astro";
         const rate = (rateFilter?.value || "").toLowerCase().trim();
         const status = (statusFilter?.value || "").toLowerCase().trim();
 
-        const filtered = allServicios.filter((srv) => {
+        filteredServicios = allServicios.filter((srv) => {
           const name = (srv.nombre || "").toLowerCase();
           const sku = (srv.codigo_sku || "").toLowerCase();
           const desc = (srv.descripcion || "").toLowerCase();
@@ -632,13 +697,24 @@ import AggServicio from "../components/AggServicio.astro";
           return matchesQ && matchesCat && matchesRate && matchesStatus;
         });
 
-        renderServicesTable(filtered);
+        servicesCurrentPage = 1;
+        renderPaginatedServices();
       }
+
+      (window as any).applyServiceFilters = applyFilters;
 
       if (searchInput) searchInput.addEventListener("input", applyFilters);
       if (categoryFilter) categoryFilter.addEventListener("change", applyFilters);
       if (rateFilter) rateFilter.addEventListener("change", applyFilters);
       if (statusFilter) statusFilter.addEventListener("change", applyFilters);
+
+      if (pageSizeSelect) {
+        pageSizeSelect.addEventListener("change", (e: any) => {
+          servicesPageSize = parseInt(e.target.value, 10) || 10;
+          servicesCurrentPage = 1;
+          renderPaginatedServices();
+        });
+      }
 
       if (resetBtn) {
         resetBtn.addEventListener("click", () => {

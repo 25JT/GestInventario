@@ -113,57 +113,20 @@ export function filterRoleTab(roleKey, btn) {
   btn.className =
     "role-tab-btn px-3 py-1.5 rounded-lg bg-surface-container-lowest text-on-surface text-[12px] font-semibold shadow-xs transition-all flex items-center gap-2 cursor-pointer";
 
-  const rows = document.querySelectorAll(".user-row");
-  let visibleCount = 0;
-
-  rows.forEach((row) => {
-    const rowRole = (row.getAttribute("data-role-type") || "").toLowerCase();
-    if (roleKey === "all" || rowRole === roleKey) {
-      row.style.display = "";
-      visibleCount++;
-    } else {
-      row.style.display = "none";
-    }
-  });
-
-  const countEl = document.getElementById("user-visible-count");
-  if (countEl) countEl.textContent = `${visibleCount}`;
+  if (typeof window !== "undefined" && typeof window.filterRoleTab === "function") {
+    // Si la página sobreescribe filterRoleTab, maneja el estado internamente
+  } else if (typeof window !== "undefined" && typeof window.applyUserFilters === "function") {
+    window.applyUserFilters();
+  }
 }
 
 /**
  * Filtrado de usuarios según buscador, sucursal y estado
  */
 export function applyUserFilters() {
-  const searchInput = document.getElementById("user-search");
-  const branchSelect = document.getElementById("user-branch-filter");
-  const statusSelect = document.getElementById("user-status-filter");
-
-  const q = (searchInput?.value || "").toLowerCase().trim();
-  const branch = (branchSelect?.value || "").toLowerCase().trim();
-  const status = (statusSelect?.value || "").toLowerCase().trim();
-
-  const rows = document.querySelectorAll(".user-row");
-  let visibleCount = 0;
-
-  rows.forEach((row) => {
-    const text = row.textContent?.toLowerCase() || "";
-    const rowBranch = (row.getAttribute("data-branch") || "").toLowerCase();
-    const rowStatus = (row.getAttribute("data-status") || "").toLowerCase();
-
-    const matchesQ = !q || text.includes(q);
-    const matchesBranch = !branch || branch === "sucursal: todas" || rowBranch.includes(branch);
-    const matchesStatus = !status || status === "todos los estados" || rowStatus.includes(status);
-
-    if (matchesQ && matchesBranch && matchesStatus) {
-      row.style.display = "";
-      visibleCount++;
-    } else {
-      row.style.display = "none";
-    }
-  });
-
-  const countEl = document.getElementById("user-visible-count");
-  if (countEl) countEl.textContent = `${visibleCount}`;
+  if (typeof window !== "undefined" && typeof window.applyUserFilters === "function") {
+    // La página maneja el estado
+  }
 }
 
 if (typeof window !== "undefined") {

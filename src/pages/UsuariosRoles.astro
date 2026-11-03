@@ -227,33 +227,24 @@ import InvitacionToken from "../components/InvitacionToken.astro";
 
           <!-- Pie de Tabla y Paginación -->
           <div class="px-4 py-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-surface-container/60">
-            <span class="text-[12px] text-on-surface-variant">
-              Mostrando <span id="user-visible-count" class="font-bold text-on-surface">3</span> de <span id="user-total-count" class="font-bold text-on-surface">3</span> usuarios registrados en el clúster
-            </span>
-            <div class="flex items-center gap-1.5">
-              <button
-                class="h-8 px-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-on-surface shadow-xs disabled:opacity-50 transition-colors flex items-center justify-center cursor-pointer"
-                type="button"
-                title="Página anterior"
-              >
-                <span class="material-symbols-outlined text-[18px]">chevron_left</span>
-              </button>
-              <button class="h-8 w-8 rounded-lg bg-secondary-container text-on-secondary text-[12px] font-bold shadow-xs flex items-center justify-center cursor-pointer" type="button">
-                1
-              </button>
-              <button class="h-8 w-8 rounded-lg bg-surface-container-lowest hover:bg-surface text-on-surface text-[12px] font-medium shadow-xs transition-colors flex items-center justify-center cursor-pointer" type="button">
-                2
-              </button>
-              <button class="h-8 w-8 rounded-lg bg-surface-container-lowest hover:bg-surface text-on-surface text-[12px] font-medium shadow-xs transition-colors flex items-center justify-center cursor-pointer" type="button">
-                3
-              </button>
-              <button
-                class="h-8 px-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-on-surface shadow-xs transition-colors flex items-center justify-center cursor-pointer"
-                type="button"
-                title="Página siguiente"
-              >
-                <span class="material-symbols-outlined text-[18px]">chevron_right</span>
-              </button>
+            <div class="flex items-center gap-4 text-[12px] text-on-surface-variant">
+              <span id="users-pagination-info">
+                Mostrando <strong class="font-bold text-on-surface">0</strong> de <strong class="font-bold text-on-surface">0</strong> usuarios registrados en el clúster
+              </span>
+              <div class="flex items-center gap-1.5">
+                <span>Filas:</span>
+                <select
+                  id="users-page-size"
+                  class="bg-surface text-on-surface rounded-lg px-2 py-1 text-[11px] border border-surface-container focus:outline-none cursor-pointer"
+                >
+                  <option value="10" selected>10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                </select>
+              </div>
+            </div>
+            <div id="users-pagination-controls" class="flex items-center gap-1">
+              <!-- Botones generados dinámicamente -->
             </div>
           </div>
         </section>
@@ -498,13 +489,256 @@ import InvitacionToken from "../components/InvitacionToken.astro";
 
     const BACKEND_URL = "http://localhost:3000";
     let cachedUsers: any[] = [];
+    let filteredUsers: any[] = [];
     let cachedBranches: any[] = [];
+    let usersCurrentPage = 1;
+    let usersPageSize = 10;
+    let currentRoleFilter = "all";
 
     // Exponer funciones globales a window
     (window as any).openUserModal = openUserModal;
     (window as any).closeUserModal = closeUserModal;
     (window as any).showUserToast = showUserToast;
-    (window as any).filterRoleTab = filterRoleTab;
+
+    (window as any).filterRoleTab = function (roleKey: string, btn: HTMLElement) {
+      document.querySelectorAll(".role-tab-btn").forEach((b) => {
+        b.className =
+          "role-tab-btn px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface text-[12px] font-medium transition-all flex items-center gap-2 cursor-pointer";
+      });
+      if (btn) {
+        btn.className =
+          "role-tab-btn px-3 py-1.5 rounded-lg bg-surface-container-lowest text-on-surface text-[12px] font-semibold shadow-xs transition-all flex items-center gap-2 cursor-pointer";
+      }
+      currentRoleFilter = (roleKey || "all").toLowerCase();
+      applyUserFilters();
+    };
+
+    function applyUserFilters() {
+      const searchInput = document.getElementById("user-search") as HTMLInputElement | null;
+      const branchSelect = document.getElementById("user-branch-filter") as HTMLSelectElement | null;
+      const statusSelect = document.getElementById("user-status-filter") as HTMLSelectElement | null;
+
+      const q = (searchInput?.value || "").toLowerCase().trim();
+      const branch = (branchSelect?.value || "").toLowerCase().trim();
+      const status = (statusSelect?.value || "").toLowerCase().trim();
+
+      filteredUsers = cachedUsers.filter((u) => {
+        const roleType = (u.rol_tab || u.rol || "pos").toLowerCase();
+        const matchesRole = currentRoleFilter === "all" || roleType === currentRoleFilter;
+
+        const text = [
+          u.nombre_completo,
+          u.nombre,
+          u.apellido,
+          u.usuario,
+          u.correo,
+          u.codigo_interno,
+          u.telefono,
+          u.sucursal_nombre,
+          u.rol,
+        ]
+          .join(" ")
+          .toLowerCase();
+        const matchesQ = !q || text.includes(q);
+
+        const uBranch = (u.sucursal_nombre || "").toLowerCase();
+        const matchesBranch = !branch || branch.includes("todas") || uBranch.includes(branch);
+
+        const uStatus = (u.estado || "activo").toLowerCase();
+        const matchesStatus = !status || status.includes("todos") || uStatus.includes(status);
+
+        return matchesRole && matchesQ && matchesBranch && matchesStatus;
+      });
+
+      usersCurrentPage = 1;
+      renderPaginatedUsers();
+    }
+
+    (window as any).applyUserFilters = applyUserFilters;
+
+    function renderPaginatedUsers() {
+      const tbody = document.getElementById("users-table-body");
+      const pagInfo = document.getElementById("users-pagination-info");
+      const controls = document.getElementById("users-pagination-controls");
+
+      if (!tbody) return;
+
+      const totalItems = filteredUsers.length;
+      const totalPages = Math.ceil(totalItems / usersPageSize) || 1;
+
+      if (usersCurrentPage > totalPages) usersCurrentPage = totalPages;
+      if (usersCurrentPage < 1) usersCurrentPage = 1;
+
+      const startIndex = (usersCurrentPage - 1) * usersPageSize;
+      const endIndex = Math.min(startIndex + usersPageSize, totalItems);
+      const pageUsers = filteredUsers.slice(startIndex, endIndex);
+
+      if (pagInfo) {
+        if (totalItems === 0) {
+          pagInfo.innerHTML = `Mostrando <strong class="font-bold text-on-surface">0</strong> de <strong class="font-bold text-on-surface">${cachedUsers.length}</strong> usuarios registrados en el clúster`;
+        } else {
+          pagInfo.innerHTML = `Mostrando <strong class="font-bold text-on-surface">${startIndex + 1}-${endIndex}</strong> de <strong class="font-bold text-on-surface">${totalItems}</strong> usuarios registrados en el clúster`;
+        }
+      }
+
+      if (totalItems === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="px-4 py-8 text-center text-on-surface-variant text-[13px]">
+              No hay usuarios que coincidan con los filtros aplicados.
+            </td>
+          </tr>
+        `;
+        if (controls) controls.innerHTML = "";
+        return;
+      }
+
+      tbody.innerHTML = pageUsers
+        .map((u: any) => {
+          const statusClass =
+            u.estado === "ACTIVO"
+              ? "text-on-tertiary-container font-semibold"
+              : u.estado === "BLOQUEADO"
+              ? "text-error font-semibold"
+              : "text-on-surface-variant font-medium";
+
+          const statusDot =
+            u.estado === "ACTIVO"
+              ? `<span class="w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"></span>`
+              : u.estado === "BLOQUEADO"
+              ? `<span class="w-2 h-2 rounded-full bg-error"></span>`
+              : `<span class="w-2 h-2 rounded-full bg-outline-variant"></span>`;
+
+          const statusLabel =
+            u.estado === "ACTIVO" ? "En línea / Activo" : u.estado === "BLOQUEADO" ? "Bloqueado" : "Inactivo";
+
+          return `
+            <tr
+              class="user-row hover:bg-surface-container-low/70 transition-colors group"
+              data-role-type="${u.rol_tab || "pos"}"
+              data-branch="${u.sucursal_nombre || ""}"
+              data-status="${(u.estado || "activo").toLowerCase()}"
+              data-user-id="${u.id}"
+            >
+              <td class="px-4 py-3">
+                <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex flex-col">
+                  <span class="text-[13px] font-semibold text-primary">${u.nombre_completo || u.nombre}</span>
+                  <span class="text-[11px] text-on-surface-variant">@${u.usuario} • <span class="font-mono">${u.codigo_interno}</span></span>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex flex-col">
+                  <span class="text-[13px] text-on-surface font-mono">${u.correo || "Sin correo"}</span>
+                  <span class="text-[11px] text-on-surface-variant font-mono">${u.telefono || "Sin teléfono"}</span>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${u.rol_badge_class || "bg-surface-container text-on-surface-variant"} text-[11px] font-semibold shadow-xs">
+                  <span class="material-symbols-outlined text-[13px]">${u.rol_icon || "badge"}</span>
+                  ${u.rol_label || u.rol}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-1.5 text-on-surface text-[12px]">
+                  <span class="material-symbols-outlined text-[16px] text-on-surface-variant">store</span>
+                  <span>${u.sucursal_nombre || "Central Sucursal 01"}</span>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center gap-1.5 text-[11px] ${statusClass}">
+                  ${statusDot}
+                  ${statusLabel}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <div class="inline-flex items-center gap-1">
+                  <button
+                    onclick="window.openEditUserModal && window.openEditUserModal('${u.id}')"
+                    class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
+                    title="Editar credenciales"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                  </button>
+                  <button
+                    onclick="window.toggleUserStatus && window.toggleUserStatus('${u.id}', '${u.estado}')"
+                    class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
+                    title="${u.estado === 'ACTIVO' ? 'Desactivar usuario' : 'Activar usuario'}"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">${u.estado === 'ACTIVO' ? 'block' : 'check_circle'}</span>
+                  </button>
+                  <button
+                    onclick="window.deleteUser && window.deleteUser('${u.id}', '${u.nombre_completo}')"
+                    class="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/20 transition-colors cursor-pointer"
+                    title="Eliminar usuario"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+
+      if (controls) {
+        let html = "";
+        const isFirst = usersCurrentPage === 1;
+        const isLast = usersCurrentPage === totalPages;
+
+        html += `
+          <button
+            class="h-8 px-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-on-surface shadow-xs disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center cursor-pointer"
+            ${isFirst ? "disabled" : ""}
+            onclick="window.goToUsersPage(${usersCurrentPage - 1})"
+            type="button"
+            title="Página anterior"
+          >
+            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+          </button>
+        `;
+
+        for (let p = 1; p <= totalPages; p++) {
+          if (p === usersCurrentPage) {
+            html += `
+              <button class="h-8 w-8 rounded-lg bg-secondary-container text-on-secondary text-[12px] font-bold shadow-xs flex items-center justify-center cursor-default" type="button">
+                ${p}
+              </button>
+            `;
+          } else {
+            html += `
+              <button class="h-8 w-8 rounded-lg bg-surface-container-lowest hover:bg-surface text-on-surface text-[12px] font-medium shadow-xs transition-colors flex items-center justify-center cursor-pointer" onclick="window.goToUsersPage(${p})" type="button">
+                ${p}
+              </button>
+            `;
+          }
+        }
+
+        html += `
+          <button
+            class="h-8 px-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-on-surface shadow-xs disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center cursor-pointer"
+            ${isLast ? "disabled" : ""}
+            onclick="window.goToUsersPage(${usersCurrentPage + 1})"
+            type="button"
+            title="Página siguiente"
+          >
+            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+          </button>
+        `;
+
+        controls.innerHTML = html;
+      }
+    }
+
+    (window as any).goToUsersPage = function (page: number) {
+      usersCurrentPage = page;
+      renderPaginatedUsers();
+    };
 
     // Cargar catálogo de usuarios y métricas RBAC desde la base de datos
     async function loadUsersFromDB() {
@@ -564,120 +798,7 @@ import InvitacionToken from "../components/InvitacionToken.astro";
             .join("");
         }
 
-        // Renderizar tabla de usuarios
-        if (usuarios.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="7" class="px-4 py-8 text-center text-on-surface-variant text-[13px]">
-                No hay usuarios registrados actualmente en la base de datos.
-              </td>
-            </tr>
-          `;
-          return;
-        }
-
-        tbody.innerHTML = usuarios
-          .map((u: any) => {
-            const statusClass =
-              u.estado === "ACTIVO"
-                ? "text-on-tertiary-container font-semibold"
-                : u.estado === "BLOQUEADO"
-                ? "text-error font-semibold"
-                : "text-on-surface-variant font-medium";
-
-            const statusDot =
-              u.estado === "ACTIVO"
-                ? `<span class="w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"></span>`
-                : u.estado === "BLOQUEADO"
-                ? `<span class="w-2 h-2 rounded-full bg-error"></span>`
-                : `<span class="w-2 h-2 rounded-full bg-outline-variant"></span>`;
-
-            const statusLabel =
-              u.estado === "ACTIVO" ? "En línea / Activo" : u.estado === "BLOQUEADO" ? "Bloqueado" : "Inactivo";
-
-            return `
-              <tr
-                class="user-row hover:bg-surface-container-low/70 transition-colors group"
-                data-role-type="${u.rol_tab || "pos"}"
-                data-branch="${u.sucursal_nombre || ""}"
-                data-status="${(u.estado || "activo").toLowerCase()}"
-                data-user-id="${u.id}"
-              >
-                <td class="px-4 py-3">
-                  <input class="w-4 h-4 rounded text-secondary-container focus:ring-0 cursor-pointer" type="checkbox" />
-                </td>
-                <td class="px-4 py-3">
-                  <div class="flex flex-col">
-                    <span class="text-[13px] font-semibold text-primary">${u.nombre_completo || u.nombre}</span>
-                    <span class="text-[11px] text-on-surface-variant">@${u.usuario} • <span class="font-mono">${u.codigo_interno}</span></span>
-                  </div>
-                </td>
-                <td class="px-4 py-3">
-                  <div class="flex flex-col">
-                    <span class="text-[13px] text-on-surface font-mono">${u.correo || "Sin correo"}</span>
-                    <span class="text-[11px] text-on-surface-variant font-mono">${u.telefono || "Sin teléfono"}</span>
-                  </div>
-                </td>
-                <td class="px-4 py-3">
-                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${u.rol_badge_class || "bg-surface-container text-on-surface-variant"} text-[11px] font-semibold shadow-xs">
-                    <span class="material-symbols-outlined text-[13px]">${u.rol_icon || "badge"}</span>
-                    ${u.rol_label || u.rol}
-                  </span>
-                </td>
-                <td class="px-4 py-3">
-                  <div class="flex items-center gap-1.5 text-on-surface text-[12px]">
-                    <span class="material-symbols-outlined text-[16px] text-on-surface-variant">store</span>
-                    <span>${u.sucursal_nombre || "Central Sucursal 01"}</span>
-                  </div>
-                </td>
-                <td class="px-4 py-3">
-                  <span class="inline-flex items-center gap-1.5 text-[11px] ${statusClass}">
-                    ${statusDot}
-                    ${statusLabel}
-                  </span>
-                </td>
-                <td class="px-4 py-3 text-right">
-                  <div class="inline-flex items-center gap-1">
-                    <button
-                      onclick="window.openEditUserModal && window.openEditUserModal('${u.id}')"
-                      class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                      title="Editar credenciales"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[18px]">edit</span>
-                    </button>
-                    <button
-                      onclick="window.toggleUserStatus && window.toggleUserStatus('${u.id}', '${u.estado}')"
-                      class="p-1.5 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
-                      title="${u.estado === 'ACTIVO' ? 'Desactivar usuario' : 'Activar usuario'}"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[18px]">${u.estado === 'ACTIVO' ? 'block' : 'check_circle'}</span>
-                    </button>
-                    <button
-                      onclick="window.deleteUser && window.deleteUser('${u.id}', '${u.nombre_completo}')"
-                      class="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/20 transition-colors cursor-pointer"
-                      title="Eliminar usuario"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-[18px]">delete</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            `;
-          })
-          .join("");
-
-        if ((window as any).applyUserFilters) {
-          (window as any).applyUserFilters();
-        }
-
-        // Actualizar conteos visibles
-        const countVisibleEl = document.getElementById("user-visible-count");
-        const countTotalEl = document.getElementById("user-total-count");
-        if (countVisibleEl) countVisibleEl.textContent = `${usuarios.length}`;
-        if (countTotalEl) countTotalEl.textContent = `${usuarios.length}`;
+        applyUserFilters();
       } catch (err: any) {
         console.error("Error al cargar usuarios de la base de datos:", err);
         tbody.innerHTML = `
@@ -872,6 +993,42 @@ import InvitacionToken from "../components/InvitacionToken.astro";
     function setupUsuarios() {
       initUsuarios();
       loadUsersFromDB();
+
+      const searchInput = document.getElementById("user-search");
+      const branchSelect = document.getElementById("user-branch-filter");
+      const statusSelect = document.getElementById("user-status-filter");
+      const pageSizeSelect = document.getElementById("users-page-size") as HTMLSelectElement | null;
+      const resetBtn = document.getElementById("btn-reset-user-filters");
+
+      searchInput?.addEventListener("input", applyUserFilters);
+      branchSelect?.addEventListener("change", applyUserFilters);
+      statusSelect?.addEventListener("change", applyUserFilters);
+
+      if (pageSizeSelect) {
+        pageSizeSelect.addEventListener("change", (e: any) => {
+          usersPageSize = parseInt(e.target.value, 10) || 10;
+          usersCurrentPage = 1;
+          renderPaginatedUsers();
+        });
+      }
+
+      if (resetBtn) {
+        resetBtn.addEventListener("click", () => {
+          if (searchInput) (searchInput as HTMLInputElement).value = "";
+          if (branchSelect) (branchSelect as HTMLSelectElement).value = "Sucursal: Todas";
+          if (statusSelect) (statusSelect as HTMLSelectElement).value = "Todos los estados";
+          currentRoleFilter = "all";
+          document.querySelectorAll(".role-tab-btn").forEach((b, idx) => {
+            if (idx === 0) {
+              b.className = "role-tab-btn px-3 py-1.5 rounded-lg bg-surface-container-lowest text-on-surface text-[12px] font-semibold shadow-xs transition-all flex items-center gap-2 cursor-pointer";
+            } else {
+              b.className = "role-tab-btn px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface text-[12px] font-medium transition-all flex items-center gap-2 cursor-pointer";
+            }
+          });
+          applyUserFilters();
+          showUserToast("Filtros restablecidos.", "info");
+        });
+      }
     }
 
     document.addEventListener("astro:page-load", setupUsuarios);
