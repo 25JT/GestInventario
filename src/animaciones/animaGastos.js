@@ -136,55 +136,7 @@ export function initGastos() {
     });
   });
 
-  // 3. Filtrado en vivo por concepto y por categoría
-  const searchInput = document.getElementById("expense-search");
-  const categorySelect = document.getElementById("expense-category-filter");
-  const resetBtn = document.getElementById("btn-reset-expense-filters");
-
-  function applyExpenseFilters() {
-    const q = (searchInput?.value || "").toLowerCase().trim();
-    const cat = (categorySelect?.value || "").toLowerCase().trim();
-
-    const rows = document.querySelectorAll(".expense-row");
-    let visibleCount = 0;
-    let accumulated = 0;
-
-    rows.forEach((row) => {
-      const text = row.textContent?.toLowerCase() || "";
-      const rowCat = (row.getAttribute("data-category") || "").toLowerCase();
-      const amount = parseFloat(row.getAttribute("data-amount") || "0");
-
-      const matchesQ = !q || text.includes(q);
-      const matchesCat = !cat || cat === "todas las categorías" || rowCat.includes(cat);
-
-      if (matchesQ && matchesCat) {
-        row.style.display = "";
-        visibleCount++;
-        accumulated += amount;
-      } else {
-        row.style.display = "none";
-      }
-    });
-
-    const countEl = document.getElementById("expense-matches-count");
-    const accumEl = document.getElementById("expense-accum-total");
-    if (countEl) countEl.textContent = `${visibleCount} egresos`;
-    if (accumEl) accumEl.textContent = `$${accumulated.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} acumulado`;
-  }
-
-  if (searchInput) searchInput.addEventListener("input", applyExpenseFilters);
-  if (categorySelect) categorySelect.addEventListener("change", applyExpenseFilters);
-
-  if (resetBtn) {
-    resetBtn.addEventListener("click", () => {
-      if (searchInput) searchInput.value = "";
-      if (categorySelect) categorySelect.value = "Todas las Categorías";
-      applyExpenseFilters();
-      showExpenseToast("Filtros restablecidos.", "info");
-    });
-  }
-
-  // 4. Modal de nuevo gasto
+  // 3. Modal de nuevo gasto
   const btnNewExpense = document.getElementById("btn-new-expense");
   const btnNewReceipt = document.getElementById("btn-new-receipt");
   const btnCloseModal = document.getElementById("closeModalBtn") || document.getElementById("btn-close-expense-modal");

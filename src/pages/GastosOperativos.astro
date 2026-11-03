@@ -38,7 +38,7 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
               id="btn-export-expenses"
               class="h-[38px] px-3.5 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface rounded-xl text-[12px] font-medium border border-surface-container/70 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
               type="button"
-              onclick="window.showExpenseToast && window.showExpenseToast('Generando informe financiero...', 'info')"
+              onclick="window.exportExpensesToExcel && window.exportExpensesToExcel()"
             >
               <span class="material-symbols-outlined text-[18px] text-on-surface-variant">download</span>
               <span>Exportar Informe</span>
@@ -316,13 +316,14 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
                 <span>Limpiar Filtros</span>
               </button>
               <button
+                id="btn-generate-report"
                 class="h-8 px-3.5 bg-secondary-container hover:bg-secondary text-on-secondary rounded-xl text-[12px] font-semibold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
                 type="button"
-                onclick="window.showExpenseToast && window.showExpenseToast('Informe filtrado generado con 42 registros.', 'info')"
+                onclick="window.exportExpensesToExcel && window.exportExpensesToExcel()"
               >
                 <span class="material-symbols-outlined text-[17px]">analytics</span>
                 <span>Generar Informe</span>
-                <span class="px-1.5 py-0.2 rounded bg-surface-container-lowest/20 text-[10px] font-bold">42</span>
+                <span id="report-count-badge" class="px-1.5 py-0.2 rounded bg-surface-container-lowest/20 text-[10px] font-bold">0</span>
               </button>
             </div>
           </div>
@@ -349,15 +350,15 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
               <label class="text-[11px] text-on-surface-variant font-semibold uppercase tracking-wider">Rango de Fechas</label>
               <div class="flex items-center gap-1.5">
                 <input
-                  class="w-full h-9 px-2.5 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-                  type="text"
-                  value="01/10/2024"
+                  id="expense-date-from"
+                  class="w-full h-9 px-2.5 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary cursor-pointer"
+                  type="date"
                 />
                 <span class="text-on-surface-variant text-[12px]">-</span>
                 <input
-                  class="w-full h-9 px-2.5 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-                  type="text"
-                  value="24/10/2024"
+                  id="expense-date-to"
+                  class="w-full h-9 px-2.5 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary cursor-pointer"
+                  type="date"
                 />
               </div>
             </div>
@@ -370,12 +371,14 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
                   id="expense-category-filter"
                   class="w-full h-9 pl-3 pr-7 bg-surface text-on-surface rounded-xl text-[12px] border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary appearance-none cursor-pointer"
                 >
-                  <option selected>Todas las Categorías</option>
-                  <option>Suministros y Empaque</option>
-                  <option>Servicios Básicos</option>
-                  <option>Mantenimiento y Taller</option>
-                  <option>Logística y Fletes</option>
-                  <option>Viáticos e Imprevistos</option>
+                  <option value="" selected>Todas las Categorías</option>
+                  <option value="SUMINISTROS">Suministros y Empaque</option>
+                  <option value="SERVICIOS_PUBLICOS">Servicios Básicos</option>
+                  <option value="MANTENIMIENTO">Mantenimiento y Taller</option>
+                  <option value="LOGISTICA">Logística y Fletes</option>
+                  <option value="VIATICOS">Viáticos e Imprevistos</option>
+                  <option value="INSUMOS">Insumos y Repuestos</option>
+                  <option value="VARIOS">Otros Egresos</option>
                 </select>
                 <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px] pointer-events-none">
                   expand_more
@@ -390,20 +393,24 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
                 <div class="relative flex-1">
                   <span class="absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[12px]">$</span>
                   <input
+                    id="expense-min-amount"
                     class="w-full h-9 pl-5 pr-2 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-                    placeholder="0"
-                    type="text"
-                    value="0"
+                    placeholder="Mín"
+                    type="number"
+                    min="0"
+                    step="5000"
                   />
                 </div>
                 <span class="text-on-surface-variant text-[12px]">-</span>
                 <div class="relative flex-1">
                   <span class="absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[12px]">$</span>
                   <input
+                    id="expense-max-amount"
                     class="w-full h-9 pl-5 pr-2 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary"
-                    placeholder="Max"
-                    type="text"
-                    value="5,000"
+                    placeholder="Máx"
+                    type="number"
+                    min="0"
+                    step="5000"
                   />
                 </div>
               </div>
@@ -414,14 +421,14 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
           <div class="flex flex-wrap items-center justify-between gap-2 pt-2 bg-surface-container-low px-3 py-2 rounded-xl border border-surface-container/50">
             <div class="flex items-center gap-2 flex-wrap text-[11px]">
               <span class="text-on-surface-variant font-medium">Filtro rápido:</span>
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-surface-container-lowest text-primary font-semibold shadow-2xs">
-                Mes: Octubre 2024
+              <span id="expense-quick-filter-tag" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-surface-container-lowest text-primary font-semibold shadow-2xs">
+                Todos los egresos registrados
               </span>
             </div>
             <div class="flex items-center gap-2 text-on-surface-variant text-[12px] shrink-0">
-              <span>Coincidencias: <strong id="expense-matches-count" class="text-primary font-bold">7 egresos</strong></span>
+              <span>Coincidencias: <strong id="expense-matches-count" class="text-primary font-bold">0 egresos</strong></span>
               <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
-              <span id="expense-accum-total" class="font-bold text-secondary">$1,573.70 acumulado</span>
+              <span id="expense-accum-total" class="font-bold text-secondary">$0 COP acumulado</span>
             </div>
           </div>
         </div>
@@ -463,26 +470,20 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
           <div class="p-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-on-surface-variant border-t border-surface-container/60">
             <div class="flex items-center gap-4">
               <span id="expenses-pagination-info">Mostrando <strong class="text-on-surface font-semibold">0</strong> egresos</span>
-              <div class="hidden sm:flex items-center gap-1.5">
+              <div class="flex items-center gap-1.5">
                 <span>Filas por página:</span>
-                <select class="bg-surface text-on-surface rounded-lg px-2 py-1 border border-surface-container/60 text-[11px] focus:outline-none cursor-pointer">
-                  <option>10</option>
-                  <option>20</option>
-                  <option>50</option>
+                <select
+                  id="expense-page-size"
+                  class="bg-surface text-on-surface rounded-lg px-2 py-1 border border-surface-container/60 text-[11px] focus:outline-none cursor-pointer"
+                >
+                  <option value="10" selected>10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
                 </select>
               </div>
             </div>
-            <div class="flex items-center gap-1">
-              <button class="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface hover:bg-surface-container border border-surface-container/60 disabled:opacity-40 cursor-pointer" disabled type="button">
-                <span class="material-symbols-outlined text-[16px]">chevron_left</span>
-              </button>
-              <button class="w-7 h-7 rounded-lg flex items-center justify-center bg-primary text-on-primary font-semibold cursor-pointer" type="button">1</button>
-              <button class="w-7 h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-surface-container text-on-surface border border-surface-container/60 cursor-pointer" type="button">2</button>
-              <button class="w-7 h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-surface-container text-on-surface border border-surface-container/60 cursor-pointer" type="button">3</button>
-              <button class="w-7 h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-surface-container text-on-surface border border-surface-container/60 cursor-pointer" type="button">4</button>
-              <button class="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface hover:bg-surface-container border border-surface-container/60 cursor-pointer" type="button">
-                <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-              </button>
+            <div id="expense-pagination-controls" class="flex items-center gap-1">
+              <!-- Botones generados dinámicamente -->
             </div>
           </div>
         </div>
@@ -517,8 +518,11 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
 
     const BACKEND_URL = "http://localhost:3000";
     let allGastos: any[] = [];
+    let filteredGastos: any[] = [];
+    let currentPage = 1;
+    let pageSize = 10;
 
-    // Formatear montos en COP con separador de miles en punto (sin decimales innecesarios)
+    // Formatear montos en COP con separador de miles en punto
     function formatCOP(num: any) {
       const val = Math.round(Number(num) || 0);
       return `$${val.toLocaleString("es-CO")} COP`;
@@ -574,7 +578,7 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
         if (kpiSum) kpiSum.textContent = formatCOP(kpis.compras_suministros);
         if (kpiCaja) kpiCaja.textContent = formatCOP(kpis.caja_chica);
 
-        renderGastosTable(allGastos);
+        applyFilters();
       } catch (err: any) {
         console.error("Error al cargar gastos:", err);
         tbody.innerHTML = `
@@ -589,37 +593,138 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
       }
     };
 
-    function renderGastosTable(gastosList: any[]) {
-      const tbody = document.getElementById("expenses-table-body");
+    // Aplicar filtros reactivos avanzados
+    function applyFilters() {
+      const searchInput = document.getElementById("expense-search") as HTMLInputElement | null;
+      const dateFromInput = document.getElementById("expense-date-from") as HTMLInputElement | null;
+      const dateToInput = document.getElementById("expense-date-to") as HTMLInputElement | null;
+      const categorySelect = document.getElementById("expense-category-filter") as HTMLSelectElement | null;
+      const minAmountInput = document.getElementById("expense-min-amount") as HTMLInputElement | null;
+      const maxAmountInput = document.getElementById("expense-max-amount") as HTMLInputElement | null;
+
+      const q = (searchInput?.value || "").trim().toLowerCase();
+      const dateFrom = dateFromInput?.value || "";
+      const dateTo = dateToInput?.value || "";
+      const cat = (categorySelect?.value || "").trim().toUpperCase();
+      const minAmt = minAmountInput?.value ? parseFloat(minAmountInput.value) : null;
+      const maxAmt = maxAmountInput?.value ? parseFloat(maxAmountInput.value) : null;
+
+      filteredGastos = allGastos.filter((gasto) => {
+        // 1. Filtro de búsqueda textual
+        if (q) {
+          const haystack = [
+            gasto.descripcion,
+            gasto.sucursal_nombre,
+            gasto.usuario_nombre,
+            gasto.metodo_pago,
+            gasto.clasificacion,
+            gasto.comprobante_url,
+            gasto.id,
+          ]
+            .join(" ")
+            .toLowerCase();
+          if (!haystack.includes(q)) return false;
+        }
+
+        // 2. Filtro de fechas (comparar YYYY-MM-DD)
+        if (gasto.created_at) {
+          const gastoDateStr = new Date(gasto.created_at).toISOString().slice(0, 10);
+          if (dateFrom && gastoDateStr < dateFrom) return false;
+          if (dateTo && gastoDateStr > dateTo) return false;
+        }
+
+        // 3. Filtro de Categoría
+        if (cat) {
+          const gastoCat = (gasto.clasificacion || "").toUpperCase();
+          if (!gastoCat.includes(cat) && !cat.includes(gastoCat)) return false;
+        }
+
+        // 4. Filtro de Monto
+        const monto = parseFloat(gasto.total) || 0;
+        if (minAmt !== null && !isNaN(minAmt) && monto < minAmt) return false;
+        if (maxAmt !== null && !isNaN(maxAmt) && monto > maxAmt) return false;
+
+        return true;
+      });
+
+      // Actualizar resumen de coincidencias y acumulados
       const matchCountEl = document.getElementById("expense-matches-count");
       const accumEl = document.getElementById("expense-accum-total");
+      const reportBadge = document.getElementById("report-count-badge");
+      const quickFilterTag = document.getElementById("expense-quick-filter-tag");
+
+      const totalAcumulado = filteredGastos.reduce((acc, curr) => acc + (Number(curr.total) || 0), 0);
+
+      if (matchCountEl) matchCountEl.textContent = `${filteredGastos.length} egresos`;
+      if (accumEl) accumEl.textContent = `${formatCOP(totalAcumulado)} acumulado`;
+      if (reportBadge) reportBadge.textContent = String(filteredGastos.length);
+
+      if (quickFilterTag) {
+        if (dateFrom && dateTo) {
+          quickFilterTag.textContent = `Período: ${dateFrom} al ${dateTo}`;
+        } else if (dateFrom) {
+          quickFilterTag.textContent = `Desde: ${dateFrom}`;
+        } else if (dateTo) {
+          quickFilterTag.textContent = `Hasta: ${dateTo}`;
+        } else if (cat) {
+          quickFilterTag.textContent = `Categoría: ${cat}`;
+        } else if (q) {
+          quickFilterTag.textContent = `Búsqueda: "${q}"`;
+        } else {
+          quickFilterTag.textContent = "Todos los egresos registrados";
+        }
+      }
+
+      currentPage = 1;
+      renderPaginatedTable();
+    }
+
+    // Renderizar la tabla con paginación
+    function renderPaginatedTable() {
+      const tbody = document.getElementById("expenses-table-body");
       const pagInfo = document.getElementById("expenses-pagination-info");
+      const controlsContainer = document.getElementById("expense-pagination-controls");
 
       if (!tbody) return;
 
-      const totalAcumulado = gastosList.reduce((acc, curr) => acc + (Number(curr.total) || 0), 0);
-      if (matchCountEl) matchCountEl.textContent = `${gastosList.length} egresos`;
-      if (accumEl) accumEl.textContent = `${formatCOP(totalAcumulado)} acumulado`;
+      const totalItems = filteredGastos.length;
+      const totalPages = Math.ceil(totalItems / pageSize) || 1;
+
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, totalItems);
+      const pageGastos = filteredGastos.slice(startIndex, endIndex);
+
+      // Info de paginación
       if (pagInfo) {
-        pagInfo.innerHTML = `Mostrando <strong class="text-on-surface font-semibold">1-${gastosList.length}</strong> de <strong class="text-on-surface font-semibold">${gastosList.length}</strong> egresos`;
+        if (totalItems === 0) {
+          pagInfo.innerHTML = `Mostrando <strong class="text-on-surface font-semibold">0</strong> de <strong class="text-on-surface font-semibold">0</strong> egresos`;
+        } else {
+          pagInfo.innerHTML = `Mostrando <strong class="text-on-surface font-semibold">${startIndex + 1}-${endIndex}</strong> de <strong class="text-on-surface font-semibold">${totalItems}</strong> egresos`;
+        }
       }
 
-      if (gastosList.length === 0) {
+      // Si no hay datos
+      if (totalItems === 0) {
         tbody.innerHTML = `
           <tr>
             <td colspan="9" class="p-10 text-center text-on-surface-variant">
-              <span class="material-symbols-outlined text-[36px] mb-2 block text-on-surface-variant/40">receipt_long</span>
-              <span class="font-semibold text-[14px] text-primary">No hay gastos registrados en la base de datos</span>
+              <span class="material-symbols-outlined text-[36px] mb-2 block text-on-surface-variant/40">search_off</span>
+              <span class="font-semibold text-[14px] text-primary">No se encontraron egresos con los filtros aplicados</span>
               <p class="text-[12px] text-on-surface-variant/70 mt-1">
-                Haz clic en el botón "Registrar Nuevo Gasto" para asentar el primer comprobante.
+                Prueba ajustando el rango de fechas, la categoría o el buscador de concepto.
               </p>
             </td>
           </tr>
         `;
+        if (controlsContainer) controlsContainer.innerHTML = "";
         return;
       }
 
-      tbody.innerHTML = gastosList
+      // Filas paginadas
+      tbody.innerHTML = pageGastos
         .map((gasto) => {
           const folio = gasto.comprobante_url
             ? gasto.comprobante_url.startsWith("http")
@@ -670,7 +775,6 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
               </td>
               <td class="px-4 text-center">
                 <div class="flex items-center justify-center gap-1">
-                  <!-- Solo botón Eliminar (se eliminó el de visualizar como solicitado) -->
                   <button
                     class="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors cursor-pointer"
                     title="Eliminar Gasto"
@@ -685,7 +789,135 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
           `;
         })
         .join("");
+
+      // Renderizar controles de paginación
+      if (controlsContainer) {
+        let buttonsHtml = "";
+
+        // Botón Anterior
+        const isPrevDisabled = currentPage === 1;
+        buttonsHtml += `
+          <button
+            class="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface hover:bg-surface-container border border-surface-container/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            ${isPrevDisabled ? "disabled" : ""}
+            onclick="window.goToExpensePage(${currentPage - 1})"
+            title="Página Anterior"
+            type="button"
+          >
+            <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+          </button>
+        `;
+
+        // Botones de Páginas Numéricas
+        for (let p = 1; p <= totalPages; p++) {
+          if (p === currentPage) {
+            buttonsHtml += `
+              <button
+                class="w-7 h-7 rounded-lg flex items-center justify-center bg-primary text-on-primary font-bold shadow-xs cursor-default text-[12px]"
+                type="button"
+              >
+                ${p}
+              </button>
+            `;
+          } else {
+            buttonsHtml += `
+              <button
+                class="w-7 h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-surface-container text-on-surface border border-surface-container/60 cursor-pointer text-[12px] transition-colors"
+                onclick="window.goToExpensePage(${p})"
+                type="button"
+              >
+                ${p}
+              </button>
+            `;
+          }
+        }
+
+        // Botón Siguiente
+        const isNextDisabled = currentPage === totalPages;
+        buttonsHtml += `
+          <button
+            class="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant bg-surface hover:bg-surface-container border border-surface-container/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            ${isNextDisabled ? "disabled" : ""}
+            onclick="window.goToExpensePage(${currentPage + 1})"
+            title="Página Siguiente"
+            type="button"
+          >
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+          </button>
+        `;
+
+        controlsContainer.innerHTML = buttonsHtml;
+      }
     }
+
+    (window as any).goToExpensePage = function (page: number) {
+      currentPage = page;
+      renderPaginatedTable();
+    };
+
+    // Exportar datos actuales a Excel (CSV con formato compatible con Microsoft Excel)
+    (window as any).exportExpensesToExcel = function () {
+      if (!filteredGastos || filteredGastos.length === 0) {
+        if (window.showExpenseToast) {
+          window.showExpenseToast("No hay registros disponibles para exportar con los filtros actuales.", "warning");
+        }
+        return;
+      }
+
+      try {
+        const headers = [
+          "Folio / Comprobante",
+          "Fecha y Hora",
+          "Concepto / Descripción",
+          "Categoría",
+          "Proveedor / Responsable",
+          "Sucursal",
+          "Método de Pago",
+          "Total (COP)",
+        ];
+
+        const rows = filteredGastos.map((g) => {
+          const folio = g.comprobante_url
+            ? g.comprobante_url.startsWith("http")
+              ? "#COMP-DOC"
+              : g.comprobante_url
+            : `#EXP-${g.id.slice(0, 6).toUpperCase()}`;
+          const fecha = g.created_at ? new Date(g.created_at).toLocaleString("es-CO") : "-";
+          const desc = (g.descripcion || "").replace(/;/g, ",").replace(/"/g, '""');
+          const cat = (g.clasificacion || "").replace(/;/g, ",");
+          const resp = (g.usuario_nombre || "").replace(/;/g, ",");
+          const sucursal = (g.sucursal_nombre || "Central").replace(/;/g, ",");
+          const metodo = (g.metodo_pago || "EFECTIVO").replace(/;/g, ",");
+          const total = Math.round(Number(g.total) || 0);
+
+          return `"${folio}";"${fecha}";"${desc}";"${cat}";"${resp}";"${sucursal}";"${metodo}";${total}`;
+        });
+
+        const totalSum = filteredGastos.reduce((acc, curr) => acc + (Number(curr.total) || 0), 0);
+        rows.push(`"TOTAL ACUMULADO";"";"${filteredGastos.length} egresos exportados";"";"";"";"";${Math.round(totalSum)}`);
+
+        const csvContent = "\uFEFF" + headers.join(";") + "\n" + rows.join("\n");
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const now = new Date().toISOString().slice(0, 10);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `informe_gastos_operativos_${now}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        if (window.showExpenseToast) {
+          window.showExpenseToast(`Informe en Excel exportado con éxito (${filteredGastos.length} registros).`);
+        }
+      } catch (err: any) {
+        console.error("Error al exportar a Excel:", err);
+        if (window.showExpenseToast) {
+          window.showExpenseToast("Error al exportar el archivo Excel.", "warning");
+        }
+      }
+    };
 
     // Eliminar gasto de la base de datos
     (window as any).deleteExpense = async function (id: string, descripcion: string) {
@@ -719,6 +951,42 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
     function setupGastos() {
       initGastos();
       (window as any).loadGastosFromDB();
+
+      // Listeners para filtros
+      const searchInput = document.getElementById("expense-search");
+      const dateFromInput = document.getElementById("expense-date-from");
+      const dateToInput = document.getElementById("expense-date-to");
+      const categorySelect = document.getElementById("expense-category-filter");
+      const minAmountInput = document.getElementById("expense-min-amount");
+      const maxAmountInput = document.getElementById("expense-max-amount");
+      const pageSizeSelect = document.getElementById("expense-page-size");
+      const resetBtn = document.getElementById("btn-reset-expense-filters");
+
+      searchInput?.addEventListener("input", applyFilters);
+      dateFromInput?.addEventListener("change", applyFilters);
+      dateToInput?.addEventListener("change", applyFilters);
+      categorySelect?.addEventListener("change", applyFilters);
+      minAmountInput?.addEventListener("input", applyFilters);
+      maxAmountInput?.addEventListener("input", applyFilters);
+
+      pageSizeSelect?.addEventListener("change", (e: any) => {
+        pageSize = parseInt(e.target.value, 10) || 10;
+        currentPage = 1;
+        renderPaginatedTable();
+      });
+
+      resetBtn?.addEventListener("click", () => {
+        if (searchInput) (searchInput as HTMLInputElement).value = "";
+        if (dateFromInput) (dateFromInput as HTMLInputElement).value = "";
+        if (dateToInput) (dateToInput as HTMLInputElement).value = "";
+        if (categorySelect) (categorySelect as HTMLSelectElement).value = "";
+        if (minAmountInput) (minAmountInput as HTMLInputElement).value = "";
+        if (maxAmountInput) (maxAmountInput as HTMLInputElement).value = "";
+        applyFilters();
+        if (window.showExpenseToast) {
+          window.showExpenseToast("Filtros restablecidos correctamente.", "info");
+        }
+      });
     }
 
     document.addEventListener("astro:page-load", setupGastos);
