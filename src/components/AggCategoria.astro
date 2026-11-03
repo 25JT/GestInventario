@@ -80,17 +80,7 @@
               >
               <span>Volver a Inventario</span>
             </button>
-            <button
-              onclick="window.showCategoryToast('Exportando taxonomía de categorías a CSV...', 'info')"
-              class="h-[34px] px-3.5 bg-surface-container-lowest text-on-surface text-[13px] font-medium rounded-xl hover:bg-surface-container border border-surface-container/60 shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-              title="Exportar taxonomía"
-              type="button"
-            >
-              <span class="material-symbols-outlined text-[17px]"
-                >file_download</span
-              >
-              <span>Exportar</span>
-            </button>
+
             <button
               onclick="window.focusCategoryForm()"
               class="h-[34px] px-3.5 bg-secondary-container hover:bg-secondary text-on-secondary text-[13px] font-semibold rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
@@ -161,8 +151,9 @@
             </div>
           </div>
           <div class="my-2 flex items-baseline gap-2">
-            <span id="cat-total-prods" class="text-[28px] text-primary font-bold tracking-tight"
-              >0</span
+            <span
+              id="cat-total-prods"
+              class="text-[28px] text-primary font-bold tracking-tight">0</span
             >
             <span class="text-[12px] text-on-tertiary-container font-semibold"
               >100% clasificado</span
@@ -188,23 +179,29 @@
             >
           </div>
           <div class="my-2 flex flex-col">
-            <span id="cat-leader-name" class="text-[16px] text-primary font-bold truncate"
-              >Ninguna</span
+            <span
+              id="cat-leader-name"
+              class="text-[16px] text-primary font-bold truncate">Ninguna</span
             >
             <div
               class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant text-[11px]"
             >
               <span id="cat-leader-units">0 unidades</span>
               <span>•</span>
-              <span id="cat-leader-val" class="font-semibold text-primary font-mono"
-                >$ 0 COP</span
+              <span
+                id="cat-leader-val"
+                class="font-semibold text-primary font-mono">$ 0 COP</span
               >
             </div>
           </div>
           <div
             class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden mt-1"
           >
-            <div id="cat-leader-bar" class="bg-secondary h-full rounded-full" style="width: 0%">
+            <div
+              id="cat-leader-bar"
+              class="bg-secondary h-full rounded-full"
+              style="width: 0%"
+            >
             </div>
           </div>
         </div>
@@ -224,8 +221,9 @@
             >
           </div>
           <div class="my-2 flex items-baseline gap-2">
-            <span id="cat-empty-count" class="text-[28px] text-primary font-bold tracking-tight"
-              >0</span
+            <span
+              id="cat-empty-count"
+              class="text-[28px] text-primary font-bold tracking-tight">0</span
             >
             <span class="text-[12px] text-on-surface-variant"
               >categorías sin productos</span
@@ -692,7 +690,10 @@
                   id="categories-table-body"
                 >
                   <tr>
-                    <td colspan="7" class="px-4 py-8 text-center text-on-surface-variant">
+                    <td
+                      colspan="7"
+                      class="px-4 py-8 text-center text-on-surface-variant"
+                    >
                       Cargando categorías de la base de datos...
                     </td>
                   </tr>
@@ -833,24 +834,40 @@
         const { categorias, metricas } = json.data;
         // Métricas superiores
         const activeCount = document.getElementById("cat-count-active");
-        if (activeCount) activeCount.textContent = String(metricas?.total_activas || categorias.length || 0);
+        if (activeCount)
+          activeCount.textContent = String(
+            metricas?.total_activas || categorias.length || 0,
+          );
 
         const totalProds = document.getElementById("cat-total-prods");
-        if (totalProds) totalProds.textContent = String(metricas?.total_articulos ?? 0);
+        if (totalProds)
+          totalProds.textContent = String(metricas?.total_articulos ?? 0);
 
         const leaderName = document.getElementById("cat-leader-name");
-        if (leaderName) leaderName.textContent = metricas?.lider?.nombre || "Ninguna";
+        if (leaderName)
+          leaderName.textContent = metricas?.lider?.nombre || "Ninguna";
 
         const leaderUnits = document.getElementById("cat-leader-units");
-        if (leaderUnits) leaderUnits.textContent = `${metricas?.lider?.unidades || 0} unidades`;
+        if (leaderUnits)
+          leaderUnits.textContent = `${metricas?.lider?.unidades || 0} unidades`;
 
         const leaderVal = document.getElementById("cat-leader-val");
-        if (leaderVal) leaderVal.textContent = `${metricas?.lider?.valor_formato || "$ 0"} COP`;
+        if (leaderVal)
+          leaderVal.textContent = `${metricas?.lider?.valor_formato || "$ 0"} COP`;
 
         const leaderBar = document.getElementById("cat-leader-bar");
         if (leaderBar) {
-          const totalVal = categorias.reduce((sum: number, x: any) => sum + (x.valor_inventario || 0), 0);
-          const pct = totalVal > 0 ? Math.min(100, Math.round(((metricas?.lider?.valor || 0) / totalVal) * 100)) : 0;
+          const totalVal = categorias.reduce(
+            (sum: number, x: any) => sum + (x.valor_inventario || 0),
+            0,
+          );
+          const pct =
+            totalVal > 0
+              ? Math.min(
+                  100,
+                  Math.round(((metricas?.lider?.valor || 0) / totalVal) * 100),
+                )
+              : 0;
           leaderBar.style.width = `${pct}%`;
         }
 
@@ -861,17 +878,23 @@
         const tabAll = document.getElementById("tab-cat-all");
         if (tabAll) tabAll.textContent = `Todas (${categorias.length})`;
 
-        const activeCats = categorias.filter((c: any) => c.estado !== "Inactiva");
-        const inactiveCats = categorias.filter((c: any) => c.estado === "Inactiva");
+        const activeCats = categorias.filter(
+          (c: any) => c.estado !== "Inactiva",
+        );
+        const inactiveCats = categorias.filter(
+          (c: any) => c.estado === "Inactiva",
+        );
 
         const tabActive = document.getElementById("tab-cat-active");
         if (tabActive) tabActive.textContent = `Activas (${activeCats.length})`;
 
         const tabInactive = document.getElementById("tab-cat-inactive");
-        if (tabInactive) tabInactive.textContent = `Inactivas (${inactiveCats.length})`;
+        if (tabInactive)
+          tabInactive.textContent = `Inactivas (${inactiveCats.length})`;
 
         const tableSummary = document.getElementById("cat-table-summary");
-        if (tableSummary) tableSummary.textContent = `Mostrando ${categorias.length} de ${categorias.length} categorías registradas`;
+        if (tableSummary)
+          tableSummary.textContent = `Mostrando ${categorias.length} de ${categorias.length} categorías registradas`;
 
         // Tabla de categorías
         const tbody = document.getElementById("categories-table-body");
@@ -886,8 +909,9 @@
             `;
           } else {
             tbody.innerHTML = categorias
-              .map((c: any) => `
-                <tr class="hover:bg-surface-container-low/50 transition-colors group" data-id="${c.id}" data-status="${c.estado === 'Inactiva' ? 'inactive' : 'active'}">
+              .map(
+                (c: any) => `
+                <tr class="hover:bg-surface-container-low/50 transition-colors group" data-id="${c.id}" data-status="${c.estado === "Inactiva" ? "inactive" : "active"}">
                   <td class="px-4 py-3 text-center">
                     <div class="w-8 h-8 mx-auto rounded-lg ${getColorClasses(c.color)} flex items-center justify-center shadow-xs">
                       <span class="material-symbols-outlined text-[18px]">${c.icono || "bolt"}</span>
@@ -903,8 +927,8 @@
                   <td class="px-4 py-3 text-right font-bold text-on-surface">${c.total_productos} SKUs</td>
                   <td class="px-4 py-3 text-right font-mono font-bold text-primary">${c.valor_inventario_formato || "$ 0"}</td>
                   <td class="px-4 py-3 text-center">
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full ${c.estado === 'Inactiva' ? 'bg-surface-container text-on-surface-variant' : 'bg-surface-container-high text-on-tertiary-container'} text-[11px] font-bold">
-                      <span class="w-1.5 h-1.5 rounded-full ${c.estado === 'Inactiva' ? 'bg-outline' : 'bg-on-tertiary-container'}"></span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full ${c.estado === "Inactiva" ? "bg-surface-container text-on-surface-variant" : "bg-surface-container-high text-on-tertiary-container"} text-[11px] font-bold">
+                      <span class="w-1.5 h-1.5 rounded-full ${c.estado === "Inactiva" ? "bg-outline" : "bg-on-tertiary-container"}"></span>
                       ${c.estado || "Activa"}
                     </span>
                   </td>
@@ -914,7 +938,7 @@
                         class="p-1 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors cursor-pointer"
                         title="Editar categoría"
                         type="button"
-                        onclick="window.editCategory('${c.id}', '${escapeAttr(c.nombre)}', '${escapeAttr(c.prefijo)}', '${escapeAttr(c.descripcion)}', '${c.icono || 'bolt'}', '${c.color || 'blue'}', '${c.estado || 'Activa'}')"
+                        onclick="window.editCategory('${c.id}', '${escapeAttr(c.nombre)}', '${escapeAttr(c.prefijo)}', '${escapeAttr(c.descripcion)}', '${c.icono || "bolt"}', '${c.color || "blue"}', '${c.estado || "Activa"}')"
                       >
                         <span class="material-symbols-outlined text-[17px]">edit</span>
                       </button>
@@ -929,7 +953,8 @@
                     </div>
                   </td>
                 </tr>
-              `)
+              `,
+              )
               .join("");
           }
         }
@@ -1001,11 +1026,17 @@
     });
 
     let trigger = btnElement;
-    if (!trigger && typeof event !== "undefined" && (event as any)?.currentTarget) {
+    if (
+      !trigger &&
+      typeof event !== "undefined" &&
+      (event as any)?.currentTarget
+    ) {
       trigger = (event as any).currentTarget as HTMLElement;
     }
     if (!trigger) {
-      const matching = document.querySelector(`.color-badge-opt[data-color="${colorName}"]`) as HTMLElement | null;
+      const matching = document.querySelector(
+        `.color-badge-opt[data-color="${colorName}"]`,
+      ) as HTMLElement | null;
       if (matching) trigger = matching;
     }
 
@@ -1035,11 +1066,17 @@
     });
 
     let trigger = btnElement;
-    if (!trigger && typeof event !== "undefined" && (event as any)?.currentTarget) {
+    if (
+      !trigger &&
+      typeof event !== "undefined" &&
+      (event as any)?.currentTarget
+    ) {
       trigger = (event as any).currentTarget as HTMLElement;
     }
     if (!trigger) {
-      const matching = document.querySelector(`.icon-opt[data-icon="${iconName}"]`) as HTMLElement | null;
+      const matching = document.querySelector(
+        `.icon-opt[data-icon="${iconName}"]`,
+      ) as HTMLElement | null;
       if (matching) trigger = matching;
     }
 
@@ -1115,15 +1152,25 @@
     status: string,
   ) {
     editingCategoryId = id;
-    const nameEl = document.getElementById("cat-name") as HTMLInputElement | null;
-    const prefixEl = document.getElementById("cat-prefix") as HTMLInputElement | null;
-    const descEl = document.getElementById("cat-desc") as HTMLTextAreaElement | null;
-    const statusEl = document.getElementById("cat-status") as HTMLSelectElement | null;
+    const nameEl = document.getElementById(
+      "cat-name",
+    ) as HTMLInputElement | null;
+    const prefixEl = document.getElementById(
+      "cat-prefix",
+    ) as HTMLInputElement | null;
+    const descEl = document.getElementById(
+      "cat-desc",
+    ) as HTMLTextAreaElement | null;
+    const statusEl = document.getElementById(
+      "cat-status",
+    ) as HTMLSelectElement | null;
 
     if (nameEl) nameEl.value = name;
     if (prefixEl) prefixEl.value = prefix;
     if (descEl) descEl.value = desc;
-    if (statusEl) statusEl.value = (status === "Inactiva" || status === "inactive") ? "inactive" : "active";
+    if (statusEl)
+      statusEl.value =
+        status === "Inactiva" || status === "inactive" ? "inactive" : "active";
 
     const heading = document.getElementById("form-heading");
     const btnText = document.getElementById("submit-btn-text");
