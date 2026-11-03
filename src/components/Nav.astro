@@ -69,18 +69,18 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
       {/* Dropdown de Resultados de Búsqueda */}
       <div
         id="nav-search-dropdown"
-        class="absolute left-0 right-0 top-full mt-2 bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container/80 overflow-hidden z-50 hidden transition-all"
+        class="absolute left-0 w-[min(560px,calc(100vw-2rem))] max-w-[95vw] top-full mt-2 bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container/80 overflow-hidden z-50 hidden transition-all"
         style="max-height: 480px;"
       >
         <div id="nav-search-dropdown-content" class="overflow-y-auto max-h-[440px] divide-y divide-surface-container/50">
           <!-- Resultados dinámicos -->
         </div>
-        <div class="p-2 bg-surface-container-low/60 border-t border-surface-container/60 flex items-center justify-between text-[11px] text-on-surface-variant px-3">
+        <div class="p-2.5 bg-surface-container-low/70 border-t border-surface-container/60 flex items-center justify-between text-[11px] text-on-surface-variant px-3.5">
           <div class="flex items-center gap-3">
             <span><kbd class="font-mono bg-surface px-1 py-0.5 rounded text-[10px] border border-surface-container">↵</kbd> Abrir</span>
             <span><kbd class="font-mono bg-surface px-1 py-0.5 rounded text-[10px] border border-surface-container">Esc</kbd> Cerrar</span>
           </div>
-          <span class="text-secondary font-medium">Búsqueda Global StockControl</span>
+          <span id="nav-search-mode-label" class="text-secondary font-medium truncate">Búsqueda Global StockControl</span>
         </div>
       </div>
     </div>
@@ -187,14 +187,37 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
     }
   }
 
+  function getUserRole(): string {
+    try {
+      const raw = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user") || "{}";
+      const u = JSON.parse(raw);
+      return String(u.rol || u.role || "").toUpperCase();
+    } catch (e) {
+      return "";
+    }
+  }
+
   function initGlobalNavSearch() {
     const input = document.getElementById("nav-global-search-input") as HTMLInputElement | null;
     const dropdown = document.getElementById("nav-search-dropdown");
     const content = document.getElementById("nav-search-dropdown-content");
     const btnClear = document.getElementById("btn-clear-nav-search");
     const container = document.getElementById("nav-search-container");
+    const modeLabel = document.getElementById("nav-search-mode-label");
 
     if (!input || !dropdown || !content) return;
+
+    const role = getUserRole();
+    const isVendedor = role === "CAJERO" || role === "VENDEDOR" || role === "POS";
+
+    // Adaptar placeholder y label según rol
+    if (isVendedor) {
+      input.placeholder = "Buscar productos o servicios... (Ctrl+K)";
+      if (modeLabel) modeLabel.textContent = "Modo Ventas: Catálogo & Servicios";
+    } else {
+      input.placeholder = "Buscar productos, servicios, comprobantes... (Ctrl+K)";
+      if (modeLabel) modeLabel.textContent = "Búsqueda Global StockControl";
+    }
 
     function closeDropdown() {
       if (dropdown) dropdown.classList.add("hidden");
@@ -237,12 +260,23 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
         const val = input.value.trim();
         if (!val) return;
         const upper = val.toUpperCase();
-        if (upper.startsWith("FAC") || upper.startsWith("#FAC")) {
-          window.location.href = `/Historial`;
-        } else if (upper.startsWith("EXP") || upper.startsWith("#EXP")) {
-          window.location.href = `/GastosOperativos`;
+
+        if (isVendedor) {
+          if (upper.startsWith("SRV")) {
+            window.location.href = `/Servicios`;
+          } else {
+            window.location.href = `/ControldeInventario`;
+          }
         } else {
-          window.location.href = `/ControldeInventario`;
+          if (upper.startsWith("FAC") || upper.startsWith("#FAC")) {
+            window.location.href = `/Historial`;
+          } else if (upper.startsWith("EXP") || upper.startsWith("#EXP")) {
+            window.location.href = `/GastosOperativos`;
+          } else if (upper.startsWith("SRV")) {
+            window.location.href = `/Servicios`;
+          } else {
+            window.location.href = `/ControldeInventario`;
+          }
         }
       }
     });
@@ -290,18 +324,22 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
         const data = json.data || {};
 
         const productos: any[] = data.productos || [];
-        const ventas: any[] = data.ventas || [];
-        const gastos: any[] = data.gastos || [];
+        const servicios: any[] = data.servicios || [];
+        // Si es vendedor, no tiene acceso a ventas ni a gastos
+        const ventas: any[] = isVendedor ? [] : (data.ventas || []);
+        const gastos: any[] = isVendedor ? [] : (data.gastos || []);
 
-        const totalResultados = productos.length + ventas.length + gastos.length;
+        const totalResultados = productos.length + servicios.length + ventas.length + gastos.length;
 
         if (totalResultados === 0) {
           content.innerHTML = `
             <div class="p-8 text-center text-on-surface-variant">
               <span class="material-symbols-outlined text-[32px] mb-1.5 block opacity-40">search_off</span>
               <p class="text-[13px] font-semibold text-on-surface">Sin resultados para "${escapeHtml(query)}"</p>
-              <p class="text-[11px] text-on-surface-variant/70 mt-0.5">
-                Verifica el SKU, código de comprobante o nombre del producto.
+              <p class="text-[11px] text-on-surface-variant/70 mt-1">
+                ${isVendedor 
+                  ? "No se encontraron productos o servicios técnicos con este criterio."
+                  : "Verifica el SKU, código de comprobante, nombre de producto o servicio."}
               </p>
             </div>
           `;
@@ -314,12 +352,12 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
         if (productos.length > 0) {
           html += `
             <div class="p-2">
-              <div class="px-2 py-1 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+              <div class="px-2.5 py-1.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                 <span class="flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-[15px] text-secondary">inventory_2</span>
                   Productos en Catálogo (${productos.length})
                 </span>
-                <a href="/ControldeInventario" class="text-secondary hover:underline normal-case font-medium text-[11px]">Ver catálogo →</a>
+                <a href="/ControldeInventario" class="text-secondary hover:underline normal-case font-semibold text-[11px]">Ver catálogo →</a>
               </div>
               <div class="flex flex-col gap-1 mt-1">
                 ${productos
@@ -327,24 +365,24 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
                     (p) => `
                   <a
                     href="/ControldeInventario"
-                    class="p-2 rounded-xl hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group text-left"
+                    class="p-2.5 rounded-xl hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group text-left border border-transparent hover:border-surface-container/60"
                   >
-                    <div class="flex items-center gap-2.5 min-w-0">
-                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary transition-colors">
-                        <span class="material-symbols-outlined text-[17px]">category</span>
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                      <div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">category</span>
                       </div>
-                      <div class="flex flex-col min-w-0">
-                        <span class="text-[12px] font-semibold text-primary truncate group-hover:text-secondary transition-colors">${escapeHtml(p.nombre)}</span>
-                        <div class="flex items-center gap-2 text-[11px] text-on-surface-variant">
-                          <span class="font-mono font-medium">${escapeHtml(p.sku)}</span>
+                      <div class="flex flex-col min-w-0 flex-1">
+                        <span class="text-[12.5px] font-semibold text-primary truncate group-hover:text-secondary transition-colors">${escapeHtml(p.nombre)}</span>
+                        <div class="flex items-center gap-2 text-[11px] text-on-surface-variant truncate mt-0.5">
+                          <span class="font-mono font-bold shrink-0">${escapeHtml(p.sku)}</span>
                           <span>•</span>
-                          <span>${escapeHtml(p.categoria || "General")}</span>
+                          <span class="truncate">${escapeHtml(p.categoria || "General")}</span>
                         </div>
                       </div>
                     </div>
-                    <div class="flex flex-col items-end shrink-0 text-right">
-                      <span class="text-[12px] font-bold text-primary font-mono">${formatCOP(p.precio_venta)}</span>
-                      <span class="text-[10px] px-1.5 py-0.2 rounded font-semibold ${p.stock <= 4 ? "bg-error-container text-error" : "bg-surface-container text-on-tertiary-container"}">
+                    <div class="flex flex-col items-end shrink-0 text-right pl-2 min-w-[95px]">
+                      <span class="text-[12.5px] font-bold text-primary font-mono">${formatCOP(p.precio_venta)}</span>
+                      <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold mt-0.5 ${p.stock <= 4 ? "bg-error-container text-error" : "bg-surface-container text-on-tertiary-container"}">
                         Stock: ${p.stock}
                       </span>
                     </div>
@@ -357,16 +395,69 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
           `;
         }
 
-        // 2. Grupo Ventas / Tickets
-        if (ventas.length > 0) {
+        // 2. Grupo Servicios Técnicos
+        if (servicios.length > 0) {
           html += `
             <div class="p-2">
-              <div class="px-2 py-1 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+              <div class="px-2.5 py-1.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[15px] text-tertiary">build</span>
+                  Servicios Técnicos (${servicios.length})
+                </span>
+                <a href="/Servicios" class="text-tertiary hover:underline normal-case font-semibold text-[11px]">Ver servicios →</a>
+              </div>
+              <div class="flex flex-col gap-1 mt-1">
+                ${servicios
+                  .map(
+                    (s) => `
+                  <a
+                    href="/Servicios"
+                    class="p-2.5 rounded-xl hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group text-left border border-transparent hover:border-surface-container/60"
+                  >
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                      <div class="w-9 h-9 rounded-xl bg-tertiary/10 text-tertiary flex items-center justify-center shrink-0 group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">handyman</span>
+                      </div>
+                      <div class="flex flex-col min-w-0 flex-1">
+                        <div class="flex items-center gap-2 min-w-0">
+                          <span class="text-[12.5px] font-semibold text-primary truncate group-hover:text-secondary transition-colors">${escapeHtml(s.nombre)}</span>
+                          <span class="text-[9.5px] px-1.5 py-0.5 rounded-md bg-tertiary-container/40 text-on-tertiary-container font-bold shrink-0 uppercase">
+                            ${s.tipo_tarifa === "hora" ? "Por Hora" : "Fija"}
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2 text-[11px] text-on-surface-variant truncate mt-0.5">
+                          <span class="font-mono font-bold shrink-0">${escapeHtml(s.sku || "SRV-TEC")}</span>
+                          <span>•</span>
+                          <span class="truncate">${escapeHtml(s.categoria || "Técnico")}</span>
+                          ${s.tiempo_estimado_min ? `<span>•</span><span class="shrink-0">${s.tiempo_estimado_min} min</span>` : ""}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex flex-col items-end shrink-0 text-right pl-2 min-w-[95px]">
+                      <span class="text-[12.5px] font-bold text-primary font-mono">${formatCOP(s.precio_venta)}</span>
+                      <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold mt-0.5 bg-surface-container text-on-surface-variant">
+                        Servicio
+                      </span>
+                    </div>
+                  </a>
+                `
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `;
+        }
+
+        // 3. Grupo Ventas / Tickets (Oculto para rol Vendedor)
+        if (!isVendedor && ventas.length > 0) {
+          html += `
+            <div class="p-2">
+              <div class="px-2.5 py-1.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                 <span class="flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-[15px] text-on-tertiary-container">receipt_long</span>
                   Comprobantes de Ventas (${ventas.length})
                 </span>
-                <a href="/Historial" class="text-secondary hover:underline normal-case font-medium text-[11px]">Ver historial →</a>
+                <a href="/Historial" class="text-secondary hover:underline normal-case font-semibold text-[11px]">Ver historial →</a>
               </div>
               <div class="flex flex-col gap-1 mt-1">
                 ${ventas
@@ -374,25 +465,25 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
                     (v) => `
                   <a
                     href="/Historial"
-                    class="p-2 rounded-xl hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group text-left"
+                    class="p-2.5 rounded-xl hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group text-left border border-transparent hover:border-surface-container/60"
                   >
-                    <div class="flex items-center gap-2.5 min-w-0">
-                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary transition-colors">
-                        <span class="material-symbols-outlined text-[17px]">receipt</span>
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                      <div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">receipt</span>
                       </div>
-                      <div class="flex flex-col min-w-0">
-                        <div class="flex items-center gap-1.5">
-                          <span class="text-[12px] font-bold text-primary font-mono">${escapeHtml(v.folio_ticket)}</span>
-                          <span class="text-[10px] px-1.5 py-0.2 rounded bg-tertiary-fixed text-tertiary-container font-bold uppercase">${escapeHtml(v.estado)}</span>
+                      <div class="flex flex-col min-w-0 flex-1">
+                        <div class="flex items-center gap-2 min-w-0">
+                          <span class="text-[12.5px] font-bold text-primary font-mono shrink-0">${escapeHtml(v.folio_ticket)}</span>
+                          <span class="text-[9.5px] px-1.5 py-0.5 rounded-md bg-tertiary-fixed text-tertiary-container font-bold shrink-0 uppercase">${escapeHtml(v.estado)}</span>
                         </div>
-                        <span class="text-[11px] text-on-surface-variant truncate">
+                        <span class="text-[11px] text-on-surface-variant truncate mt-0.5">
                           Resp: ${escapeHtml(v.responsable)} • ${escapeHtml(v.metodo_pago)}
                         </span>
                       </div>
                     </div>
-                    <div class="flex flex-col items-end shrink-0 text-right">
-                      <span class="text-[12px] font-bold text-primary">${formatCOP(v.total)}</span>
-                      <span class="text-[10px] text-on-surface-variant">
+                    <div class="flex flex-col items-end shrink-0 text-right pl-2 min-w-[95px]">
+                      <span class="text-[12.5px] font-bold text-primary font-mono">${formatCOP(v.total)}</span>
+                      <span class="text-[10px] text-on-surface-variant mt-0.5">
                         ${v.created_at ? new Date(v.created_at).toLocaleDateString("es-CO", { day: "2-digit", month: "short" }) : ""}
                       </span>
                     </div>
@@ -405,16 +496,16 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
           `;
         }
 
-        // 3. Grupo Gastos Operativos
-        if (gastos.length > 0) {
+        // 4. Grupo Gastos Operativos (Oculto para rol Vendedor)
+        if (!isVendedor && gastos.length > 0) {
           html += `
             <div class="p-2">
-              <div class="px-2 py-1 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+              <div class="px-2.5 py-1.5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                 <span class="flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-[15px] text-error">payments</span>
                   Comprobantes de Gastos (${gastos.length})
                 </span>
-                <a href="/GastosOperativos" class="text-secondary hover:underline normal-case font-medium text-[11px]">Ver gastos →</a>
+                <a href="/GastosOperativos" class="text-secondary hover:underline normal-case font-semibold text-[11px]">Ver gastos →</a>
               </div>
               <div class="flex flex-col gap-1 mt-1">
                 ${gastos
@@ -422,23 +513,23 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
                     (g) => `
                   <a
                     href="/GastosOperativos"
-                    class="p-2 rounded-xl hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group text-left"
+                    class="p-2.5 rounded-xl hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group text-left border border-transparent hover:border-surface-container/60"
                   >
-                    <div class="flex items-center gap-2.5 min-w-0">
-                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant group-hover:bg-error group-hover:text-on-error transition-colors">
-                        <span class="material-symbols-outlined text-[17px]">request_quote</span>
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                      <div class="w-9 h-9 rounded-xl bg-error/10 text-error flex items-center justify-center shrink-0 group-hover:bg-error group-hover:text-on-error transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">request_quote</span>
                       </div>
-                      <div class="flex flex-col min-w-0">
-                        <div class="flex items-center gap-1.5">
-                          <span class="text-[12px] font-bold text-primary font-mono">${escapeHtml(g.folio)}</span>
-                          <span class="text-[10px] px-1.5 py-0.2 rounded bg-surface-container-high text-secondary font-semibold uppercase">${escapeHtml(g.clasificacion)}</span>
+                      <div class="flex flex-col min-w-0 flex-1">
+                        <div class="flex items-center gap-2 min-w-0">
+                          <span class="text-[12.5px] font-bold text-primary font-mono shrink-0">${escapeHtml(g.folio)}</span>
+                          <span class="text-[9.5px] px-2 py-0.5 rounded-md bg-surface-container-high text-secondary font-bold uppercase truncate max-w-[130px] shrink-0">${escapeHtml(g.clasificacion)}</span>
                         </div>
-                        <span class="text-[11px] text-on-surface-variant truncate">${escapeHtml(g.descripcion)}</span>
+                        <span class="text-[11px] text-on-surface-variant truncate mt-0.5">${escapeHtml(g.descripcion)}</span>
                       </div>
                     </div>
-                    <div class="flex flex-col items-end shrink-0 text-right">
-                      <span class="text-[12px] font-bold text-error">${formatCOP(g.total)}</span>
-                      <span class="text-[10px] text-on-surface-variant">${escapeHtml(g.metodo_pago)}</span>
+                    <div class="flex flex-col items-end shrink-0 text-right pl-2 min-w-[95px]">
+                      <span class="text-[12.5px] font-bold text-error font-mono">${formatCOP(g.total)}</span>
+                      <span class="text-[10px] text-on-surface-variant uppercase font-medium mt-0.5">${escapeHtml(g.metodo_pago)}</span>
                     </div>
                   </a>
                 `
