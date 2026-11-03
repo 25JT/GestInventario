@@ -51,22 +51,24 @@ const isLinkActive = (path: string, url: string) => {
       type="button"
       class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer"
       title="Cerrar menú lateral"
+      aria-label="Cerrar menú lateral"
     >
-      <span class="material-symbols-outlined text-[20px]">close</span>
+      <span class="material-symbols-outlined text-[20px]" aria-hidden="true">close</span>
     </button>
   </div>
 
   {/* Lista de Navegación con Scroll Interno si es necesario */}
   <div class="flex-1 overflow-y-auto px-3 py-3">
     <div class="px-2 pb-2">
-      <span class="text-[11px] font-semibold text-outline uppercase tracking-wider">Módulos Operativos</span>
+      <h2 class="text-[11px] font-semibold text-outline uppercase tracking-wider">Módulos Operativos</h2>
     </div>
 
-    <nav class="flex flex-col gap-1">
+    <nav class="flex flex-col gap-1" aria-label="Enlaces de navegación">
       {/* 1. Principal */}
       <a
         href="/DashPrincipal"
         data-path="principal"
+        aria-label="Ir al Panel de Control Principal"
         class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
           isLinkActive("principal", "/DashPrincipal")
             ? "bg-primary-container text-on-primary font-semibold shadow-xs"
@@ -74,7 +76,7 @@ const isLinkActive = (path: string, url: string) => {
         }`}
         aria-current={isLinkActive("principal", "/DashPrincipal") ? "page" : undefined}
       >
-        <span class="material-symbols-outlined text-[20px]">grid_view</span>
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">grid_view</span>
         <span>Principal</span>
       </a>
 
@@ -82,6 +84,7 @@ const isLinkActive = (path: string, url: string) => {
       <a
         href="/ControldeInventario"
         data-path="inventario"
+        aria-label="Ir al Control de Inventario"
         class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
           isLinkActive("inventario", "/ControldeInventario")
             ? "bg-primary-container text-on-primary font-semibold shadow-xs"
@@ -89,7 +92,7 @@ const isLinkActive = (path: string, url: string) => {
         }`}
         aria-current={isLinkActive("inventario", "/ControldeInventario") ? "page" : undefined}
       >
-        <span class="material-symbols-outlined text-[20px]">inventory_2</span>
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">inventory_2</span>
         <span>Control de Inventario</span>
       </a>
 
@@ -97,6 +100,7 @@ const isLinkActive = (path: string, url: string) => {
       <a
         href="/RegVenta"
         data-path="ventas"
+        aria-label="Ir al Registro de Ventas"
         class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
           isLinkActive("ventas", "/RegVenta")
             ? "bg-primary-container text-on-primary font-semibold shadow-xs"
@@ -104,7 +108,7 @@ const isLinkActive = (path: string, url: string) => {
         }`}
         aria-current={isLinkActive("ventas", "/RegVenta") ? "page" : undefined}
       >
-        <span class="material-symbols-outlined text-[20px]">point_of_sale</span>
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">point_of_sale</span>
         <span>Registro de Ventas</span>
       </a>
 
@@ -112,6 +116,7 @@ const isLinkActive = (path: string, url: string) => {
       <a
         href="/GastosOperativos"
         data-path="gastos"
+        aria-label="Ir a Gastos Operativos"
         class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
           isLinkActive("gastos", "/GastosOperativos")
             ? "bg-primary-container text-on-primary font-semibold shadow-xs"
@@ -119,7 +124,7 @@ const isLinkActive = (path: string, url: string) => {
         }`}
         aria-current={isLinkActive("gastos", "/GastosOperativos") ? "page" : undefined}
       >
-        <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">receipt_long</span>
         <span>Gastos Operativos</span>
       </a>
 
@@ -127,6 +132,7 @@ const isLinkActive = (path: string, url: string) => {
       <a
         href="/Historial"
         data-path="historial"
+        aria-label="Ir al Historial Financiero y Auditoría"
         class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
           isLinkActive("historial", "/Historial")
             ? "bg-primary-container text-on-primary font-semibold shadow-xs"
@@ -134,7 +140,7 @@ const isLinkActive = (path: string, url: string) => {
         }`}
         aria-current={isLinkActive("historial", "/Historial") ? "page" : undefined}
       >
-        <span class="material-symbols-outlined text-[20px]">monitoring</span>
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">monitoring</span>
         <span>Historial</span>
       </a>
 
@@ -142,6 +148,7 @@ const isLinkActive = (path: string, url: string) => {
       <a
         href="/Servicios"
         data-path="servicios"
+        aria-label="Ir a Gestión de Servicios"
         class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
           isLinkActive("servicios", "/Servicios")
             ? "bg-primary-container text-on-primary font-semibold shadow-xs"
@@ -149,14 +156,15 @@ const isLinkActive = (path: string, url: string) => {
         }`}
         aria-current={isLinkActive("servicios", "/Servicios") ? "page" : undefined}
       >
-        <span class="material-symbols-outlined text-[20px]">home_repair_service</span>
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">home_repair_service</span>
         <span>Servicios</span>
       </a>
 
-      {/* 6. Usuarios y Roles */}
+      {/* 7. Usuarios y Roles */}
       <a
         href="/UsuariosRoles"
         data-path="usuarios"
+        aria-label="Ir a Gestión de Usuarios y Roles"
         class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
           isLinkActive("usuarios", "/UsuariosRoles")
             ? "bg-primary-container text-on-primary font-semibold shadow-xs"
@@ -164,7 +172,7 @@ const isLinkActive = (path: string, url: string) => {
         }`}
         aria-current={isLinkActive("usuarios", "/UsuariosRoles") ? "page" : undefined}
       >
-        <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">admin_panel_settings</span>
         <span>Usuarios y Roles</span>
       </a>
     </nav>
@@ -178,6 +186,7 @@ const isLinkActive = (path: string, url: string) => {
         <div
           id="user-avatar"
           class="w-10 h-10 rounded-xl bg-primary text-on-primary font-bold text-[13px] flex items-center justify-center shrink-0 shadow-2xs tracking-wider"
+          aria-hidden="true"
         >
           OP
         </div>
@@ -216,8 +225,9 @@ const isLinkActive = (path: string, url: string) => {
         data-action="logout"
         class="text-on-surface-variant hover:text-error hover:bg-error-container/30 p-2 rounded-lg transition-colors shrink-0 cursor-pointer"
         title="Cerrar sesión corporativa"
+        aria-label="Cerrar sesión corporativa"
       >
-        <span class="material-symbols-outlined text-[19px]">logout</span>
+        <span class="material-symbols-outlined text-[19px]" aria-hidden="true">logout</span>
       </button>
     </div>
   </div>
