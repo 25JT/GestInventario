@@ -53,37 +53,14 @@ export async function iniciarSesion({ identifier, password, role = "vendedor", r
       const err = await response.json().catch(() => ({}));
       return {
         success: false,
-        message: err.message || `Error en autenticación (${response.status})`,
+        message: err.message || `Credenciales incorrectas o error en autenticación (${response.status})`,
       };
     }
   } catch (error) {
-    // Si el servidor backend aún no está iniciado, proporcionamos modo simulado/integración
-    console.warn("Servidor backend no disponible en este momento. Ejecutando en modo de prueba local:", error);
-
-    const roleLabels = {
-      vendedor: "Vendedor POS (Terminal 01)",
-      administrativo: "Administrativo (Inventario & Flujo)",
-      admin: "Jefe / Administrador General",
-    };
-
-    const mockUser = {
-      nombre: identifier.split("@")[0] || "Colaborador",
-      identifier,
-      role,
-      roleName: roleLabels[role] || role,
-      terminal: "Terminal 01 - Sucursal Central",
-      loginAt: new Date().toISOString(),
-    };
-
-    const storage = rememberSession ? localStorage : sessionStorage;
-    storage.setItem("stock_auth_token", "demo-token-" + Date.now());
-    storage.setItem("stock_auth_user", JSON.stringify(mockUser));
-
+    console.error("Error al conectar con el servidor de autenticación:", error);
     return {
-      success: true,
-      simulated: true,
-      user: mockUser,
-      message: `Accediendo al entorno de trabajo con credenciales autorizadas como: ${roleLabels[role] || role}.`,
+      success: false,
+      message: "No se pudo establecer conexión con el servidor backend. Verifica tu conexión a internet o inténtalo más tarde.",
     };
   }
 }
@@ -100,7 +77,12 @@ export async function verificarYRefrescarSesion() {
     localStorage.getItem("stock_auth_token") ||
     sessionStorage.getItem("stock_auth_token");
 
-  if (!token) {
+  if (!token || token.startsWith("demo-token-")) {
+    localStorage.removeItem("stock_auth_token");
+    localStorage.removeItem("stock_auth_user");
+    localStorage.removeItem("stock_auth_issued_at");
+    sessionStorage.removeItem("stock_auth_token");
+    sessionStorage.removeItem("stock_auth_user");
     return { valid: false };
   }
 

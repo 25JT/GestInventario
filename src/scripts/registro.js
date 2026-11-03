@@ -75,12 +75,10 @@ export async function registrarUsuario(datosRegistro) {
       };
     }
   } catch (error) {
-    // Fallback simulado para desarrollo
-    console.warn("Servidor backend no disponible en este momento. Registro simulado:", error);
+    console.error("Error al conectar con el servidor para registro:", error);
     return {
-      success: true,
-      simulated: true,
-      message: `El usuario corporativo @${datosRegistro.username} ha sido registrado en el sistema. La cuenta se activará con el rol asignado por el Administrador General.`,
+      success: false,
+      message: "No se pudo establecer conexión con el servidor backend para procesar el registro. Inténtalo más tarde.",
     };
   }
 }
