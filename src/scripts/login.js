@@ -19,7 +19,7 @@ export const API_BASE_URL = Ruta;
  * @returns {Promise<{success: boolean, user?: Object, token?: string, message?: string}>}
  */
 export async function iniciarSesion({ identifier, password, role = "vendedor", rememberSession = true }) {
-  console.log(identifier, password, role);
+
 
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
