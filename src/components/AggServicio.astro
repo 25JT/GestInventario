@@ -486,8 +486,9 @@
 <!-- Scripts de Interactividad y Cálculos del Servicio -->
 <script>
   import gsap from "gsap";
+  import { getBackendUrl } from "../scripts/apiConfig.js";
 
-  const BACKEND_URL = "https://guileless-custard-bb32da.netlify.app";
+  const BACKEND_URL = getBackendUrl();
 
   function parseCOPDigits(val: string): number {
     const digits = (val || "").replace(/\D/g, "");

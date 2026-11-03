@@ -405,8 +405,9 @@
 
 <script>
   import gsap from "gsap";
+  import { getBackendUrl } from "../scripts/apiConfig.js";
 
-  const BACKEND_URL = "https://guileless-custard-bb32da.netlify.app";
+  const BACKEND_URL = getBackendUrl();
 
   // Obtener fecha y hora local en formato YYYY-MM-DDTHH:MM
   function getNowLocalISO(): string {

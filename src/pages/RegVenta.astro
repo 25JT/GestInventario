@@ -567,7 +567,9 @@ import NavBar from "../components/Nav.astro";
     window.closeNewCustomerModal = closeCustomerModal;
     window.showPosToast = showPosToast;
 
-    const API_BASE = "https://guileless-custard-bb32da.netlify.app/api/ventas";
+    import { getApiUrl } from "../scripts/apiConfig.js";
+
+    const API_BASE = `${getApiUrl()}/ventas`;
 
     let catalogItems: any[] = [];
     let currentFilterCat: string = "all";

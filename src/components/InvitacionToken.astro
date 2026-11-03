@@ -466,8 +466,9 @@
 <!-- LÓGICA DE CONTROL, GSAP Y EVENTOS -->
 <script>
   import gsap from "gsap";
+  import { getBackendUrl } from "../scripts/apiConfig.js";
 
-  const BACKEND_URL = "https://guileless-custard-bb32da.netlify.app";
+  const BACKEND_URL = getBackendUrl();
 
   // Estado del rol seleccionado
   let selectedRoleName = "Vendedor POS / Mostrador";

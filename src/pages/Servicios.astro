@@ -347,7 +347,9 @@ import AggServicio from "../components/AggServicio.astro";
     (window as any).closeServiceModal = closeServiceModal;
     (window as any).showServiceToast = showServiceToast;
 
-    const BACKEND_URL = "https://guileless-custard-bb32da.netlify.app";
+    import { getBackendUrl } from "../scripts/apiConfig.js";
+
+    const BACKEND_URL = getBackendUrl();
     let allServicios: any[] = [];
     let filteredServicios: any[] = [];
     let servicesCurrentPage = 1;

@@ -3,6 +3,9 @@
 import Layout from "../layouts/Layout.astro";
 import SlideBar from "../components/SlideBar.astro";
 import NavBar from "../components/Nav.astro";
+import { getApiUrl } from "../scripts/apiConfig.js";
+
+const apiUrl = getApiUrl();
 
 // Formateador local para SSR
 const formatCOP = (val: number | string) => {
@@ -14,10 +17,10 @@ const formatCOP = (val: number | string) => {
   }).format(num);
 };
 
-// Carga inicial de datos desde la API del servidor en la nube
+// Carga inicial de datos desde la API
 let initialData: any = null;
 try {
-  const res = await fetch("https://guileless-custard-bb32da.netlify.app/api/dashboard?period=mes", {
+  const res = await fetch(`${apiUrl}/dashboard?period=mes`, {
     signal: AbortSignal.timeout(2000),
   });
   if (res.ok) {
@@ -1191,8 +1194,9 @@ const transactions = initialData?.transactions || [];
       animateChartTransition,
       showRestockToast,
     } from "../animaciones/animaDashboard.js";
+    import { getApiUrl } from "../scripts/apiConfig.js";
 
-    const API_URL = "https://guileless-custard-bb32da.netlify.app/api/dashboard";
+    const API_URL = `${getApiUrl()}/dashboard`;
     let currentPeriod = "mes";
     let lastChartData: any = null;
     let currentChartTab: "ventas" | "gastos" | "utilidad" = "ventas";

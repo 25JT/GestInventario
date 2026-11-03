@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import gsap from "gsap";
+import { getApiUrl } from "../../scripts/apiConfig.js";
 
 // Formateador de moneda colombiana
 const formatCOP = (num) => {
@@ -130,7 +131,7 @@ export default function HistorialFinancieroApp() {
         anio: String(anioActual),
       });
 
-      const res = await fetch(`https://guileless-custard-bb32da.netlify.app/api/historial?${q.toString()}`);
+      const res = await fetch(`${getApiUrl()}/historial?${q.toString()}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}: Error al obtener historial financiero`);
       const json = await res.json();
 

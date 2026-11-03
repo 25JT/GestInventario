@@ -139,8 +139,9 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
 
 <script>
   import { initNavSlide } from "../animaciones/animaNavSlide.js";
+  import { getBackendUrl } from "../scripts/apiConfig.js";
 
-  const BACKEND_URL = "https://guileless-custard-bb32da.netlify.app";
+  const BACKEND_URL = getBackendUrl();
   let searchDebounceTimer: any = null;
 
   function formatCOP(num: any) {

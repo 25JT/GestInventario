@@ -520,7 +520,9 @@ const todayStr = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }
     (window as any).closeExpenseModal = closeExpenseModal;
     (window as any).showExpenseToast = showExpenseToast;
 
-    const BACKEND_URL = "https://guileless-custard-bb32da.netlify.app";
+    import { getBackendUrl } from "../scripts/apiConfig.js";
+
+    const BACKEND_URL = getBackendUrl();
     let allGastos: any[] = [];
     let filteredGastos: any[] = [];
     let currentPage = 1;

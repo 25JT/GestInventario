@@ -5,6 +5,9 @@ import SlideBar from "../components/SlideBar.astro";
 import NavBar from "../components/Nav.astro";
 import AggCategoria from "../components/AggCategoria.astro";
 import CarMasivaProductos from "../components/CarMasivaProductos.astro";
+import { getApiUrl } from "../scripts/apiConfig.js";
+
+const apiUrl = getApiUrl();
 
 // Carga inicial SSR desde la API local de Node/Express
 let initialKpis: any = {
@@ -23,9 +26,9 @@ let totalItemsCount = 0;
 
 try {
   const [resKpis, resInv, resCat] = await Promise.all([
-    fetch("https://guileless-custard-bb32da.netlify.app/api/inventario/kpis", { signal: AbortSignal.timeout(2000) }),
-    fetch("https://guileless-custard-bb32da.netlify.app/api/inventario?limit=50", { signal: AbortSignal.timeout(2000) }),
-    fetch("https://guileless-custard-bb32da.netlify.app/api/categorias", { signal: AbortSignal.timeout(2000) }),
+    fetch(`${apiUrl}/inventario/kpis`, { signal: AbortSignal.timeout(2000) }),
+    fetch(`${apiUrl}/inventario?limit=50`, { signal: AbortSignal.timeout(2000) }),
+    fetch(`${apiUrl}/categorias`, { signal: AbortSignal.timeout(2000) }),
   ]);
   if (resKpis.ok) {
     const jsonK = await resKpis.json();
@@ -688,8 +691,9 @@ try {
       closeProductDrawer,
       showInventoryToast,
     } from "../animaciones/animaInventario.js";
+    import { getApiUrl } from "../scripts/apiConfig.js";
 
-    const API_BASE = "https://guileless-custard-bb32da.netlify.app/api";
+    const API_BASE = getApiUrl();
 
     // Exponer funciones necesarias al scope global
     (window as any).openProductDrawer = openProductDrawer;
