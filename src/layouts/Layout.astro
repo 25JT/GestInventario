@@ -31,5 +31,8 @@ const { title = "Control de Stock - Enterprise JR" } = Astro.props;
   </head>
   <body class="bg-surface font-body-md text-on-surface min-h-screen">
     <slot />
+    <script>
+      import "../scripts/apiConfig.js";
+    </script>
   </body>
 </html>
