@@ -26,12 +26,14 @@ export default function HistorialFinancieroApp() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [activeHoverIndex, setActiveHoverIndex] = useState(null);
+  const [tabRotacion, setTabRotacion] = useState("productos"); // 'productos' | 'servicios'
 
   // Referencias para animaciones fluidas con GSAP
   const mainContainerRef = useRef(null);
   const kpisRef = useRef(null);
   const chartRef = useRef(null);
   const tableRef = useRef(null);
+  const rotacionRef = useRef(null);
 
   // Animación de entrada inicial de la página
   useEffect(() => {
@@ -95,8 +97,21 @@ export default function HistorialFinancieroApp() {
           );
         }
       }
+
+      // 4. Ítems de la sección de Rotación de Inventario
+      if (rotacionRef.current) {
+        const rotItems = rotacionRef.current.querySelectorAll(".rotacion-animate-item");
+        if (rotItems.length > 0) {
+          gsap.killTweensOf(rotItems);
+          gsap.fromTo(
+            rotItems,
+            { opacity: 0, y: 10 },
+            { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", stagger: 0.03 }
+          );
+        }
+      }
     }
-  }, [data, loading]);
+  }, [data, loading, tabRotacion]);
 
   // Función para consultar la API sin recargar la página
   const fetchData = async (overrideParams = {}) => {
@@ -236,6 +251,36 @@ export default function HistorialFinancieroApp() {
       `${data.kpis.margen_porcentaje}%`
     ]);
 
+    // Anexo de Rotación de Inventario en el reporte CSV
+    if (data.rotacion_inventario?.top_productos?.length > 0) {
+      rows.push([]);
+      rows.push([`"--- RANKING DE PRODUCTOS DE MAYOR ROTACIÓN (${desde} AL ${hasta}) ---"`]);
+      rows.push([
+        "Puesto",
+        "Producto",
+        "Código / SKU",
+        "Categoría",
+        "Unidades Vendidas",
+        "Total Ventas (COP)",
+        "Utilidad Bruta (COP)",
+        "Margen (%)",
+        "Participación (%)"
+      ]);
+      data.rotacion_inventario.top_productos.forEach((p) => {
+        rows.push([
+          `"#${p.posicion}"`,
+          `"${p.nombre}"`,
+          `"${p.codigo_barras}"`,
+          `"${p.categoria}"`,
+          p.unidades_vendidas,
+          p.total_ingresos,
+          p.utilidad_bruta,
+          `${p.margen_porcentaje}%`,
+          `${p.porcentaje_rotacion}%`
+        ]);
+      });
+    }
+
     const csvContent = "\uFEFF" + [headers.join(";"), ...rows.map(e => e.join(";"))].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -271,6 +316,13 @@ export default function HistorialFinancieroApp() {
 
   const tablaItems = data?.tabla || [];
   const graficaItems = data?.grafica || [];
+
+  // Datos de rotación y productos más vendidos en el período
+  const rotacion = data?.rotacion_inventario || {};
+  const topProductos = rotacion.top_productos || [];
+  const productoEstrella = rotacion.producto_estrella || null;
+  const topServicios = rotacion.top_servicios || [];
+  const servicioEstrella = rotacion.servicio_estrella || null;
 
   // Mes activo en la gráfica (para el tooltip flotante)
   const activeMonthData = useMemo(() => {
@@ -794,6 +846,409 @@ export default function HistorialFinancieroApp() {
                 </tr>
               </tfoot>
             </table>
+          </div>
+        )}
+      </div>
+
+      {/* 6. Sección de Mayor Rotación de Productos y Demanda Comercial */}
+      <div ref={rotacionRef} className="bg-surface-container-lowest rounded-xl border border-surface-container/60 shadow-xs overflow-hidden p-4 sm:p-6 space-y-6">
+        {/* Cabecera de la Sección con Tabs */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-surface-container/60 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-secondary-container"></span>
+              <h2 className="text-[17px] font-bold text-primary">
+                Mayor Rotación de Productos & Demanda Comercial
+              </h2>
+              <span className="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[11px] font-semibold">
+                Controlado por Granularidad
+              </span>
+            </div>
+            <p className="text-[12.5px] text-on-surface-variant mt-1">
+              Ítems con mayor rotación y volumen de ventas durante el período seleccionado ({desde} al {hasta}). Identifica los productos estrella de tu inventario.
+            </p>
+          </div>
+
+          {/* Selector de Pestañas (Productos vs Servicios) */}
+          <div className="inline-flex p-1 bg-surface-container-low rounded-xl self-start sm:self-auto shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setTabRotacion("productos")}
+              className={`px-3.5 py-1 text-[12.5px] rounded-lg font-semibold transition-all cursor-pointer ${
+                tabRotacion === "productos"
+                  ? "bg-surface-container-lowest text-primary shadow-xs"
+                  : "text-on-surface-variant hover:text-on-surface"
+              }`}
+            >
+              Productos en Rotación ({topProductos.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setTabRotacion("servicios")}
+              className={`px-3.5 py-1 text-[12.5px] rounded-lg font-semibold transition-all cursor-pointer ${
+                tabRotacion === "servicios"
+                  ? "bg-surface-container-lowest text-primary shadow-xs"
+                  : "text-on-surface-variant hover:text-on-surface"
+              }`}
+            >
+              Servicios Demandados ({topServicios.length})
+            </button>
+          </div>
+        </div>
+
+        {/* Pestaña: PRODUCTOS DE MAYOR ROTACIÓN */}
+        {tabRotacion === "productos" && (
+          <div className="space-y-6">
+            {topProductos.length === 0 ? (
+              <div className="py-12 px-4 flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-3">
+                <div className="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-on-surface-variant">
+                  <span className="material-symbols-outlined text-[28px]">inventory_2</span>
+                </div>
+                <h3 className="text-[15px] font-bold text-primary">
+                  Sin ventas de productos en este período
+                </h3>
+                <p className="text-[12.5px] text-on-surface-variant leading-relaxed">
+                  No se registraron salidas de productos de inventario en las fechas seleccionadas. Ajusta el filtro de fechas o la granularidad para visualizar períodos con actividad.
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Tarjeta Destacada: Producto Estrella #1 en Rotación */}
+                {productoEstrella && (
+                  <div className="rotacion-animate-item bg-gradient-to-r from-blue-50/90 via-indigo-50/50 to-surface-container-lowest border border-blue-200/80 rounded-2xl p-4 sm:p-5 shadow-xs">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      {/* Información del Producto #1 */}
+                      <div className="flex items-start sm:items-center gap-3.5">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-400/20 text-amber-600 border border-amber-300 flex items-center justify-center text-[24px] shrink-0 shadow-2xs">
+                          🥇
+                        </div>
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 border border-amber-300 text-[10.5px] font-extrabold uppercase tracking-wide">
+                              #1 Más Vendido en el Período
+                            </span>
+                            <span className="text-[11.5px] font-semibold text-primary/80">
+                              {productoEstrella.categoria}
+                            </span>
+                          </div>
+                          <h3 className="text-[18px] sm:text-[20px] font-extrabold text-on-surface mt-0.5 tracking-tight">
+                            {productoEstrella.nombre}
+                          </h3>
+                          <span className="text-[11.5px] text-on-surface-variant font-mono">
+                            Código / Barras: {productoEstrella.codigo_barras}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Métricas Clave del Líder de Ventas */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 bg-surface-container-lowest/80 p-3 rounded-xl border border-blue-100 shadow-2xs">
+                        <div className="flex flex-col">
+                          <span className="text-[10.5px] text-on-surface-variant uppercase font-semibold">
+                            Unidades Vendidas
+                          </span>
+                          <span className="text-[17px] font-extrabold text-blue-600">
+                            {productoEstrella.unidades_vendidas} unds
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col">
+                          <span className="text-[10.5px] text-on-surface-variant uppercase font-semibold">
+                            Ingresos Totales
+                          </span>
+                          <span className="text-[17px] font-extrabold text-on-surface">
+                            {productoEstrella.total_ingresos_formato}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col">
+                          <span className="text-[10.5px] text-on-surface-variant uppercase font-semibold">
+                            Utilidad Bruta
+                          </span>
+                          <span className="text-[17px] font-extrabold text-emerald-600">
+                            {productoEstrella.utilidad_bruta_formato}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col">
+                          <span className="text-[10.5px] text-on-surface-variant uppercase font-semibold">
+                            Participación
+                          </span>
+                          <span className="text-[17px] font-extrabold text-indigo-600">
+                            {productoEstrella.porcentaje_rotacion}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Tabla Detallada del Ranking de Productos de Mayor Rotación */}
+                <div className="overflow-x-auto rounded-xl border border-surface-container/60 shadow-2xs">
+                  <table className="w-full text-left border-collapse text-[12.5px]">
+                    <thead>
+                      <tr className="border-b border-surface-container bg-surface-container-low/50 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                        <th className="py-3 px-4 w-12 text-center">Rank</th>
+                        <th className="py-3 px-4">Producto / Catálogo</th>
+                        <th className="py-3 px-4">Rotación Relativa</th>
+                        <th className="py-3 px-4 text-center">Unidades</th>
+                        <th className="py-3 px-4 text-right">Total Ventas (COP)</th>
+                        <th className="py-3 px-4 text-right">Utilidad Bruta</th>
+                        <th className="py-3 px-4 text-center">En Pedidos</th>
+                        <th className="py-3 px-4 text-right">Margen %</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-surface-container/50">
+                      {topProductos.map((prod) => {
+                        const rankMedal = prod.posicion === 1 ? "🥇" : prod.posicion === 2 ? "🥈" : prod.posicion === 3 ? "🥉" : null;
+                        const rankBg = prod.posicion === 1 
+                          ? "bg-amber-100 text-amber-900 border-amber-300 font-extrabold" 
+                          : prod.posicion === 2 
+                            ? "bg-slate-200 text-slate-800 border-slate-300 font-bold" 
+                            : prod.posicion === 3 
+                              ? "bg-amber-50 text-amber-800 border-amber-200 font-bold" 
+                              : "bg-surface-container text-on-surface-variant font-medium";
+
+                        return (
+                          <tr key={prod.id} className="rotacion-animate-item hover:bg-surface-container-low/60 transition-colors">
+                            <td className="py-3 px-4 text-center">
+                              {rankMedal ? (
+                                <span className="text-[16px]" title={`Puesto #${prod.posicion}`}>
+                                  {rankMedal}
+                                </span>
+                              ) : (
+                                <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-[11px] border ${rankBg}`}>
+                                  #{prod.posicion}
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="py-3 px-4">
+                              <div className="flex flex-col">
+                                <span className="font-bold text-on-surface text-[13px]">
+                                  {prod.nombre}
+                                </span>
+                                <div className="flex items-center gap-2 text-[11px] text-on-surface-variant">
+                                  <span>{prod.categoria}</span>
+                                  {prod.codigo_barras !== "N/A" && (
+                                    <>
+                                      <span>•</span>
+                                      <span className="font-mono text-[10px] bg-surface-container px-1 rounded">{prod.codigo_barras}</span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Barra de Rotación Relativa */}
+                            <td className="py-3 px-4 min-w-[130px]">
+                              <div className="flex flex-col gap-1">
+                                <div className="w-full bg-surface-container-high rounded-full h-2 overflow-hidden">
+                                  <div
+                                    className="bg-blue-600 h-full rounded-full transition-all duration-500"
+                                    style={{ width: `${prod.porcentaje_relativo_max}%` }}
+                                  ></div>
+                                </div>
+                                <span className="text-[10px] text-on-surface-variant font-medium">
+                                  {prod.porcentaje_rotacion}% del total despachado
+                                </span>
+                              </div>
+                            </td>
+
+                            <td className="py-3 px-4 text-center font-extrabold text-blue-700 text-[13.5px]">
+                              {prod.unidades_vendidas}
+                            </td>
+
+                            <td className="py-3 px-4 text-right font-bold text-on-surface">
+                              {prod.total_ingresos_formato}
+                            </td>
+
+                            <td className="py-3 px-4 text-right font-semibold text-emerald-600">
+                              {prod.utilidad_bruta_formato}
+                            </td>
+
+                            <td className="py-3 px-4 text-center text-on-surface-variant font-medium text-[12px]">
+                              {prod.total_pedidos} tickets
+                            </td>
+
+                            <td className="py-3 px-4 text-right font-semibold text-on-surface-variant">
+                              <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${prod.margen_porcentaje >= 30 ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+                                {prod.margen_porcentaje}%
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Pestaña: SERVICIOS CON MAYOR DEMANDA */}
+        {tabRotacion === "servicios" && (
+          <div className="space-y-6">
+            {topServicios.length === 0 ? (
+              <div className="py-12 px-4 flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-3">
+                <div className="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-on-surface-variant">
+                  <span className="material-symbols-outlined text-[28px]">build</span>
+                </div>
+                <h3 className="text-[15px] font-bold text-primary">
+                  Sin servicios facturados en este período
+                </h3>
+                <p className="text-[12.5px] text-on-surface-variant leading-relaxed">
+                  No se registraron servicios técnicos o de taller en las fechas seleccionadas.
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Tarjeta Destacada: Servicio Estrella #1 */}
+                {servicioEstrella && (
+                  <div className="rotacion-animate-item bg-gradient-to-r from-emerald-50/90 via-teal-50/50 to-surface-container-lowest border border-emerald-200/80 rounded-2xl p-4 sm:p-5 shadow-xs">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      {/* Información del Servicio #1 */}
+                      <div className="flex items-start sm:items-center gap-3.5">
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-700 border border-emerald-300 flex items-center justify-center text-[24px] shrink-0 shadow-2xs">
+                          ⭐
+                        </div>
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-900 border border-emerald-300 text-[10.5px] font-extrabold uppercase tracking-wide">
+                              #1 Más Solicitado
+                            </span>
+                            <span className="text-[11.5px] font-semibold text-primary/80">
+                              {servicioEstrella.categoria}
+                            </span>
+                          </div>
+                          <h3 className="text-[18px] sm:text-[20px] font-extrabold text-on-surface mt-0.5 tracking-tight">
+                            {servicioEstrella.nombre}
+                          </h3>
+                          <span className="text-[11.5px] text-on-surface-variant font-mono">
+                            Código SKU: {servicioEstrella.codigo_sku}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Métricas Clave del Líder de Servicios */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 bg-surface-container-lowest/80 p-3 rounded-xl border border-emerald-100 shadow-2xs">
+                        <div className="flex flex-col">
+                          <span className="text-[10.5px] text-on-surface-variant uppercase font-semibold">
+                            Servicios Prestados
+                          </span>
+                          <span className="text-[17px] font-extrabold text-emerald-600">
+                            {servicioEstrella.servicios_prestados} atenciones
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col">
+                          <span className="text-[10.5px] text-on-surface-variant uppercase font-semibold">
+                            Ingresos Facturados
+                          </span>
+                          <span className="text-[17px] font-extrabold text-on-surface">
+                            {servicioEstrella.total_ingresos_formato}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col">
+                          <span className="text-[10.5px] text-on-surface-variant uppercase font-semibold">
+                            Utilidad Bruta
+                          </span>
+                          <span className="text-[17px] font-extrabold text-teal-600">
+                            {servicioEstrella.utilidad_bruta_formato}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col">
+                          <span className="text-[10.5px] text-on-surface-variant uppercase font-semibold">
+                            Demanda Relativa
+                          </span>
+                          <span className="text-[17px] font-extrabold text-emerald-700">
+                            {servicioEstrella.porcentaje_demanda}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Tabla Detallada del Ranking de Servicios */}
+                <div className="overflow-x-auto rounded-xl border border-surface-container/60 shadow-2xs">
+                  <table className="w-full text-left border-collapse text-[12.5px]">
+                    <thead>
+                      <tr className="border-b border-surface-container bg-surface-container-low/50 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                        <th className="py-3 px-4 w-12 text-center">Rank</th>
+                        <th className="py-3 px-4">Servicio / Labor</th>
+                        <th className="py-3 px-4">Demanda Relativa</th>
+                        <th className="py-3 px-4 text-center">Veces Prestado</th>
+                        <th className="py-3 px-4 text-right">Facturación Total</th>
+                        <th className="py-3 px-4 text-right">Utilidad Bruta</th>
+                        <th className="py-3 px-4 text-center">En Pedidos</th>
+                        <th className="py-3 px-4 text-right">Margen %</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-surface-container/50">
+                      {topServicios.map((srv) => (
+                        <tr key={srv.id} className="rotacion-animate-item hover:bg-surface-container-low/60 transition-colors">
+                          <td className="py-3 px-4 text-center">
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-[11px] border bg-surface-container text-on-surface-variant font-bold">
+                              #{srv.posicion}
+                            </span>
+                          </td>
+
+                          <td className="py-3 px-4">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-on-surface text-[13px]">
+                                {srv.nombre}
+                              </span>
+                              <span className="text-[11px] text-on-surface-variant font-mono">
+                                SKU: {srv.codigo_sku}
+                              </span>
+                            </div>
+                          </td>
+
+                          <td className="py-3 px-4 min-w-[130px]">
+                            <div className="flex flex-col gap-1">
+                              <div className="w-full bg-surface-container-high rounded-full h-2 overflow-hidden">
+                                <div
+                                  className="bg-emerald-600 h-full rounded-full transition-all duration-500"
+                                  style={{ width: `${srv.porcentaje_relativo_max}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-[10px] text-on-surface-variant font-medium">
+                                {srv.porcentaje_demanda}% de las labores
+                              </span>
+                            </div>
+                          </td>
+
+                          <td className="py-3 px-4 text-center font-extrabold text-emerald-700 text-[13.5px]">
+                            {srv.servicios_prestados}
+                          </td>
+
+                          <td className="py-3 px-4 text-right font-bold text-on-surface">
+                            {srv.total_ingresos_formato}
+                          </td>
+
+                          <td className="py-3 px-4 text-right font-semibold text-emerald-600">
+                            {srv.utilidad_bruta_formato}
+                          </td>
+
+                          <td className="py-3 px-4 text-center text-on-surface-variant font-medium text-[12px]">
+                            {srv.total_pedidos} tickets
+                          </td>
+
+                          <td className="py-3 px-4 text-right font-semibold text-on-surface-variant">
+                            <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700">
+                              {srv.margen_porcentaje}%
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
