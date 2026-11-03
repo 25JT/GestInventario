@@ -96,12 +96,20 @@ export default function HistorialFinancieroApp() {
   // Filtrar por fechas manuales
   const handleFilterSubmit = (e) => {
     e?.preventDefault();
+    let safeDesde = desde;
     let safeHasta = hasta;
     if (safeHasta > hoyStr) {
       safeHasta = hoyStr;
       setHasta(hoyStr);
     }
-    fetchData({ desde, hasta: safeHasta });
+    if (safeDesde > safeHasta) {
+      const tmp = safeDesde;
+      safeDesde = safeHasta;
+      safeHasta = tmp;
+      setDesde(safeDesde);
+      setHasta(safeHasta);
+    }
+    fetchData({ desde: safeDesde, hasta: safeHasta });
   };
 
   // Restablecer a Hoy
@@ -217,15 +225,7 @@ export default function HistorialFinancieroApp() {
       {/* 1. Encabezado de Sección y Acciones Rápidas */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex flex-col">
-          <div className="flex items-center gap-1.5 text-on-surface-variant text-[12px] uppercase tracking-wider mb-1 font-semibold">
-            <span>Principal</span>
-            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <span>Historial y Balance Financiero</span>
-            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <span className="text-secondary font-bold">Auditoría Ejecutiva</span>
-          </div>
-
-          <h1 className="text-[24px] sm:text-[28px] font-bold text-primary tracking-tight flex items-center gap-2">
+                  <h1 className="text-[24px] sm:text-[28px] font-bold text-primary tracking-tight flex items-center gap-2">
             Historial General de Ventas, Gastos y Balance Operativo
           </h1>
 
@@ -320,10 +320,9 @@ export default function HistorialFinancieroApp() {
               <input
                 type="date"
                 value={desde}
-                min={primeraFecha}
                 max={hoyStr}
                 onChange={(e) => setDesde(e.target.value)}
-                className="h-8 px-2.5 bg-surface text-on-surface rounded-xl text-[12px] border border-surface-container/70 focus:outline-none focus:border-secondary"
+                className="h-8 px-2.5 bg-surface text-on-surface rounded-xl text-[12px] border border-surface-container/70 focus:outline-none focus:border-secondary cursor-pointer"
               />
             </div>
 
@@ -332,10 +331,9 @@ export default function HistorialFinancieroApp() {
               <input
                 type="date"
                 value={hasta}
-                min={desde}
                 max={hoyStr}
                 onChange={(e) => setHasta(e.target.value)}
-                className="h-8 px-2.5 bg-surface text-on-surface rounded-xl text-[12px] border border-surface-container/70 focus:outline-none focus:border-secondary"
+                className="h-8 px-2.5 bg-surface text-on-surface rounded-xl text-[12px] border border-surface-container/70 focus:outline-none focus:border-secondary cursor-pointer"
               />
             </div>
 
