@@ -3,7 +3,7 @@
  * Se encarga de enviar las credenciales al backend y gestionar el almacenamiento de la sesión.
  */
 
-import { Ruta } from "./apiConfig.js";
+import { Ruta, checkLocalServerHealth } from "./apiConfig.js";
 
 // Exportamos Ruta y API_BASE_URL para compatibilidad
 export { Ruta };
@@ -58,9 +58,10 @@ export async function iniciarSesion({ identifier, password, role = "vendedor", r
     }
   } catch (error) {
     console.error("Error al conectar con el servidor de autenticación:", error);
+    checkLocalServerHealth();
     return {
       success: false,
-      message: "No se pudo establecer conexión con el servidor backend. Verifica tu conexión a internet o inténtalo más tarde.",
+      message: "No se pudo establecer conexión con el servidor backend. Verifica tu conexión a internet o el estado del sistema.",
     };
   }
 }
