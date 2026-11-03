@@ -1162,7 +1162,7 @@ export default function AuthCard() {
                                   : "bg-surface-container-high text-on-surface-variant"
                               }`}
                             >
-                              {tokenInfo.valid ? "ASIGNADO EN TIEMPO REAL ✓" : "PENDIENTE"}
+                              {tokenInfo.valid ? "TOKEN ACTIVO" : "PENDIENTE"}
                             </span>
                           </div>
                           <span

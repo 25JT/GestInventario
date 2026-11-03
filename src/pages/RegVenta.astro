@@ -1053,6 +1053,24 @@ import NavBar from "../components/Nav.astro";
       const metodoPago = getActivePaymentMethod();
       const customerName = document.getElementById("currentCustomerName")?.textContent?.trim() || "Consumidor Final";
 
+      // Obtener ID del usuario activo en sesión
+      let currentUserId = null;
+      try {
+        const rawAuthUser = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+        if (rawAuthUser) {
+          const authUser = JSON.parse(rawAuthUser);
+          currentUserId = authUser.id || null;
+        }
+      } catch (e) {
+        console.warn("No se pudo leer usuario autenticado:", e);
+      }
+
+      const authToken = localStorage.getItem("stock_auth_token") || sessionStorage.getItem("stock_auth_token");
+      const requestHeaders: Record<string, string> = { "Content-Type": "application/json" };
+      if (authToken) {
+        requestHeaders["Authorization"] = `Bearer ${authToken}`;
+      }
+
       const btnCheckout = document.getElementById("btnCheckoutAction");
       const btnCheckoutLabel = document.getElementById("btnCheckoutLabel");
 
@@ -1062,8 +1080,9 @@ import NavBar from "../components/Nav.astro";
 
         const res = await fetch(API_BASE, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: requestHeaders,
           body: JSON.stringify({
+            usuario_id: currentUserId,
             vendedor_nombre: activeCashier,
             metodo_pago: metodoPago,
             items: items,

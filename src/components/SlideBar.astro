@@ -123,7 +123,22 @@ const isLinkActive = (path: string, url: string) => {
         <span>Gastos Operativos</span>
       </a>
 
-      {/* 5. Servicios */}
+      {/* 5. Historial Financiero */}
+      <a
+        href="/Historial"
+        data-path="historial"
+        class={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-label-md text-[13px] transition-all ${
+          isLinkActive("historial", "/Historial")
+            ? "bg-primary-container text-on-primary font-semibold shadow-xs"
+            : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+        }`}
+        aria-current={isLinkActive("historial", "/Historial") ? "page" : undefined}
+      >
+        <span class="material-symbols-outlined text-[20px]">monitoring</span>
+        <span>Historial</span>
+      </a>
+
+      {/* 6. Servicios */}
       <a
         href="/Servicios"
         data-path="servicios"

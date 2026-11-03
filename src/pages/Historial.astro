@@ -1,0 +1,22 @@
+---
+// Historial.astro - Auditoría Financiera, Ventas, Gastos y Balances
+import Layout from "../layouts/Layout.astro";
+import SlideBar from "../components/SlideBar.astro";
+import NavBar from "../components/Nav.astro";
+import HistorialFinancieroApp from "../components/historial/HistorialFinancieroApp.jsx";
+---
+
+<Layout title="Historial y Balance Financiero - StockControl Enterprise JR">
+  <div class="min-h-screen bg-surface flex flex-col font-body-md text-on-surface">
+    {/* Barra lateral y superior globales y responsivas */}
+    <SlideBar currentPath="historial" />
+    <NavBar storeName="Central Sucursal 01" operationStatus="Auditoría Financiera Activa" />
+
+    {/* Contenedor principal */}
+    <div id="app-content" class="pt-16 min-h-screen flex flex-col flex-1">
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <HistorialFinancieroApp client:load />
+      </main>
+    </div>
+  </div>
+</Layout>

@@ -102,6 +102,9 @@ export function hydrateUserSession() {
         if (path === "usuarios" && !isSuperAdmin) {
           visible = false;
         }
+        if (path === "historial" && !isSuperAdmin) {
+          visible = false;
+        }
         if (path === "gastos" && isCajero) {
           visible = false;
         }
@@ -119,6 +122,9 @@ export function hydrateUserSession() {
       if (currentPath.includes("usuariosroles") && !isSuperAdmin) {
         alert("Acceso denegado: Tu rol no tiene permisos para el módulo de Usuarios y Roles.");
         window.location.href = "/DashPrincipal";
+      } else if (currentPath.includes("historial") && !isSuperAdmin) {
+        alert("Acceso restringido: El módulo de Historial Financiero y Auditoría es exclusivo para Administradores y Jefes.");
+        window.location.href = isCajero ? "/RegVenta" : "/DashPrincipal";
       } else if ((currentPath.includes("gastosoperativos") || currentPath.includes("controldeinventario") || currentPath.includes("servicios")) && isCajero) {
         alert("Acceso restringido: Tu perfil operativo de Vendedor POS no tiene permisos para este módulo.");
         window.location.href = "/RegVenta";
