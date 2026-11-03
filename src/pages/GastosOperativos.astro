@@ -4,6 +4,8 @@ import Layout from "../layouts/Layout.astro";
 import SlideBar from "../components/SlideBar.astro";
 import NavBar from "../components/Nav.astro";
 import AggGastosOperativos from "../components/AggGastosOperativos.astro";
+
+const todayStr = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(new Date());
 ---
 
 <Layout title="Control de Gastos Operativos - StockControl Enterprise JR">
@@ -353,12 +355,14 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
                   id="expense-date-from"
                   class="w-full h-9 px-2.5 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary cursor-pointer"
                   type="date"
+                  max={todayStr}
                 />
                 <span class="text-on-surface-variant text-[12px]">-</span>
                 <input
                   id="expense-date-to"
                   class="w-full h-9 px-2.5 bg-surface rounded-xl text-[12px] text-on-surface border border-transparent hover:border-surface-container focus:outline-none focus:border-secondary cursor-pointer"
                   type="date"
+                  max={todayStr}
                 />
               </div>
             </div>
@@ -528,6 +532,14 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
       return `$${val.toLocaleString("es-CO")} COP`;
     }
 
+    function getTodayLocalStr() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
     function formatDate(dateStr: string) {
       if (!dateStr) return "-";
       try {
@@ -601,6 +613,33 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
       const categorySelect = document.getElementById("expense-category-filter") as HTMLSelectElement | null;
       const minAmountInput = document.getElementById("expense-min-amount") as HTMLInputElement | null;
       const maxAmountInput = document.getElementById("expense-max-amount") as HTMLInputElement | null;
+
+      const todayLimit = getTodayLocalStr();
+
+      // Bloquear cualquier intento de fecha futura
+      if (dateFromInput && dateFromInput.value && dateFromInput.value > todayLimit) {
+        dateFromInput.value = todayLimit;
+        if (window.showExpenseToast) {
+          window.showExpenseToast("No se permiten fechas futuras. Ajustado al día actual.", "warning");
+        }
+      }
+      if (dateToInput && dateToInput.value && dateToInput.value > todayLimit) {
+        dateToInput.value = todayLimit;
+        if (window.showExpenseToast) {
+          window.showExpenseToast("No se permiten fechas futuras. Ajustado al día actual.", "warning");
+        }
+      }
+
+      // Restricción cruzada: Desde no puede superar a Hasta, y Hasta no puede ser antes de Desde
+      if (dateFromInput && dateToInput) {
+        dateFromInput.max = (dateToInput.value && dateToInput.value < todayLimit) ? dateToInput.value : todayLimit;
+        if (dateFromInput.value) {
+          dateToInput.min = dateFromInput.value;
+        } else {
+          dateToInput.removeAttribute("min");
+        }
+        dateToInput.max = todayLimit;
+      }
 
       const q = (searchInput?.value || "").trim().toLowerCase();
       const dateFrom = dateFromInput?.value || "";
@@ -953,17 +992,24 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
       (window as any).loadGastosFromDB();
 
       // Listeners para filtros
-      const searchInput = document.getElementById("expense-search");
-      const dateFromInput = document.getElementById("expense-date-from");
-      const dateToInput = document.getElementById("expense-date-to");
-      const categorySelect = document.getElementById("expense-category-filter");
-      const minAmountInput = document.getElementById("expense-min-amount");
-      const maxAmountInput = document.getElementById("expense-max-amount");
-      const pageSizeSelect = document.getElementById("expense-page-size");
+      const searchInput = document.getElementById("expense-search") as HTMLInputElement | null;
+      const dateFromInput = document.getElementById("expense-date-from") as HTMLInputElement | null;
+      const dateToInput = document.getElementById("expense-date-to") as HTMLInputElement | null;
+      const categorySelect = document.getElementById("expense-category-filter") as HTMLSelectElement | null;
+      const minAmountInput = document.getElementById("expense-min-amount") as HTMLInputElement | null;
+      const maxAmountInput = document.getElementById("expense-max-amount") as HTMLInputElement | null;
+      const pageSizeSelect = document.getElementById("expense-page-size") as HTMLSelectElement | null;
       const resetBtn = document.getElementById("btn-reset-expense-filters");
 
+      // Establecer límite máximo a la fecha actual (no fechas futuras)
+      const todayLimit = getTodayLocalStr();
+      if (dateFromInput) dateFromInput.max = todayLimit;
+      if (dateToInput) dateToInput.max = todayLimit;
+
       searchInput?.addEventListener("input", applyFilters);
+      dateFromInput?.addEventListener("input", applyFilters);
       dateFromInput?.addEventListener("change", applyFilters);
+      dateToInput?.addEventListener("input", applyFilters);
       dateToInput?.addEventListener("change", applyFilters);
       categorySelect?.addEventListener("change", applyFilters);
       minAmountInput?.addEventListener("input", applyFilters);
@@ -976,12 +1022,20 @@ import AggGastosOperativos from "../components/AggGastosOperativos.astro";
       });
 
       resetBtn?.addEventListener("click", () => {
-        if (searchInput) (searchInput as HTMLInputElement).value = "";
-        if (dateFromInput) (dateFromInput as HTMLInputElement).value = "";
-        if (dateToInput) (dateToInput as HTMLInputElement).value = "";
-        if (categorySelect) (categorySelect as HTMLSelectElement).value = "";
-        if (minAmountInput) (minAmountInput as HTMLInputElement).value = "";
-        if (maxAmountInput) (maxAmountInput as HTMLInputElement).value = "";
+        if (searchInput) searchInput.value = "";
+        if (dateFromInput) {
+          dateFromInput.value = "";
+          dateFromInput.max = todayLimit;
+          dateFromInput.removeAttribute("min");
+        }
+        if (dateToInput) {
+          dateToInput.value = "";
+          dateToInput.max = todayLimit;
+          dateToInput.removeAttribute("min");
+        }
+        if (categorySelect) categorySelect.value = "";
+        if (minAmountInput) minAmountInput.value = "";
+        if (maxAmountInput) maxAmountInput.value = "";
         applyFilters();
         if (window.showExpenseToast) {
           window.showExpenseToast("Filtros restablecidos correctamente.", "info");
