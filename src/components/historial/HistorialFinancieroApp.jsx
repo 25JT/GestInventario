@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import gsap from "gsap";
 
 // Formateador de moneda colombiana
 const formatCOP = (num) => {
@@ -25,6 +26,77 @@ export default function HistorialFinancieroApp() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [activeHoverIndex, setActiveHoverIndex] = useState(null);
+
+  // Referencias para animaciones fluidas con GSAP
+  const mainContainerRef = useRef(null);
+  const kpisRef = useRef(null);
+  const chartRef = useRef(null);
+  const tableRef = useRef(null);
+
+  // Animación de entrada inicial de la página
+  useEffect(() => {
+    if (mainContainerRef.current) {
+      gsap.fromTo(
+        mainContainerRef.current,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }
+      );
+    }
+  }, []);
+
+  // Animación suave con GSAP ante cada cambio de datos y filtros
+  useEffect(() => {
+    if (!loading && data) {
+      // 1. Tarjetas KPI
+      if (kpisRef.current) {
+        const cards = kpisRef.current.querySelectorAll(".kpi-animate-card");
+        if (cards.length > 0) {
+          gsap.killTweensOf(cards);
+          gsap.fromTo(
+            cards,
+            { opacity: 0.35, y: 12, scale: 0.98 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "power2.out", stagger: 0.05 }
+          );
+        }
+      }
+
+      // 2. Barras de la gráfica
+      if (chartRef.current) {
+        const bars = chartRef.current.querySelectorAll(".chart-bar-item");
+        if (bars.length > 0) {
+          gsap.killTweensOf(bars);
+          gsap.fromTo(
+            bars,
+            { scaleY: 0, transformOrigin: "bottom" },
+            { scaleY: 1, duration: 0.5, ease: "power3.out", stagger: 0.02 }
+          );
+        }
+      }
+
+      // 3. Filas de la tabla
+      if (tableRef.current) {
+        const rows = tableRef.current.querySelectorAll(".table-row-item");
+        if (rows.length > 0) {
+          gsap.killTweensOf(rows);
+          gsap.fromTo(
+            rows,
+            { opacity: 0, y: 8 },
+            { opacity: 1, y: 0, duration: 0.35, ease: "power2.out", stagger: 0.02 }
+          );
+        }
+
+        const emptyState = tableRef.current.querySelector(".empty-state-card");
+        if (emptyState) {
+          gsap.killTweensOf(emptyState);
+          gsap.fromTo(
+            emptyState,
+            { opacity: 0, scale: 0.94, y: 12 },
+            { opacity: 1, scale: 1, y: 0, duration: 0.38, ease: "back.out(1.4)" }
+          );
+        }
+      }
+    }
+  }, [data, loading]);
 
   // Función para consultar la API sin recargar la página
   const fetchData = async (overrideParams = {}) => {
@@ -221,7 +293,7 @@ export default function HistorialFinancieroApp() {
   }, [graficaItems]);
 
   return (
-    <div className="space-y-6">
+    <div ref={mainContainerRef} className="space-y-6">
       {/* 1. Encabezado de Sección y Acciones Rápidas */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex flex-col">
@@ -365,9 +437,9 @@ export default function HistorialFinancieroApp() {
       </div>
 
       {/* 3. Cuatro Tarjetas KPI Principales (Resumen Financiero) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div ref={kpisRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Ventas Totales (Ingresos) */}
-        <div className="bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
+        <div className="kpi-animate-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <span className="text-[12px] text-on-surface-variant font-medium flex items-center gap-1">
               <span className="material-symbols-outlined text-[16px] text-blue-600">trending_up</span>
@@ -389,7 +461,7 @@ export default function HistorialFinancieroApp() {
         </div>
 
         {/* Card 2: Gastos Operativos (Egresos) */}
-        <div className="bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
+        <div className="kpi-animate-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <span className="text-[12px] text-on-surface-variant font-medium flex items-center gap-1">
               <span className="material-symbols-outlined text-[16px] text-rose-600">trending_down</span>
@@ -420,7 +492,7 @@ export default function HistorialFinancieroApp() {
         </div>
 
         {/* Card 3: BALANCE NETO OPERATIVO (Tarjeta Verde Esmeralda Destacada) */}
-        <div className="bg-gradient-to-br from-[#064e3b] to-[#042f2e] text-white p-4 sm:p-5 rounded-xl border border-emerald-800/60 shadow-md flex flex-col justify-between hover:shadow-lg transition-all relative overflow-hidden">
+        <div className="kpi-animate-card bg-gradient-to-br from-[#064e3b] to-[#042f2e] text-white p-4 sm:p-5 rounded-xl border border-emerald-800/60 shadow-md flex flex-col justify-between hover:shadow-lg transition-all relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-[11.5px] text-emerald-200 uppercase font-bold tracking-wider flex items-center gap-1">
               <span className="material-symbols-outlined text-[16px] text-emerald-300">account_balance_wallet</span>
@@ -455,7 +527,7 @@ export default function HistorialFinancieroApp() {
         </div>
 
         {/* Card 4: Métricas de Flujo Consolidado */}
-        <div className="bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
+        <div className="kpi-animate-card bg-surface-container-lowest p-4 sm:p-5 rounded-xl border border-surface-container/60 shadow-xs flex flex-col justify-between hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
             <span className="text-[12px] text-on-surface-variant font-medium flex items-center gap-1">
               <span className="material-symbols-outlined text-[16px] text-secondary">receipt_long</span>
@@ -488,7 +560,7 @@ export default function HistorialFinancieroApp() {
       </div>
 
       {/* 4. Gráfica de Rendimiento: Ingresos vs. Gastos vs. Utilidad */}
-      <div className="bg-surface-container-lowest p-5 rounded-xl border border-surface-container/60 shadow-xs space-y-4">
+      <div ref={chartRef} className="bg-surface-container-lowest p-5 rounded-xl border border-surface-container/60 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-[16px] font-bold text-primary">
@@ -562,14 +634,14 @@ export default function HistorialFinancieroApp() {
                       {/* Barra Ingresos */}
                       <div
                         style={{ height: `${Math.max(4, hIngresos)}%` }}
-                        className="w-2.5 sm:w-4 bg-blue-600 rounded-t-sm transition-all relative group-hover:brightness-110"
+                        className="chart-bar-item w-2.5 sm:w-4 bg-blue-600 rounded-t-sm transition-all relative group-hover:brightness-110"
                         title={`Ingresos: ${formatCOP(item.ingresos_total)}`}
                       ></div>
 
                       {/* Barra Gastos */}
                       <div
                         style={{ height: `${Math.max(4, hGastos)}%` }}
-                        className="w-2.5 sm:w-4 bg-rose-600 rounded-t-sm transition-all relative group-hover:brightness-110"
+                        className="chart-bar-item w-2.5 sm:w-4 bg-rose-600 rounded-t-sm transition-all relative group-hover:brightness-110"
                         title={`Gastos: ${formatCOP(item.gastos_total)}`}
                       ></div>
                     </div>
@@ -594,7 +666,7 @@ export default function HistorialFinancieroApp() {
       </div>
 
       {/* 5. Matriz de Conciliación Financiera Consolidada (Tabla) */}
-      <div className="bg-surface-container-lowest rounded-xl border border-surface-container/60 shadow-xs overflow-hidden">
+      <div ref={tableRef} className="bg-surface-container-lowest rounded-xl border border-surface-container/60 shadow-xs overflow-hidden">
         <div className="p-4 sm:p-5 border-b border-surface-container/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h2 className="text-[16px] font-bold text-primary">
@@ -619,7 +691,7 @@ export default function HistorialFinancieroApp() {
           </div>
         ) : !data?.tiene_datos || tablaItems.length === 0 ? (
           /* Estado Vacío cuando no hay ventas en el tiempo seleccionado */
-          <div className="py-16 px-4 flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-3">
+          <div className="empty-state-card py-16 px-4 flex flex-col items-center justify-center text-center max-w-md mx-auto space-y-3">
             <div className="w-14 h-14 rounded-2xl bg-surface-container flex items-center justify-center text-on-surface-variant">
               <span className="material-symbols-outlined text-[32px]">event_busy</span>
             </div>
@@ -657,7 +729,7 @@ export default function HistorialFinancieroApp() {
                   return (
                     <tr
                       key={item.id}
-                      className="hover:bg-surface-container-low/60 transition-colors"
+                      className="table-row-item hover:bg-surface-container-low/60 transition-colors"
                     >
                       <td className="py-3 px-4 font-semibold text-primary">
                         {item.periodo}
