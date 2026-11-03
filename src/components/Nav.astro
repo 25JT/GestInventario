@@ -38,17 +38,51 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
       <span class="material-symbols-outlined text-[22px]" aria-hidden="true">menu</span>
     </button>
 
-    {/* Campo de Búsqueda Rápida */}
-    <div class="relative w-full">
+    {/* Campo de Búsqueda Rápida Global */}
+    <div id="nav-search-container" class="relative w-full">
       <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px] pointer-events-none" aria-hidden="true">
         search
       </span>
       <input
+        id="nav-global-search-input"
         type="text"
-        placeholder="Buscar productos, SKU, comprobantes..."
+        placeholder="Buscar productos, SKU, comprobantes... (Ctrl+K)"
         aria-label="Buscar productos, SKU o comprobantes"
-        class="w-full h-9 pl-9 pr-4 bg-surface rounded-xl font-body-md text-[13px] text-on-surface placeholder:text-outline border border-transparent hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all shadow-2xs"
+        autocomplete="off"
+        class="w-full h-9 pl-9 pr-16 bg-surface rounded-xl font-body-md text-[13px] text-on-surface placeholder:text-outline border border-transparent hover:border-surface-container focus:border-secondary focus:bg-surface-container-lowest focus:outline-none transition-all shadow-2xs"
       />
+      <div class="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+        <button
+          id="btn-clear-nav-search"
+          type="button"
+          class="hidden p-0.5 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
+          title="Limpiar búsqueda"
+          aria-label="Limpiar campo de búsqueda"
+        >
+          <span class="material-symbols-outlined text-[15px]">close</span>
+        </button>
+        <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold text-on-surface-variant bg-surface-container rounded border border-surface-container-high/80 pointer-events-none">
+          Ctrl K
+        </kbd>
+      </div>
+
+      {/* Dropdown de Resultados de Búsqueda */}
+      <div
+        id="nav-search-dropdown"
+        class="absolute left-0 right-0 top-full mt-2 bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container/80 overflow-hidden z-50 hidden transition-all"
+        style="max-height: 480px;"
+      >
+        <div id="nav-search-dropdown-content" class="overflow-y-auto max-h-[440px] divide-y divide-surface-container/50">
+          <!-- Resultados dinámicos -->
+        </div>
+        <div class="p-2 bg-surface-container-low/60 border-t border-surface-container/60 flex items-center justify-between text-[11px] text-on-surface-variant px-3">
+          <div class="flex items-center gap-3">
+            <span><kbd class="font-mono bg-surface px-1 py-0.5 rounded text-[10px] border border-surface-container">↵</kbd> Abrir</span>
+            <span><kbd class="font-mono bg-surface px-1 py-0.5 rounded text-[10px] border border-surface-container">Esc</kbd> Cerrar</span>
+          </div>
+          <span class="text-secondary font-medium">Búsqueda Global StockControl</span>
+        </div>
+      </div>
     </div>
 
     {/* Sucursal / Almacén (visible en pantallas grandes) */}
@@ -106,9 +140,27 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
 <script>
   import { initNavSlide } from "../animaciones/animaNavSlide.js";
 
+  const BACKEND_URL = "http://localhost:3000";
+  let searchDebounceTimer: any = null;
+
+  function formatCOP(num: any) {
+    const val = Math.round(Number(num) || 0);
+    return `$${val.toLocaleString("es-CO")} COP`;
+  }
+
+  function escapeHtml(str: any) {
+    return String(str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function setupNav() {
     initNavSlide();
     updateDate();
+    initGlobalNavSearch();
   }
 
   // Soporte para transiciones entre pestañas y carga inicial
@@ -132,6 +184,281 @@ const serverDateFormatted = nowServer.toLocaleDateString("es-CO", {
       const formatted = now.toLocaleDateString("es-CO", options);
       const cap = formatted.charAt(0).toUpperCase() + formatted.slice(1);
       dateEl.innerHTML = `<span class="material-symbols-outlined text-[14px] text-secondary">calendar_today</span> ${cap}`;
+    }
+  }
+
+  function initGlobalNavSearch() {
+    const input = document.getElementById("nav-global-search-input") as HTMLInputElement | null;
+    const dropdown = document.getElementById("nav-search-dropdown");
+    const content = document.getElementById("nav-search-dropdown-content");
+    const btnClear = document.getElementById("btn-clear-nav-search");
+    const container = document.getElementById("nav-search-container");
+
+    if (!input || !dropdown || !content) return;
+
+    function closeDropdown() {
+      if (dropdown) dropdown.classList.add("hidden");
+    }
+
+    function openDropdown() {
+      if (dropdown) dropdown.classList.remove("hidden");
+    }
+
+    // Atajo global Ctrl+K / Cmd+K
+    document.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        input.focus();
+        input.select();
+      }
+      if (e.key === "Escape") {
+        closeDropdown();
+      }
+    });
+
+    // Clic fuera del buscador
+    document.addEventListener("click", (e) => {
+      if (container && !container.contains(e.target as Node)) {
+        closeDropdown();
+      }
+    });
+
+    // Botón limpiar
+    btnClear?.addEventListener("click", () => {
+      input.value = "";
+      btnClear.classList.add("hidden");
+      closeDropdown();
+      input.focus();
+    });
+
+    // Enter para navegación directa
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const val = input.value.trim();
+        if (!val) return;
+        const upper = val.toUpperCase();
+        if (upper.startsWith("FAC") || upper.startsWith("#FAC")) {
+          window.location.href = `/Historial`;
+        } else if (upper.startsWith("EXP") || upper.startsWith("#EXP")) {
+          window.location.href = `/GastosOperativos`;
+        } else {
+          window.location.href = `/ControldeInventario`;
+        }
+      }
+    });
+
+    // Búsqueda en tiempo real con debounce
+    input.addEventListener("input", () => {
+      const query = input.value.trim();
+
+      if (btnClear) {
+        if (query.length > 0) btnClear.classList.remove("hidden");
+        else btnClear.classList.add("hidden");
+      }
+
+      if (query.length < 2) {
+        closeDropdown();
+        if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+        return;
+      }
+
+      if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(async () => {
+        await executeSearch(query);
+      }, 200);
+    });
+
+    input.addEventListener("focus", () => {
+      if (input.value.trim().length >= 2) {
+        openDropdown();
+      }
+    });
+
+    async function executeSearch(query: string) {
+      content.innerHTML = `
+        <div class="p-6 text-center text-on-surface-variant flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[20px] animate-spin text-secondary">progress_activity</span>
+          <span class="text-[12px]">Buscando coincidencias para "${escapeHtml(query)}"...</span>
+        </div>
+      `;
+      openDropdown();
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/dashboard/busqueda-global?q=${encodeURIComponent(query)}`);
+        if (!res.ok) throw new Error("Error en respuesta del servidor");
+        const json = await res.json();
+        const data = json.data || {};
+
+        const productos: any[] = data.productos || [];
+        const ventas: any[] = data.ventas || [];
+        const gastos: any[] = data.gastos || [];
+
+        const totalResultados = productos.length + ventas.length + gastos.length;
+
+        if (totalResultados === 0) {
+          content.innerHTML = `
+            <div class="p-8 text-center text-on-surface-variant">
+              <span class="material-symbols-outlined text-[32px] mb-1.5 block opacity-40">search_off</span>
+              <p class="text-[13px] font-semibold text-on-surface">Sin resultados para "${escapeHtml(query)}"</p>
+              <p class="text-[11px] text-on-surface-variant/70 mt-0.5">
+                Verifica el SKU, código de comprobante o nombre del producto.
+              </p>
+            </div>
+          `;
+          return;
+        }
+
+        let html = "";
+
+        // 1. Grupo Productos
+        if (productos.length > 0) {
+          html += `
+            <div class="p-2">
+              <div class="px-2 py-1 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[15px] text-secondary">inventory_2</span>
+                  Productos en Catálogo (${productos.length})
+                </span>
+                <a href="/ControldeInventario" class="text-secondary hover:underline normal-case font-medium text-[11px]">Ver catálogo →</a>
+              </div>
+              <div class="flex flex-col gap-1 mt-1">
+                ${productos
+                  .map(
+                    (p) => `
+                  <a
+                    href="/ControldeInventario"
+                    class="p-2 rounded-xl hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group text-left"
+                  >
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                        <span class="material-symbols-outlined text-[17px]">category</span>
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <span class="text-[12px] font-semibold text-primary truncate group-hover:text-secondary transition-colors">${escapeHtml(p.nombre)}</span>
+                        <div class="flex items-center gap-2 text-[11px] text-on-surface-variant">
+                          <span class="font-mono font-medium">${escapeHtml(p.sku)}</span>
+                          <span>•</span>
+                          <span>${escapeHtml(p.categoria || "General")}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex flex-col items-end shrink-0 text-right">
+                      <span class="text-[12px] font-bold text-primary font-mono">${formatCOP(p.precio_venta)}</span>
+                      <span class="text-[10px] px-1.5 py-0.2 rounded font-semibold ${p.stock <= 4 ? "bg-error-container text-error" : "bg-surface-container text-on-tertiary-container"}">
+                        Stock: ${p.stock}
+                      </span>
+                    </div>
+                  </a>
+                `
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `;
+        }
+
+        // 2. Grupo Ventas / Tickets
+        if (ventas.length > 0) {
+          html += `
+            <div class="p-2">
+              <div class="px-2 py-1 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[15px] text-on-tertiary-container">receipt_long</span>
+                  Comprobantes de Ventas (${ventas.length})
+                </span>
+                <a href="/Historial" class="text-secondary hover:underline normal-case font-medium text-[11px]">Ver historial →</a>
+              </div>
+              <div class="flex flex-col gap-1 mt-1">
+                ${ventas
+                  .map(
+                    (v) => `
+                  <a
+                    href="/Historial"
+                    class="p-2 rounded-xl hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group text-left"
+                  >
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                        <span class="material-symbols-outlined text-[17px]">receipt</span>
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <div class="flex items-center gap-1.5">
+                          <span class="text-[12px] font-bold text-primary font-mono">${escapeHtml(v.folio_ticket)}</span>
+                          <span class="text-[10px] px-1.5 py-0.2 rounded bg-tertiary-fixed text-tertiary-container font-bold uppercase">${escapeHtml(v.estado)}</span>
+                        </div>
+                        <span class="text-[11px] text-on-surface-variant truncate">
+                          Resp: ${escapeHtml(v.responsable)} • ${escapeHtml(v.metodo_pago)}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="flex flex-col items-end shrink-0 text-right">
+                      <span class="text-[12px] font-bold text-primary">${formatCOP(v.total)}</span>
+                      <span class="text-[10px] text-on-surface-variant">
+                        ${v.created_at ? new Date(v.created_at).toLocaleDateString("es-CO", { day: "2-digit", month: "short" }) : ""}
+                      </span>
+                    </div>
+                  </a>
+                `
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `;
+        }
+
+        // 3. Grupo Gastos Operativos
+        if (gastos.length > 0) {
+          html += `
+            <div class="p-2">
+              <div class="px-2 py-1 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[15px] text-error">payments</span>
+                  Comprobantes de Gastos (${gastos.length})
+                </span>
+                <a href="/GastosOperativos" class="text-secondary hover:underline normal-case font-medium text-[11px]">Ver gastos →</a>
+              </div>
+              <div class="flex flex-col gap-1 mt-1">
+                ${gastos
+                  .map(
+                    (g) => `
+                  <a
+                    href="/GastosOperativos"
+                    class="p-2 rounded-xl hover:bg-surface-container-low transition-colors flex items-center justify-between gap-3 group text-left"
+                  >
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant group-hover:bg-error group-hover:text-on-error transition-colors">
+                        <span class="material-symbols-outlined text-[17px]">request_quote</span>
+                      </div>
+                      <div class="flex flex-col min-w-0">
+                        <div class="flex items-center gap-1.5">
+                          <span class="text-[12px] font-bold text-primary font-mono">${escapeHtml(g.folio)}</span>
+                          <span class="text-[10px] px-1.5 py-0.2 rounded bg-surface-container-high text-secondary font-semibold uppercase">${escapeHtml(g.clasificacion)}</span>
+                        </div>
+                        <span class="text-[11px] text-on-surface-variant truncate">${escapeHtml(g.descripcion)}</span>
+                      </div>
+                    </div>
+                    <div class="flex flex-col items-end shrink-0 text-right">
+                      <span class="text-[12px] font-bold text-error">${formatCOP(g.total)}</span>
+                      <span class="text-[10px] text-on-surface-variant">${escapeHtml(g.metodo_pago)}</span>
+                    </div>
+                  </a>
+                `
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `;
+        }
+
+        content.innerHTML = html;
+      } catch (err: any) {
+        console.error("Error al buscar en Nav:", err);
+        content.innerHTML = `
+          <div class="p-6 text-center text-error text-[12px]">
+            <span class="material-symbols-outlined text-[24px] mb-1 block">error</span>
+            <span>No se pudo conectar con el servicio de búsqueda global.</span>
+          </div>
+        `;
+      }
     }
   }
 </script>
