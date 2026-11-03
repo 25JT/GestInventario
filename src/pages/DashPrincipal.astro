@@ -114,6 +114,14 @@ const transactions = initialData?.transactions || [];
   <script is:inline>
     // Prepara el estado inicial para la animación GSAP evitando el destello FOUC
     document.documentElement.classList.add("dash-preparing");
+    try {
+      const u = JSON.parse(localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user") || "{}");
+      const r = String(u.rol || u.role || "").toUpperCase();
+      if (r === "CAJERO" || r === "VENDEDOR" || r === "POS") {
+        document.documentElement.classList.add("role-cajero");
+      }
+    } catch (e) {}
+
     setTimeout(() => {
       document.documentElement.classList.remove("dash-preparing");
     }, 1500);
@@ -128,6 +136,26 @@ const transactions = initialData?.transactions || [];
     html.dash-preparing #dash-transactions-card {
       opacity: 0 !important;
       transform: translateY(18px) !important;
+    }
+
+    /* Restricciones específicas para Rol Vendedor POS / Cajero */
+    html.role-cajero #quick-btn-gasto,
+    html.role-cajero #quick-btn-producto,
+    html.role-cajero #quick-btn-servicio,
+    html.role-cajero #container-ver-inventario-completo,
+    html.role-cajero #link-ver-historial-completo,
+    html.role-cajero #kpi-card-gastos,
+    html.role-cajero #kpi-card-utilidad,
+    html.role-cajero #tab-gastos,
+    html.role-cajero #tab-utilidad,
+    html.role-cajero #chart-legend-gastos {
+      display: none !important;
+    }
+
+    html.role-cajero #quick-actions-btns-container {
+      display: flex !important;
+      justify-content: flex-end !important;
+      width: auto !important;
     }
   </style>
 
@@ -880,8 +908,9 @@ const transactions = initialData?.transactions || [];
                 </div>
               </div>
 
-              <div class="pt-3 mt-3 border-t border-surface-container/40">
+              <div id="container-ver-inventario-completo" class="pt-3 mt-3 border-t border-surface-container/40">
                 <a
+                  id="link-ver-inventario-completo"
                   class="w-full h-9 bg-surface-container-low hover:bg-surface-container text-secondary-container font-semibold text-[13px] rounded-xl flex items-center justify-center gap-1.5 transition-colors border border-surface-container/40"
                   href="/ControldeInventario"
                 >
@@ -927,11 +956,13 @@ const transactions = initialData?.transactions || [];
 
               {/* Botones de acción */}
               <div
+                id="quick-actions-btns-container"
                 class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 w-full md:w-auto"
               >
                 <a
+                  id="quick-btn-nueva-venta"
                   class="min-h-[46px] py-2.5 px-3 sm:px-4 bg-surface-container-lowest hover:bg-secondary-container hover:text-on-secondary text-on-surface font-semibold text-[13px] rounded-xl shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-surface-container/60 hover:shadow-sm active:scale-95"
-                  href="/RegistroVentas"
+                  href="/RegVenta"
                 >
                   <span
                     class="material-symbols-outlined text-[19px] text-secondary-container shrink-0"
@@ -941,6 +972,7 @@ const transactions = initialData?.transactions || [];
                 </a>
 
                 <a
+                  id="quick-btn-gasto"
                   class="min-h-[46px] py-2.5 px-3 sm:px-4 bg-surface-container-lowest hover:bg-primary-container hover:text-on-primary text-on-surface font-semibold text-[13px] rounded-xl shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-surface-container/60 hover:shadow-sm active:scale-95"
                   href="/GastosOperativos"
                 >
@@ -952,6 +984,7 @@ const transactions = initialData?.transactions || [];
                 </a>
 
                 <a
+                  id="quick-btn-producto"
                   class="min-h-[46px] py-2.5 px-3 sm:px-4 bg-surface-container-lowest hover:bg-primary-container hover:text-on-primary text-on-surface font-semibold text-[13px] rounded-xl shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-surface-container/60 hover:shadow-sm active:scale-95"
                   href="/ControldeInventario"
                 >
@@ -963,6 +996,7 @@ const transactions = initialData?.transactions || [];
                 </a>
 
                 <a
+                  id="quick-btn-servicio"
                   class="min-h-[46px] py-2.5 px-3 sm:px-4 bg-surface-container-lowest hover:bg-secondary hover:text-on-secondary text-on-surface font-semibold text-[13px] rounded-xl shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-surface-container/60 hover:shadow-sm active:scale-95"
                   href="/Servicios"
                 >
@@ -1115,6 +1149,7 @@ const transactions = initialData?.transactions || [];
                   Mostrando {transactions.length} transacciones registradas
                 </span>
                 <a
+                  id="link-ver-historial-completo"
                   class="text-[13px] text-secondary-container hover:text-secondary font-semibold flex items-center gap-1 transition-colors"
                   href="/Historial"
                 >
@@ -1708,6 +1743,26 @@ const transactions = initialData?.transactions || [];
         // Ocultar leyenda de gastos en la gráfica
         const legendGastos = document.getElementById("chart-legend-gastos");
         if (legendGastos) legendGastos.style.display = "none";
+
+        // Operaciones Rápidas: Solo 'Nueva Venta' permitida para el rol Vendedor / Cajero
+        const btnGasto = document.getElementById("quick-btn-gasto");
+        const btnProducto = document.getElementById("quick-btn-producto");
+        const btnServicio = document.getElementById("quick-btn-servicio");
+        const btnsContainer = document.getElementById("quick-actions-btns-container");
+        if (btnGasto) btnGasto.style.display = "none";
+        if (btnProducto) btnProducto.style.display = "none";
+        if (btnServicio) btnServicio.style.display = "none";
+        if (btnsContainer) {
+          btnsContainer.className = "flex items-center justify-end w-full sm:w-auto";
+        }
+
+        // Inventario: Ocultar botón 'Ver inventario central completo'
+        const containerInv = document.getElementById("container-ver-inventario-completo");
+        if (containerInv) containerInv.style.display = "none";
+
+        // Ventas: Ocultar enlace 'Ver historial completo de ventas'
+        const linkHist = document.getElementById("link-ver-historial-completo");
+        if (linkHist) linkHist.style.display = "none";
       }
 
       return isCajero;
