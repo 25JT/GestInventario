@@ -544,13 +544,18 @@ try {
         </div>
 
         <!-- Cantidades y Umbrales -->
-        <div class="p-3 bg-surface-container-low rounded-xl space-y-2 border border-surface-container/60">
-          <span class="text-[11px] text-on-surface-variant font-semibold uppercase tracking-wider">
-            Gestión de Stock Inicial
-          </span>
+        <div class="p-3 bg-surface-container-low rounded-xl space-y-2.5 border border-surface-container/60">
+          <div class="flex items-center justify-between">
+            <span id="drawer-stock-section-title" class="text-[11px] text-on-surface-variant font-semibold uppercase tracking-wider">
+              Gestión de Stock Inicial
+            </span>
+            <span id="drawer-stock-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-bold bg-secondary/15 text-secondary border border-secondary/30">
+              Modo Edición BD
+            </span>
+          </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div class="space-y-1">
-              <label id="drawer-stock-label" class="text-[11px] font-semibold text-on-surface">Cantidad Inicial (Ingreso)</label>
+              <label id="drawer-stock-label" class="text-[11px] font-semibold text-on-surface">Cantidad Inicial (Ingreso) *</label>
               <input
                 id="drawer-stock-initial"
                 class="w-full h-9 px-3 bg-surface-container-lowest rounded-xl text-[13px] text-primary font-bold border border-surface-container/60 focus:outline-none focus:border-secondary"
@@ -558,16 +563,35 @@ try {
                 type="number"
                 value="10"
               />
+              <p id="drawer-stock-hint" class="text-[10px] text-on-surface-variant hidden">
+                Edita este número para fijar directamente el stock total en la BD.
+              </p>
             </div>
             <div class="space-y-1">
-              <label class="text-[11px] font-semibold text-on-surface">Alerta Stock Mínimo</label>
+              <label id="drawer-min-label" class="text-[11px] font-semibold text-on-surface">Alerta Stock Mínimo</label>
               <input
                 id="drawer-stock-min"
                 class="w-full h-9 px-3 bg-surface-container-lowest rounded-xl text-[13px] text-error font-bold border border-surface-container/60 focus:outline-none focus:border-error"
-                min="1"
+                min="0"
                 type="number"
                 value="5"
               />
+            </div>
+          </div>
+
+          <!-- Reabastecimiento rápido opcional en modo edición -->
+          <div id="drawer-reabastecer-box" class="hidden pt-2 border-t border-surface-container/40 flex items-center justify-between text-[11px]">
+            <span class="text-on-surface-variant">¿Deseas sumar unidades al stock total?</span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] text-secondary font-semibold">+</span>
+              <input
+                id="drawer-stock-add"
+                class="w-16 h-7 px-2 bg-surface-container-lowest rounded-lg text-[12px] text-on-surface font-semibold border border-surface-container/60 focus:outline-none focus:border-secondary text-center"
+                placeholder="0"
+                min="0"
+                type="number"
+              />
+              <span class="text-[10.5px] text-on-surface-variant">unid.</span>
             </div>
           </div>
         </div>
@@ -1141,7 +1165,7 @@ try {
       }
     };
 
-    // 6. Guardar / Reabastecer producto desde el Drawer con validación de existencia
+    // 6. Guardar / Reabastecer / Editar producto desde el Drawer con persistencia de modo y edición directa de Stock Total
     function setupDrawerForm() {
       const btnSave = document.getElementById("btn-save-drawer");
       const costInput = document.getElementById("drawer-cost") as HTMLInputElement | null;
@@ -1161,6 +1185,12 @@ try {
       const hTitle = document.getElementById("drawer-header-title");
       const hSub = document.getElementById("drawer-header-subtitle");
 
+      const stockSecTitle = document.getElementById("drawer-stock-section-title");
+      const stockBadge = document.getElementById("drawer-stock-badge");
+      const stockHint = document.getElementById("drawer-stock-hint");
+      const reabastecerBox = document.getElementById("drawer-reabastecer-box");
+      const stockAddInput = document.getElementById("drawer-stock-add") as HTMLInputElement | null;
+
       let existingProduct: any = null;
 
       // Restablecer modo normal de creación
@@ -1169,6 +1199,12 @@ try {
         if (alertBox) alertBox.classList.add("hidden");
         if (hTitle) hTitle.textContent = "Agregar Producto";
         if (hSub) hSub.textContent = "Flujo de alta en catálogo maestro de almacén";
+
+        if (stockSecTitle) stockSecTitle.textContent = "Gestión de Stock Inicial";
+        if (stockBadge) stockBadge.classList.add("hidden");
+        if (stockHint) stockHint.classList.add("hidden");
+        if (reabastecerBox) reabastecerBox.classList.add("hidden");
+        if (stockAddInput) stockAddInput.value = "";
 
         if (nameInput) {
           nameInput.readOnly = false;
@@ -1195,7 +1231,7 @@ try {
           minInput.classList.remove("bg-surface-container", "opacity-75", "cursor-not-allowed");
         }
         if (stockLabel) {
-          stockLabel.textContent = "Cantidad Inicial (Ingreso)";
+          stockLabel.textContent = "Cantidad Inicial (Ingreso) *";
         }
         if (btnSave) {
           btnSave.innerHTML = `<span class="material-symbols-outlined text-[18px]">save</span><span>Guardar Producto</span>`;
@@ -1204,16 +1240,16 @@ try {
         }
       }
 
-      // Aplica un producto existente al Drawer en modo actualización/reabastecimiento
+      // Aplica un producto existente al Drawer en modo actualización y edición directa de Stock Total
       function applyProductToDrawer(p: any) {
         existingProduct = p;
 
         if (hTitle) hTitle.textContent = "Actualizar Producto";
-        if (hSub) hSub.textContent = "Edición y reabastecimiento de existencias";
+        if (hSub) hSub.textContent = "Edición directa de existencias en BD y datos comerciales";
 
         if (alertBox) alertBox.classList.remove("hidden");
         if (descEl) {
-          descEl.innerHTML = `Producto <strong>"${p.nombre}"</strong> (SKU: ${p.sku}) ya existe en catálogo. Los datos maestros están protegidos. <strong>Solo puedes modificar:</strong> Cantidad a Ingresar, Precio de Compra, Precio de Venta y Proveedor Asignado.`;
+          descEl.innerHTML = `Producto <strong>"${p.nombre}"</strong> (SKU: ${p.sku}) cargado. Los datos maestros están protegidos. <strong>Puedes modificar:</strong> Stock Total en Almacén, Alerta de Stock Mínimo, Precio de Compra, Precio de Venta y Proveedor.`;
         }
 
         // Bloquear datos maestros
@@ -1242,20 +1278,31 @@ try {
           locInput.readOnly = true;
           locInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
         }
-        if (minInput) {
-          minInput.value = String(p.stock_minimo || 5);
-          minInput.readOnly = true;
-          minInput.classList.add("bg-surface-container", "opacity-75", "cursor-not-allowed");
-        }
 
-        // Habilitados para modificar
-        if (costInput) costInput.value = String(p.precio_compra ?? 0);
-        if (priceInput) priceInput.value = String(p.precio_venta ?? 0);
+        // Habilitar edición directa de stock total y stock mínimo en la BD
+        const currentStock = Number(p.stock_actual) || 0;
+        if (stockSecTitle) stockSecTitle.textContent = "Control de Stock en Base de Datos";
+        if (stockBadge) stockBadge.classList.remove("hidden");
+        if (stockHint) stockHint.classList.remove("hidden");
+        if (reabastecerBox) reabastecerBox.classList.remove("hidden");
+        if (stockAddInput) stockAddInput.value = "";
 
         if (stockLabel) {
-          stockLabel.innerHTML = `Cantidad a Ingresar / Reabastecer <span class="text-secondary font-bold">(Stock actual: ${p.stock_actual ?? 0} unid.)</span> *`;
+          stockLabel.innerHTML = `Stock Total en BD <span class="text-secondary font-bold">(Actual: ${currentStock} unid.)</span> *`;
         }
-        if (stockInput) stockInput.value = "1";
+        if (stockInput) {
+          stockInput.value = String(currentStock);
+        }
+
+        if (minInput) {
+          minInput.value = String(p.stock_minimo !== undefined ? p.stock_minimo : 5);
+          minInput.readOnly = false;
+          minInput.classList.remove("bg-surface-container", "opacity-75", "cursor-not-allowed");
+        }
+
+        // Precios habilitados para modificar
+        if (costInput) costInput.value = String(p.precio_compra ?? 0);
+        if (priceInput) priceInput.value = String(p.precio_venta ?? 0);
 
         updateMargin();
 
@@ -1266,6 +1313,16 @@ try {
           btnSave.classList.add("bg-emerald-600", "hover:bg-emerald-700");
         }
       }
+
+      // Sincronización entre input de suma rápida y el stock total
+      stockAddInput?.addEventListener("input", () => {
+        if (!existingProduct) return;
+        const base = Number(existingProduct.stock_actual) || 0;
+        const add = Number(stockAddInput.value) || 0;
+        if (stockInput) {
+          stockInput.value = String(Math.max(0, base + add));
+        }
+      });
 
       // Exponer apertura en modo edición/actualización por ID para las acciones de la tabla
       (window as any).openEditProductDrawer = async function(productId: string) {
@@ -1289,6 +1346,7 @@ try {
 
       // Averigua con la BD si el producto ya existe por SKU o Código de Barras
       async function checkForExistingProduct(code: string) {
+        if (existingProduct) return; // Si ya se está editando un producto, no re-verificar
         const clean = (code || "").trim();
         if (!clean || clean.length < 3 || clean === "SKU-" || clean === "SKU-2024-") {
           return;
@@ -1322,20 +1380,23 @@ try {
       costInput?.addEventListener("input", updateMargin);
       priceInput?.addEventListener("input", updateMargin);
 
-      // Verificación en tiempo real al escribir o escanear
+      // Verificación en tiempo real al escribir o escanear (sólo si no estamos en modo edición)
       skuInput?.addEventListener("blur", () => {
+        if (existingProduct) return;
         if (skuInput.value && skuInput.value.trim().length >= 4) {
           checkForExistingProduct(skuInput.value);
         }
       });
 
       eanInput?.addEventListener("blur", () => {
+        if (existingProduct) return;
         if (eanInput.value && eanInput.value.trim().length >= 3) {
           checkForExistingProduct(eanInput.value);
         }
       });
 
       eanInput?.addEventListener("change", () => {
+        if (existingProduct) return;
         if (eanInput.value && eanInput.value.trim().length >= 3) {
           checkForExistingProduct(eanInput.value);
         }
@@ -1367,26 +1428,45 @@ try {
         updateMargin();
       });
 
-      // Botón cancelar / cerrar
-      document.getElementById("btn-cancel-drawer")?.addEventListener("click", () => {
-        resetExistingMode();
+      // PREVENCIÓN DE BUGS DE CLIC:
+      // Cualquier clic dentro de drawer-panel no debe propagarse al backdrop
+      const drawerPanel = document.getElementById("drawer-panel");
+      drawerPanel?.addEventListener("click", (e) => {
+        e.stopPropagation();
       });
-      document.getElementById("btn-close-drawer")?.addEventListener("click", () => {
+
+      // Botones cancelar / cerrar
+      document.getElementById("btn-cancel-drawer")?.addEventListener("click", (e) => {
+        e.stopPropagation();
         resetExistingMode();
+        closeProductDrawer();
       });
-      document.getElementById("drawer-backdrop")?.addEventListener("click", () => {
+      document.getElementById("btn-close-drawer")?.addEventListener("click", (e) => {
+        e.stopPropagation();
         resetExistingMode();
+        closeProductDrawer();
+      });
+
+      // Cerrar solo si se hace clic explícitamente en el fondo oscuro (backdrop)
+      const drawerBackdrop = document.getElementById("drawer-backdrop");
+      drawerBackdrop?.addEventListener("click", (e) => {
+        if (e.target === drawerBackdrop) {
+          resetExistingMode();
+          closeProductDrawer();
+        }
       });
 
       if (btnSave) {
         btnSave.addEventListener("click", async () => {
+          const isExisting = Boolean(existingProduct);
           const id = existingProduct?.id || null;
           const nombre = nameInput?.value.trim() || existingProduct?.nombre;
           const sku = skuInput?.value.trim() || existingProduct?.sku;
           const categoria_id = catSelect?.value || existingProduct?.categoria_id;
           const precio_compra = Number(costInput?.value) || 0;
           const precio_venta = Number(priceInput?.value) || 0;
-          const stock_inicial = Number(stockInput?.value) || 0;
+          const stock_total = isExisting ? (Number(stockInput?.value) || 0) : undefined;
+          const stock_inicial = isExisting ? 0 : (Number(stockInput?.value) || 0);
           const stock_minimo = Number(minInput?.value) || 5;
           const ubicacion = locInput?.value.trim() || existingProduct?.ubicacion || "";
           const codigo_barras = eanInput?.value.trim() || existingProduct?.codigo_barras || "";
@@ -1432,6 +1512,7 @@ try {
                 categoria_id,
                 precio_compra,
                 precio_venta,
+                stock_total,
                 stock_inicial,
                 stock_minimo,
                 ubicacion,
