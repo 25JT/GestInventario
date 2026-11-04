@@ -70,7 +70,7 @@ import NavBar from "../components/Nav.astro";
           <div class="flex-1 min-w-0 w-full flex flex-col gap-4">
             
             <!-- Clean Header & Search Bar -->
-            <div class="bg-surface-container-lowest p-3 sm:p-4 rounded-xl border border-surface-container/60 shadow-xs flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
+            <div class="bg-surface-container-lowest p-3 sm:p-4 rounded-xl border border-surface-container/60 shadow-xs flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
               <div class="relative flex-1">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">
                   search
@@ -96,15 +96,41 @@ import NavBar from "../components/Nav.astro";
                 </div>
               </div>
 
-              <button
-                class="h-10 px-3.5 bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface text-[12px] font-medium rounded-xl flex items-center justify-center gap-1.5 shrink-0 transition-colors cursor-pointer"
-                onclick="window.clearSearch && window.clearSearch()"
-                title="Limpiar búsqueda"
-                type="button"
-              >
-                <span class="material-symbols-outlined text-[18px]">backspace</span>
-                <span>Limpiar</span>
-              </button>
+              <div class="flex items-center gap-2 shrink-0">
+                <button
+                  class="h-10 px-3 bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface text-[12px] font-medium rounded-xl flex items-center justify-center gap-1.5 shrink-0 transition-colors cursor-pointer border border-transparent hover:border-surface-container"
+                  onclick="window.clearSearch && window.clearSearch()"
+                  title="Limpiar búsqueda (Esc)"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[18px]">backspace</span>
+                  <span class="hidden sm:inline">Limpiar</span>
+                </button>
+
+                <!-- Selector de Vista: Tabla (Default) vs Cuadrícula -->
+                <div class="flex items-center bg-surface-container/70 p-1 rounded-xl">
+                  <button
+                    id="btn-view-table"
+                    class="px-2.5 py-1.5 rounded-lg text-[12px] font-semibold bg-surface-container-lowest text-primary shadow-xs transition-all flex items-center gap-1 cursor-pointer"
+                    title="Vista de Tabla POS (Recomendada)"
+                    type="button"
+                    onclick="window.switchCatalogLayout && window.switchCatalogLayout('table')"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">table_rows</span>
+                    <span class="hidden md:inline">Tabla</span>
+                  </button>
+                  <button
+                    id="btn-view-grid"
+                    class="px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-1 cursor-pointer"
+                    title="Vista de Tarjetas"
+                    type="button"
+                    onclick="window.switchCatalogLayout && window.switchCatalogLayout('grid')"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">grid_view</span>
+                    <span class="hidden md:inline">Tarjetas</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <!-- Category Filter Pills (Generadas dinámicamente) -->
@@ -119,9 +145,38 @@ import NavBar from "../components/Nav.astro";
               </button>
             </div>
 
-            <!-- Grid de Catálogo de Productos y Servicios (Cargado dinámicamente de la BD) -->
-            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-              <!-- Cargando items de la base de datos... -->
+            <!-- VISTA 1: TABLA DE CATÁLOGO POS (Principal, ergonómica y de alta visibilidad) -->
+            <div id="catalog-table-container" class="bg-surface-container-lowest rounded-xl border border-surface-container/60 shadow-xs overflow-hidden flex flex-col">
+              <div class="overflow-x-auto max-h-[calc(100vh-275px)] overflow-y-auto">
+                <table class="w-full text-left border-collapse text-[13px]">
+                  <thead class="sticky top-0 z-10 bg-surface-container-low text-on-surface-variant uppercase text-[11px] font-bold tracking-wider border-b border-surface-container/60 shadow-2xs">
+                    <tr>
+                      <th class="py-3 px-3.5">Artículo / Servicio</th>
+                      <th class="py-3 px-3">Categoría</th>
+                      <th class="py-3 px-3 text-center min-w-[130px]">Disponibilidad / Salud</th>
+                      <th class="py-3 px-3 text-right min-w-[110px]">Precio Unitario</th>
+                      <th class="py-3 px-3.5 text-center w-28">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="product-table-body" class="divide-y divide-surface-container/40">
+                    <!-- Filas cargadas dinámicamente -->
+                  </tbody>
+                </table>
+              </div>
+              <!-- Pie informativo de la tabla -->
+              <div class="px-4 py-2.5 bg-surface-container-low/60 border-t border-surface-container/50 flex items-center justify-between text-[11px] text-on-surface-variant">
+                <span id="catalog-count-info">Cargando catálogo...</span>
+                <span class="hidden sm:flex items-center gap-1 text-[10px] text-on-surface-variant/80">
+                  <span class="material-symbols-outlined text-[13px]">touch_app</span> Haz clic en una fila o en "+ Agregar" para añadir al ticket
+                </span>
+              </div>
+            </div>
+
+            <!-- VISTA 2: CUADRÍCULA DE TARJETAS (Modo alternativo) -->
+            <div id="catalog-grid-container" class="hidden">
+              <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                <!-- Cargando items de la base de datos... -->
+              </div>
             </div>
 
             <!-- Estado Vacío cuando no hay resultados de búsqueda -->
@@ -129,6 +184,13 @@ import NavBar from "../components/Nav.astro";
               <span class="material-symbols-outlined text-[48px] text-on-surface-variant/40">inventory_2</span>
               <h4 class="text-[15px] font-semibold text-on-surface">No se encontraron productos o servicios</h4>
               <p class="text-[12px] text-on-surface-variant">Intenta con otro término de búsqueda o selecciona otra categoría.</p>
+              <button
+                class="mt-2 px-3.5 py-1.5 rounded-lg bg-surface-container text-primary font-medium text-[12px] hover:bg-surface-container-high transition-colors cursor-pointer"
+                onclick="window.clearSearch && window.clearSearch()"
+                type="button"
+              >
+                Limpiar búsqueda
+              </button>
             </div>
           </div>
 
@@ -573,18 +635,69 @@ import NavBar from "../components/Nav.astro";
 
     let catalogItems: any[] = [];
     let currentFilterCat: string = "all";
+    let currentCatalogLayout: string = "table";
+
+    function normalizeText(str: any) {
+      return String(str || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+    }
+
+    // Alternar entre Vista de Tabla y Vista de Cuadrícula
+    (window as any).switchCatalogLayout = function(mode: string) {
+      currentCatalogLayout = mode;
+      const btnTable = document.getElementById("btn-view-table");
+      const btnGrid = document.getElementById("btn-view-grid");
+      const tableContainer = document.getElementById("catalog-table-container");
+      const gridContainer = document.getElementById("catalog-grid-container");
+
+      if (mode === "table") {
+        btnTable?.classList.add("bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+        btnTable?.classList.remove("text-on-surface-variant", "font-medium");
+        btnGrid?.classList.remove("bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+        btnGrid?.classList.add("text-on-surface-variant", "font-medium");
+
+        tableContainer?.classList.remove("hidden");
+        gridContainer?.classList.add("hidden");
+      } else {
+        btnGrid?.classList.add("bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+        btnGrid?.classList.remove("text-on-surface-variant", "font-medium");
+        btnTable?.classList.remove("bg-surface-container-lowest", "text-primary", "shadow-xs", "font-semibold");
+        btnTable?.classList.add("text-on-surface-variant", "font-medium");
+
+        tableContainer?.classList.add("hidden");
+        gridContainer?.classList.remove("hidden");
+      }
+    };
 
     // 1. Cargar catálogo de productos y servicios desde la BD
     async function loadPosCatalog() {
+      const tbody = document.getElementById("product-table-body");
       const grid = document.getElementById("product-grid");
-      if (!grid) return;
 
-      grid.innerHTML = `
-        <div class="col-span-full py-12 flex flex-col items-center justify-center gap-2 text-on-surface-variant">
-          <span class="material-symbols-outlined text-[32px] animate-spin text-secondary">sync</span>
-          <p class="text-[13px] font-medium">Cargando catálogo en tiempo real...</p>
-        </div>
-      `;
+      if (tbody) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-12 text-center text-on-surface-variant">
+              <div class="flex flex-col items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[32px] animate-spin text-secondary">sync</span>
+                <p class="text-[13px] font-medium">Cargando catálogo en tiempo real...</p>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+
+      if (grid) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 flex flex-col items-center justify-center gap-2 text-on-surface-variant">
+            <span class="material-symbols-outlined text-[32px] animate-spin text-secondary">sync</span>
+            <p class="text-[13px] font-medium">Cargando catálogo en tiempo real...</p>
+          </div>
+        `;
+      }
 
       try {
         const res = await fetch(`${API_BASE}/catalogo`);
@@ -595,14 +708,19 @@ import NavBar from "../components/Nav.astro";
           const servs = json.data.servicios || [];
           catalogItems = [...prods, ...servs];
 
+          // Ordenar alfabéticamente por defecto
+          catalogItems.sort((a, b) => (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" }));
+
           renderCategoryPills(catalogItems);
-          renderCatalogGrid(catalogItems);
+          renderCatalog(catalogItems);
         } else {
-          grid.innerHTML = `<p class="col-span-full text-center text-error py-8">No se pudo cargar el catálogo.</p>`;
+          if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="text-center text-error py-8">No se pudo cargar el catálogo.</td></tr>`;
+          if (grid) grid.innerHTML = `<p class="col-span-full text-center text-error py-8">No se pudo cargar el catálogo.</p>`;
         }
       } catch (err) {
         console.error("Error al cargar catálogo POS:", err);
-        grid.innerHTML = `<p class="col-span-full text-center text-error py-8">Error de conexión al cargar catálogo.</p>`;
+        if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="text-center text-error py-8">Error de conexión al cargar catálogo.</td></tr>`;
+        if (grid) grid.innerHTML = `<p class="col-span-full text-center text-error py-8">Error de conexión al cargar catálogo.</p>`;
       }
     }
 
@@ -663,14 +781,20 @@ import NavBar from "../components/Nav.astro";
       filterProductsLive();
     };
 
-    // 3. Renderizar las tarjetas del catálogo
-    function renderCatalogGrid(items: any[]) {
+    // 3. Renderizar Catálogo (Tabla principal de alta legibilidad y Cuadrícula alternativa)
+    function renderCatalog(items: any[]) {
+      const tbody = document.getElementById("product-table-body");
       const grid = document.getElementById("product-grid");
       const emptyState = document.getElementById("catalog-empty");
-      if (!grid) return;
+      const countInfo = document.getElementById("catalog-count-info");
+
+      if (countInfo) {
+        countInfo.textContent = `Mostrando ${items.length} de ${catalogItems.length} artículos disponibles`;
+      }
 
       if (items.length === 0) {
-        grid.innerHTML = "";
+        if (tbody) tbody.innerHTML = "";
+        if (grid) grid.innerHTML = "";
         emptyState?.classList.remove("hidden");
         emptyState?.classList.add("flex");
         return;
@@ -679,76 +803,174 @@ import NavBar from "../components/Nav.astro";
       emptyState?.classList.add("hidden");
       emptyState?.classList.remove("flex");
 
-      grid.innerHTML = items.map((item) => {
-        const isServicio = item.tipo_item === "SERVICIO";
-        const stockNum = Number(item.stock) || 0;
+      // 3.A. Renderizado de TABLA (Ergonómica, sin nombres cortados, máxima visibilidad)
+      if (tbody) {
+        tbody.innerHTML = items.map((item) => {
+          const isServicio = item.tipo_item === "SERVICIO";
+          const stockNum = Number(item.stock) || 0;
 
-        // Semáforo de stock solicitado:
-        // 0 a 4: Rojo (Urgente / Agotado)
-        // 5 a 6: Amarillo (Próximo)
-        // 7 en adelante: Verde (Estado OK)
-        let stockBadge = "";
-        if (isServicio) {
-          stockBadge = `<span class="text-[10px] font-bold bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded-md">Servicio Técnico</span>`;
-        } else if (stockNum === 0) {
-          stockBadge = `<span class="text-[10px] font-bold bg-error-container text-error px-2 py-0.5 rounded-md">Agotado (0)</span>`;
-        } else if (stockNum <= 4) {
-          stockBadge = `<span class="text-[10px] font-bold bg-error-container/30 text-error px-2 py-0.5 rounded-md">Urgente (${stockNum} unid.)</span>`;
-        } else if (stockNum <= 6) {
-          stockBadge = `<span class="text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-md">Próximo (${stockNum} unid.)</span>`;
-        } else {
-          stockBadge = `<span class="text-[10px] font-bold bg-tertiary-container/30 text-on-tertiary-container px-2 py-0.5 rounded-md">Stock: ${stockNum}</span>`;
-        }
+          let stockBadge = "";
+          if (isServicio) {
+            stockBadge = `
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                <span class="material-symbols-outlined text-[13px]">handyman</span>
+                <span>Servicio Activo</span>
+              </span>
+            `;
+          } else if (stockNum === 0) {
+            stockBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-error-container text-error">
+                <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                <span>Agotado (0)</span>
+              </span>
+            `;
+          } else if (stockNum <= 4) {
+            stockBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-error-container/40 text-error">
+                <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                <span>Urgente (${stockNum})</span>
+              </span>
+            `;
+          } else if (stockNum <= 6) {
+            stockBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                <span>Próximo (${stockNum})</span>
+              </span>
+            `;
+          } else {
+            stockBadge = `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>OK (${stockNum})</span>
+              </span>
+            `;
+          }
 
-        const iconName = item.categoria_icono || (isServicio ? "handyman" : "inventory_2");
+          const iconName = item.categoria_icono || (isServicio ? "handyman" : "inventory_2");
+          const isDisabled = !isServicio && stockNum === 0;
 
-        return `
-          <div
-            class="product-item bg-surface-container-lowest rounded-xl p-3 border border-surface-container/60 shadow-xs flex flex-col justify-between group hover:shadow-md hover:border-secondary transition-all"
-            data-category="${item.categoria}"
-            data-name="${item.nombre.toLowerCase()}"
-            data-sku="${(item.sku || "").toLowerCase()}"
-            data-barcode="${(item.codigo_barras || "").toLowerCase()}"
-          >
-            <div>
-              <!-- Visual Header con icono y categoría (sin imágenes) -->
-              <div class="relative w-full h-24 rounded-lg bg-surface-container-low flex flex-col items-center justify-center mb-2.5 overflow-hidden">
-                <span class="material-symbols-outlined text-[38px] text-on-surface-variant/80 group-hover:scale-110 group-hover:text-primary transition-transform duration-300">
-                  ${iconName}
+          return `
+            <tr
+              class="group hover:bg-surface-container-low transition-colors cursor-pointer border-b border-surface-container/30 ${isDisabled ? "opacity-60 bg-surface-container-lowest/50" : ""}"
+              onclick="window.addProductFromCatalog('${item.id}')"
+              title="${isDisabled ? 'Producto sin existencias' : 'Haz clic para agregar al ticket: ' + item.nombre}"
+            >
+              <!-- Artículo / Servicio -->
+              <td class="py-2.5 px-3.5">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">${iconName}</span>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <span class="font-bold text-[13px] text-on-surface group-hover:text-primary transition-colors leading-snug">${item.nombre}</span>
+                    <div class="flex items-center gap-2 text-[11px] text-on-surface-variant font-mono mt-0.5">
+                      <span>SKU: ${item.sku || "N/A"}</span>
+                      ${item.codigo_barras ? `<span class="text-on-surface-variant/70">&bull; ${item.codigo_barras}</span>` : ""}
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Categoría -->
+              <td class="py-2.5 px-3 whitespace-nowrap">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container text-[11px] font-medium text-on-surface">
+                  <span>${item.categoria}</span>
                 </span>
-                <span class="absolute top-1.5 left-1.5 text-[10px] font-semibold bg-surface-container-lowest/90 px-1.5 py-0.5 rounded text-on-surface">
-                  ${item.categoria}
+              </td>
+
+              <!-- Disponibilidad / Salud de Stock -->
+              <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                ${stockBadge}
+              </td>
+
+              <!-- Precio Unitario -->
+              <td class="py-2.5 px-3 text-right whitespace-nowrap">
+                <span class="font-bold text-[14px] text-primary tabular-nums tracking-tight">
+                  ${formatCOP(item.precio_venta)}
                 </span>
-                <span class="absolute bottom-1.5 right-1.5">
+              </td>
+
+              <!-- Botón Agregar -->
+              <td class="py-2.5 px-3.5 text-center" onclick="event.stopPropagation()">
+                <button
+                  class="h-8 w-full px-2.5 rounded-lg bg-primary hover:bg-primary/90 text-on-primary text-[12px] font-semibold flex items-center justify-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer ${isDisabled ? "opacity-40 pointer-events-none" : ""}"
+                  onclick="window.addProductFromCatalog('${item.id}')"
+                  type="button"
+                  title="Agregar al ticket"
+                >
+                  <span class="material-symbols-outlined text-[16px]">add_shopping_cart</span>
+                  <span>Agregar</span>
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      // 3.B. Renderizado de CUADRÍCULA (Alternativa mejorada sin recortar texto)
+      if (grid) {
+        grid.innerHTML = items.map((item) => {
+          const isServicio = item.tipo_item === "SERVICIO";
+          const stockNum = Number(item.stock) || 0;
+
+          let stockBadge = "";
+          if (isServicio) {
+            stockBadge = `<span class="text-[10px] font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-md">Servicio</span>`;
+          } else if (stockNum === 0) {
+            stockBadge = `<span class="text-[10px] font-bold bg-error-container text-error px-2 py-0.5 rounded-md">Agotado (0)</span>`;
+          } else if (stockNum <= 4) {
+            stockBadge = `<span class="text-[10px] font-bold bg-error-container/40 text-error px-2 py-0.5 rounded-md">Urgente (${stockNum})</span>`;
+          } else if (stockNum <= 6) {
+            stockBadge = `<span class="text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-md">Próximo (${stockNum})</span>`;
+          } else {
+            stockBadge = `<span class="text-[10px] font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-md">Stock: ${stockNum}</span>`;
+          }
+
+          const iconName = item.categoria_icono || (isServicio ? "handyman" : "inventory_2");
+          const isDisabled = !isServicio && stockNum === 0;
+
+          return `
+            <div
+              class="product-item bg-surface-container-lowest rounded-xl p-3 border border-surface-container/60 shadow-xs flex flex-col justify-between group hover:shadow-md hover:border-primary transition-all cursor-pointer ${isDisabled ? "opacity-60" : ""}"
+              onclick="window.addProductFromCatalog('${item.id}')"
+            >
+              <div>
+                <div class="flex items-center justify-between gap-1 mb-2">
+                  <span class="text-[10px] font-semibold bg-surface-container px-2 py-0.5 rounded-md text-on-surface truncate">
+                    ${item.categoria}
+                  </span>
                   ${stockBadge}
-                </span>
-              </div>
-              
-              <!-- Info del Producto -->
-              <div class="flex flex-col gap-0.5 mb-2">
-                <h4 class="text-[13px] font-semibold text-on-surface line-clamp-1" title="${item.nombre}">${item.nombre}</h4>
-                <div class="flex items-center gap-1.5 text-[11px] text-on-surface-variant font-mono">
-                  <span>SKU: ${item.sku || "N/A"}</span>
-                  ${item.codigo_barras ? `<span class="text-[10px] text-on-surface-variant/70">&bull; ${item.codigo_barras}</span>` : ""}
+                </div>
+
+                <div class="flex items-start gap-2.5 mb-2.5">
+                  <div class="w-9 h-9 rounded-lg bg-surface-container-low flex items-center justify-center shrink-0 text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">${iconName}</span>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <h4 class="text-[12.5px] font-bold text-on-surface leading-snug group-hover:text-primary transition-colors line-clamp-2" title="${item.nombre}">
+                      ${item.nombre}
+                    </h4>
+                    <span class="text-[11px] text-on-surface-variant font-mono mt-0.5">SKU: ${item.sku || "N/A"}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Footer con Precio COP y Botón Agregar -->
-            <div class="flex items-center justify-between pt-2 border-t border-surface-container/40">
-              <span class="text-[15px] text-primary font-bold tracking-tight">${formatCOP(item.precio_venta)}</span>
-              <button
-                class="h-8 px-3 rounded-lg bg-secondary-container hover:bg-secondary text-on-secondary text-[12px] font-semibold flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer ${!isServicio && stockNum === 0 ? "opacity-50 pointer-events-none" : ""}"
-                onclick="window.addProductFromCatalog('${item.id}')"
-                type="button"
-              >
-                <span class="material-symbols-outlined text-[16px]">add</span>
-                <span>Agregar</span>
-              </button>
+              <div class="flex items-center justify-between pt-2 border-t border-surface-container/40" onclick="event.stopPropagation()">
+                <span class="text-[14px] text-primary font-bold tracking-tight">${formatCOP(item.precio_venta)}</span>
+                <button
+                  class="h-7 px-2.5 rounded-lg bg-primary hover:bg-primary/90 text-on-primary text-[11px] font-semibold flex items-center gap-1 shadow-2xs active:scale-95 transition-all cursor-pointer ${isDisabled ? "opacity-40 pointer-events-none" : ""}"
+                  onclick="window.addProductFromCatalog('${item.id}')"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[15px]">add</span>
+                  <span>Agregar</span>
+                </button>
+              </div>
             </div>
-          </div>
-        `;
-      }).join("");
+          `;
+        }).join("");
+      }
     }
 
     // 4. Agregar ítem desde el catálogo al ticket
@@ -775,19 +997,22 @@ import NavBar from "../components/Nav.astro";
     // 5. Filtrar productos en vivo por búsqueda y categoría
     function filterProductsLive() {
       const input = document.getElementById("productSearch") as HTMLInputElement | null;
-      const q = input?.value.toLowerCase().trim() || "";
+      const q = normalizeText(input?.value || "");
 
       const filtered = catalogItems.filter((item) => {
         const matchesCategory = currentFilterCat === "all" || item.categoria === currentFilterCat;
-        const matchesQuery = !q ||
-          item.nombre.toLowerCase().includes(q) ||
-          (item.sku && item.sku.toLowerCase().includes(q)) ||
-          (item.codigo_barras && item.codigo_barras.toLowerCase().includes(q));
+        if (!matchesCategory) return false;
+        if (!q) return true;
 
-        return matchesCategory && matchesQuery;
+        const name = normalizeText(item.nombre);
+        const sku = normalizeText(item.sku);
+        const barcode = normalizeText(item.codigo_barras);
+        const cat = normalizeText(item.categoria);
+
+        return name.includes(q) || sku.includes(q) || barcode.includes(q) || cat.includes(q);
       });
 
-      renderCatalogGrid(filtered);
+      renderCatalog(filtered);
     }
 
     window.filterProducts = filterProductsLive;
@@ -1170,9 +1395,15 @@ import NavBar from "../components/Nav.astro";
       loadSalesHistory("hoy");
 
       // Buscador en catálogo
-      const searchInput = document.getElementById("productSearch");
+      const searchInput = document.getElementById("productSearch") as HTMLInputElement | null;
       if (searchInput) {
         searchInput.addEventListener("input", filterProductsLive);
+        searchInput.addEventListener("keydown", (e: KeyboardEvent) => {
+          if (e.key === "Escape") {
+            searchInput.value = "";
+            filterProductsLive();
+          }
+        });
       }
 
       // Filtro de periodos en historial
