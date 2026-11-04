@@ -27,7 +27,7 @@ let totalItemsCount = 0;
 try {
   const [resKpis, resInv, resCat] = await Promise.all([
     fetch(`${apiUrl}/inventario/kpis`, { signal: AbortSignal.timeout(2000) }),
-    fetch(`${apiUrl}/inventario?limit=50`, { signal: AbortSignal.timeout(2000) }),
+    fetch(`${apiUrl}/inventario?limit=500&sort=alpha_asc`, { signal: AbortSignal.timeout(2000) }),
     fetch(`${apiUrl}/categorias`, { signal: AbortSignal.timeout(2000) }),
   ]);
   if (resKpis.ok) {
@@ -38,7 +38,11 @@ try {
     const jsonI = await resInv.json();
     if (jsonI.success) {
       initialProducts = jsonI.data.items || [];
-      totalItemsCount = jsonI.data.total || 0;
+      // Ordenar alfabéticamente por nombre
+      initialProducts.sort((a: any, b: any) =>
+        (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" })
+      );
+      totalItemsCount = jsonI.data.total || initialProducts.length;
     }
   }
   if (resCat.ok) {
@@ -222,19 +226,24 @@ try {
 
           <!-- Quick Filter Selectors -->
           <div class="flex flex-wrap items-center gap-2">
-            <!-- Categoria -->
+            <!-- Formas de Filtrar / Ordenar -->
             <div class="relative">
               <select
-                id="filter-category"
-                class="h-9 pl-3 pr-7 bg-surface hover:bg-surface-container-low text-on-surface rounded-xl text-[12px] font-medium appearance-none cursor-pointer border border-transparent hover:border-surface-container focus:outline-none focus:bg-surface-container-lowest transition-all"
+                id="filter-sort"
+                class="h-9 pl-3 pr-7 bg-surface hover:bg-surface-container-low text-on-surface rounded-xl text-[12px] font-semibold appearance-none cursor-pointer border border-transparent hover:border-surface-container focus:outline-none focus:bg-surface-container-lowest transition-all"
               >
-                <option value="">Categoría: Todas</option>
-                {initialCategories.map((c: any) => (
-                  <option value={c.id}>{c.nombre} ({c.prefijo || "GEN"})</option>
-                ))}
+                <option value="alpha_asc">Ordenar: Nombre (A - Z)</option>
+                <option value="alpha_desc">Ordenar: Nombre (Z - A)</option>
+                <option value="stock_desc">Ordenar: Mayor Stock</option>
+                <option value="stock_asc">Ordenar: Menor Stock</option>
+                <option value="price_desc">Ordenar: Mayor Precio</option>
+                <option value="price_asc">Ordenar: Menor Precio</option>
+                <option value="has_stock">Filtro: Con Existencias (&gt; 0)</option>
+                <option value="no_stock">Filtro: Solo Agotados (= 0)</option>
+                <option value="recent">Ordenar: Últimos Agregados</option>
               </select>
               <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant">
-                expand_more
+                sort
               </span>
             </div>
 
@@ -249,21 +258,6 @@ try {
                 <option value="proximo">5 a 6: Próximo (Amarillo)</option>
                 <option value="ok">7 en adelante: OK (Verde)</option>
                 <option value="zero">Agotado (0 Unidades)</option>
-              </select>
-              <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant">
-                expand_more
-              </span>
-            </div>
-
-            <!-- Almacén Selector -->
-            <div class="relative">
-              <select
-                id="filter-warehouse"
-                class="h-9 pl-3 pr-7 bg-surface hover:bg-surface-container-low text-on-surface rounded-xl text-[12px] font-semibold appearance-none cursor-pointer border border-transparent hover:border-surface-container focus:outline-none focus:bg-surface-container-lowest transition-all"
-              >
-                <option value="main">Depósito: Sucursal Principal</option>
-                <option value="north">Depósito: Bodega Norte 02</option>
-                <option value="transit">En Tránsito Logístico</option>
               </select>
               <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant">
                 expand_more
@@ -326,7 +320,7 @@ try {
               </thead>
               <tbody id="inventory-table-body" class="divide-y divide-surface-container/40">
                 {initialProducts.length > 0 ? (
-                  initialProducts.map((item: any) => (
+                  initialProducts.slice(0, 10).map((item: any) => (
                     <tr
                       class="inventory-row h-12 hover:bg-surface-container-low transition-colors group"
                       data-id={item.id}
@@ -728,20 +722,54 @@ try {
     let inventoryCurrentPage = 1;
     let inventoryPageSize = 10;
 
-    // 1. Cargar productos desde la base de datos
-    async function fetchInventory(search = "", category = "", status = "") {
+    // 1. Cargar productos desde la base de datos con ordenamiento alfabético y filtros
+    async function fetchInventory(searchParam?: string, statusParam?: string, sortParam?: string) {
       try {
+        const searchInput = document.getElementById("inventory-search") as HTMLInputElement | null;
+        const statusSelect = document.getElementById("filter-status") as HTMLSelectElement | null;
+        const sortSelect = document.getElementById("filter-sort") as HTMLSelectElement | null;
+
+        const search = searchParam !== undefined ? searchParam : (searchInput?.value.trim() || "");
+        const status = statusParam !== undefined ? statusParam : (statusSelect?.value || "");
+        const sort = sortParam !== undefined ? sortParam : (sortSelect?.value || "alpha_asc");
+
         const params = new URLSearchParams();
         if (search) params.append("q", search);
-        if (category) params.append("categoria", category);
         if (status) params.append("salud", status);
+        if (sort && !["has_stock", "no_stock"].includes(sort)) {
+          params.append("sort", sort);
+        }
         params.append("limit", "500");
 
         const res = await fetch(`${API_BASE}/inventario?${params.toString()}`);
         if (!res.ok) throw new Error("HTTP error " + res.status);
         const json = await res.json();
         if (json.success && json.data) {
-          allInventoryItems = json.data.items || [];
+          let items: any[] = json.data.items || [];
+
+          // Filtros especiales de existencias en cliente
+          if (sort === "has_stock") {
+            items = items.filter((it: any) => (Number(it.stock_actual) || 0) > 0);
+          } else if (sort === "no_stock") {
+            items = items.filter((it: any) => (Number(it.stock_actual) || 0) === 0);
+          }
+
+          // Ordenamiento alfabético garantizado (A - Z por defecto) o según criterio
+          if (sort === "alpha_asc" || !sort || sort === "has_stock" || sort === "no_stock") {
+            items.sort((a: any, b: any) => (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" }));
+          } else if (sort === "alpha_desc") {
+            items.sort((a: any, b: any) => (b.nombre || "").localeCompare(a.nombre || "", "es", { sensitivity: "base" }));
+          } else if (sort === "stock_desc") {
+            items.sort((a: any, b: any) => (Number(b.stock_actual) || 0) - (Number(a.stock_actual) || 0));
+          } else if (sort === "stock_asc") {
+            items.sort((a: any, b: any) => (Number(a.stock_actual) || 0) - (Number(b.stock_actual) || 0));
+          } else if (sort === "price_desc") {
+            items.sort((a: any, b: any) => (Number(b.precio_venta) || 0) - (Number(a.precio_venta) || 0));
+          } else if (sort === "price_asc") {
+            items.sort((a: any, b: any) => (Number(a.precio_venta) || 0) - (Number(b.precio_venta) || 0));
+          }
+
+          allInventoryItems = items;
           inventoryCurrentPage = 1;
           renderPaginatedInventory();
         }
@@ -893,15 +921,7 @@ try {
         if (json.success && json.data && Array.isArray(json.data.categorias)) {
           const cats = json.data.categorias;
 
-          // Selector de filtro de tabla
-          const filterCat = document.getElementById("filter-category") as HTMLSelectElement | null;
-          if (filterCat) {
-            const currentVal = filterCat.value;
-            filterCat.innerHTML = `<option value="">Categoría: Todas</option>` +
-              cats.map((c: any) => `<option value="${c.id}" ${currentVal === c.id ? "selected" : ""}>${c.nombre} (${c.prefijo || "GEN"})</option>`).join("");
-          }
-
-          // Selector del Drawer
+          // Selector del Drawer (Categoría para nuevo/editar producto)
           const drawerCat = document.getElementById("drawer-category") as HTMLSelectElement | null;
           if (drawerCat) {
             drawerCat.innerHTML = `<option value="">Seleccione categoría...</option>` +
@@ -1024,11 +1044,7 @@ try {
         const json = await res.json();
         if (json.success) {
           showInventoryToast(`Stock de ${sku} actualizado a ${nuevaCantidad} unidades.`);
-          fetchInventory(
-            (document.getElementById("inventory-search") as HTMLInputElement)?.value || "",
-            (document.getElementById("filter-category") as HTMLSelectElement)?.value || "",
-            (document.getElementById("filter-status") as HTMLSelectElement)?.value || ""
-          );
+          fetchInventory();
           fetchKpis();
         } else {
           alert(json.error || "No se pudo actualizar el stock.");
@@ -1050,11 +1066,7 @@ try {
         const json = await res.json();
         if (json.success) {
           showInventoryToast(`Producto "${name}" eliminado del catálogo.`);
-          fetchInventory(
-            (document.getElementById("inventory-search") as HTMLInputElement)?.value || "",
-            (document.getElementById("filter-category") as HTMLSelectElement)?.value || "",
-            (document.getElementById("filter-status") as HTMLSelectElement)?.value || ""
-          );
+          fetchInventory();
           fetchKpis();
           fetchCategories();
         } else {
@@ -1407,7 +1419,7 @@ try {
     // 7. Configuración de filtros reactivos
     function setupFilters() {
       const searchInput = document.getElementById("inventory-search") as HTMLInputElement | null;
-      const catSelect = document.getElementById("filter-category") as HTMLSelectElement | null;
+      const sortSelect = document.getElementById("filter-sort") as HTMLSelectElement | null;
       const statusSelect = document.getElementById("filter-status") as HTMLSelectElement | null;
       const pageSizeSelect = document.getElementById("inventory-page-size") as HTMLSelectElement | null;
       const btnReset = document.getElementById("btn-reset-filters");
@@ -1415,10 +1427,8 @@ try {
       let debounceTimer: any = null;
 
       const triggerFilter = () => {
-        const q = searchInput?.value.trim() || "";
-        const c = catSelect?.value || "";
-        const s = statusSelect?.value || "";
-        fetchInventory(q, c, s);
+        inventoryCurrentPage = 1;
+        fetchInventory();
       };
 
       searchInput?.addEventListener("input", () => {
@@ -1426,7 +1436,7 @@ try {
         debounceTimer = setTimeout(triggerFilter, 250);
       });
 
-      catSelect?.addEventListener("change", triggerFilter);
+      sortSelect?.addEventListener("change", triggerFilter);
       statusSelect?.addEventListener("change", triggerFilter);
 
       pageSizeSelect?.addEventListener("change", (e: any) => {
@@ -1437,9 +1447,10 @@ try {
 
       btnReset?.addEventListener("click", () => {
         if (searchInput) searchInput.value = "";
-        if (catSelect) catSelect.value = "";
         if (statusSelect) statusSelect.value = "";
-        triggerFilter();
+        if (sortSelect) sortSelect.value = "alpha_asc";
+        inventoryCurrentPage = 1;
+        fetchInventory("", "", "alpha_asc");
       });
     }
 
