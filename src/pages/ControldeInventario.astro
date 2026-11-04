@@ -718,9 +718,89 @@ try {
       }).format(num);
     }
 
+    let masterInventoryList: any[] = [];
     let allInventoryItems: any[] = [];
     let inventoryCurrentPage = 1;
     let inventoryPageSize = 10;
+
+    function normalizeText(str: any) {
+      return String(str || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+    }
+
+    // Aplica filtros de búsqueda, salud de stock y ordenamiento
+    function applyFiltersAndSort(items: any[], search: string, status: string, sort: string) {
+      let filtered = [...items];
+
+      // Filtro de texto (insensible a tildes y mayúsculas/minúsculas)
+      if (search) {
+        const q = normalizeText(search);
+        filtered = filtered.filter((it: any) => {
+          const name = normalizeText(it.nombre);
+          const sku = normalizeText(it.sku);
+          const ean = normalizeText(it.codigo_barras);
+          return name.includes(q) || sku.includes(q) || ean.includes(q);
+        });
+      }
+
+      // Filtro de salud de stock
+      if (status === "urgente") {
+        filtered = filtered.filter((it: any) => (Number(it.stock_actual) || 0) <= 4);
+      } else if (status === "proximo") {
+        filtered = filtered.filter((it: any) => {
+          const st = Number(it.stock_actual) || 0;
+          return st >= 5 && st <= 6;
+        });
+      } else if (status === "ok") {
+        filtered = filtered.filter((it: any) => (Number(it.stock_actual) || 0) >= 7);
+      } else if (status === "zero") {
+        filtered = filtered.filter((it: any) => (Number(it.stock_actual) || 0) === 0);
+      }
+
+      // Filtros especiales de existencias
+      if (sort === "has_stock") {
+        filtered = filtered.filter((it: any) => (Number(it.stock_actual) || 0) > 0);
+      } else if (sort === "no_stock") {
+        filtered = filtered.filter((it: any) => (Number(it.stock_actual) || 0) === 0);
+      }
+
+      // Criterios de ordenamiento
+      if (sort === "alpha_asc" || !sort || sort === "has_stock" || sort === "no_stock") {
+        filtered.sort((a: any, b: any) => (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" }));
+      } else if (sort === "alpha_desc") {
+        filtered.sort((a: any, b: any) => (b.nombre || "").localeCompare(a.nombre || "", "es", { sensitivity: "base" }));
+      } else if (sort === "stock_desc") {
+        filtered.sort((a: any, b: any) => (Number(b.stock_actual) || 0) - (Number(a.stock_actual) || 0));
+      } else if (sort === "stock_asc") {
+        filtered.sort((a: any, b: any) => (Number(a.stock_actual) || 0) - (Number(b.stock_actual) || 0));
+      } else if (sort === "price_desc") {
+        filtered.sort((a: any, b: any) => (Number(b.precio_venta) || 0) - (Number(a.precio_venta) || 0));
+      } else if (sort === "price_asc") {
+        filtered.sort((a: any, b: any) => (Number(a.precio_venta) || 0) - (Number(b.precio_venta) || 0));
+      }
+
+      return filtered;
+    }
+
+    // Filtrado instantáneo en memoria para respuesta a 0ms
+    function triggerLocalFilter() {
+      const searchInput = document.getElementById("inventory-search") as HTMLInputElement | null;
+      const statusSelect = document.getElementById("filter-status") as HTMLSelectElement | null;
+      const sortSelect = document.getElementById("filter-sort") as HTMLSelectElement | null;
+
+      const search = searchInput?.value.trim() || "";
+      const status = statusSelect?.value || "";
+      const sort = sortSelect?.value || "alpha_asc";
+
+      if (masterInventoryList.length > 0) {
+        allInventoryItems = applyFiltersAndSort(masterInventoryList, search, status, sort);
+        inventoryCurrentPage = 1;
+        renderPaginatedInventory();
+      }
+    }
 
     // 1. Cargar productos desde la base de datos con ordenamiento alfabético y filtros
     async function fetchInventory(searchParam?: string, statusParam?: string, sortParam?: string) {
@@ -734,7 +814,10 @@ try {
         const sort = sortParam !== undefined ? sortParam : (sortSelect?.value || "alpha_asc");
 
         const params = new URLSearchParams();
-        if (search) params.append("q", search);
+        if (search) {
+          params.append("search", search);
+          params.append("q", search);
+        }
         if (status) params.append("salud", status);
         if (sort && !["has_stock", "no_stock"].includes(sort)) {
           params.append("sort", sort);
@@ -745,31 +828,11 @@ try {
         if (!res.ok) throw new Error("HTTP error " + res.status);
         const json = await res.json();
         if (json.success && json.data) {
-          let items: any[] = json.data.items || [];
-
-          // Filtros especiales de existencias en cliente
-          if (sort === "has_stock") {
-            items = items.filter((it: any) => (Number(it.stock_actual) || 0) > 0);
-          } else if (sort === "no_stock") {
-            items = items.filter((it: any) => (Number(it.stock_actual) || 0) === 0);
+          const items: any[] = json.data.items || [];
+          if (!search && !status && (sort === "alpha_asc" || !sort)) {
+            masterInventoryList = [...items];
           }
-
-          // Ordenamiento alfabético garantizado (A - Z por defecto) o según criterio
-          if (sort === "alpha_asc" || !sort || sort === "has_stock" || sort === "no_stock") {
-            items.sort((a: any, b: any) => (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" }));
-          } else if (sort === "alpha_desc") {
-            items.sort((a: any, b: any) => (b.nombre || "").localeCompare(a.nombre || "", "es", { sensitivity: "base" }));
-          } else if (sort === "stock_desc") {
-            items.sort((a: any, b: any) => (Number(b.stock_actual) || 0) - (Number(a.stock_actual) || 0));
-          } else if (sort === "stock_asc") {
-            items.sort((a: any, b: any) => (Number(a.stock_actual) || 0) - (Number(b.stock_actual) || 0));
-          } else if (sort === "price_desc") {
-            items.sort((a: any, b: any) => (Number(b.precio_venta) || 0) - (Number(a.precio_venta) || 0));
-          } else if (sort === "price_asc") {
-            items.sort((a: any, b: any) => (Number(a.precio_venta) || 0) - (Number(b.precio_venta) || 0));
-          }
-
-          allInventoryItems = items;
+          allInventoryItems = applyFiltersAndSort(items, search, status, sort);
           inventoryCurrentPage = 1;
           renderPaginatedInventory();
         }
@@ -1428,12 +1491,26 @@ try {
 
       const triggerFilter = () => {
         inventoryCurrentPage = 1;
+        triggerLocalFilter();
         fetchInventory();
       };
 
       searchInput?.addEventListener("input", () => {
+        // Filtrado visual instantáneo en 0ms
+        triggerLocalFilter();
+        // Sincronización con el servidor backend
         if (debounceTimer) clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(triggerFilter, 250);
+        debounceTimer = setTimeout(() => {
+          inventoryCurrentPage = 1;
+          fetchInventory();
+        }, 200);
+      });
+
+      searchInput?.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          searchInput.value = "";
+          triggerFilter();
+        }
       });
 
       sortSelect?.addEventListener("change", triggerFilter);
@@ -1450,6 +1527,7 @@ try {
         if (statusSelect) statusSelect.value = "";
         if (sortSelect) sortSelect.value = "alpha_asc";
         inventoryCurrentPage = 1;
+        triggerLocalFilter();
         fetchInventory("", "", "alpha_asc");
       });
     }
