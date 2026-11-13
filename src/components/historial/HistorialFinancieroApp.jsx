@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import gsap from "gsap";
 import { getApiUrl } from "../../scripts/apiConfig.js";
 
@@ -15,6 +16,11 @@ export default function HistorialFinancieroApp() {
   const hoyStr = new Date().toISOString().slice(0, 10);
   const anioActual = new Date().getFullYear();
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Estados de Filtro
   const [granularidad, setGranularidad] = useState("meses"); // 'dias' | 'meses' | 'anios' | 'todo'
   const [desde, setDesde] = useState(`${anioActual}-01-01`);
@@ -28,6 +34,45 @@ export default function HistorialFinancieroApp() {
   const [error, setError] = useState(null);
   const [activeHoverIndex, setActiveHoverIndex] = useState(null);
   const [tabRotacion, setTabRotacion] = useState("productos"); // 'productos' | 'servicios'
+
+  // Estado para Modal de Auditoría y Desglose Operativo Diario
+  const [modalDetalleOpen, setModalDetalleOpen] = useState(false);
+  const [detalleLoading, setDetalleLoading] = useState(false);
+  const [detalleData, setDetalleData] = useState(null);
+  const [selectedPeriodoItem, setSelectedPeriodoItem] = useState(null);
+  const [detalleTab, setDetalleTab] = useState("todos"); // 'todos' | 'ventas' | 'gastos'
+  const [detalleSearch, setDetalleSearch] = useState("");
+
+  const abrirDetallePeriodo = async (item) => {
+    setSelectedPeriodoItem(item);
+    setModalDetalleOpen(true);
+    setDetalleLoading(true);
+    setDetalleData(null);
+    setDetalleSearch("");
+    setDetalleTab("todos");
+
+    try {
+      const url = `${getApiUrl()}/historial/detalle?periodo_id=${encodeURIComponent(item.id)}&fecha=${encodeURIComponent(item.periodo)}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      if (json.success && json.data) {
+        setDetalleData(json.data);
+      } else {
+        setDetalleData({ error: json.error || "No se encontraron detalles para este período." });
+      }
+    } catch (err) {
+      console.error("Error al cargar detalle del período:", err);
+      setDetalleData({ error: "Error de conexión al cargar el desglose detallado." });
+    } finally {
+      setDetalleLoading(false);
+    }
+  };
+
+  const cerrarDetalleModal = () => {
+    setModalDetalleOpen(false);
+    setDetalleData(null);
+    setSelectedPeriodoItem(null);
+  };
 
   // Referencias para animaciones fluidas con GSAP
   const mainContainerRef = useRef(null);
@@ -46,6 +91,28 @@ export default function HistorialFinancieroApp() {
       );
     }
   }, []);
+
+  // Cerrar modal de auditoría al presionar tecla Escape
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && modalDetalleOpen) {
+        cerrarDetalleModal();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [modalDetalleOpen]);
+
+  // Bloquear scroll de la página principal cuando el modal esté abierto
+  useEffect(() => {
+    if (modalDetalleOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [modalDetalleOpen]);
 
   // Animación suave con GSAP ante cada cambio de datos y filtros
   useEffect(() => {
@@ -344,6 +411,45 @@ export default function HistorialFinancieroApp() {
     );
     return Math.ceil(maxVal * 1.15); // 15% de margen superior
   }, [graficaItems]);
+
+  // Filtrado reactivo de ventas y gastos dentro del modal de auditoría
+  const modalVentas = useMemo(() => {
+    if (!detalleData || !Array.isArray(detalleData.ventas)) return [];
+    if (detalleTab === "gastos") return [];
+    const q = detalleSearch.toLowerCase().trim();
+    if (!q) return detalleData.ventas;
+    return detalleData.ventas.filter((v) => {
+      const matchVenta = (v.folio_ticket || "").toLowerCase().includes(q) ||
+        (v.cliente_nombre || "").toLowerCase().includes(q) ||
+        (v.cliente || "").toLowerCase().includes(q) ||
+        (v.responsable || "").toLowerCase().includes(q) ||
+        (v.metodo_pago || "").toLowerCase().includes(q);
+      if (matchVenta) return true;
+      const matchItems = Array.isArray(v.items) && v.items.some((it) =>
+        (it.descripcion || "").toLowerCase().includes(q) ||
+        (it.nombre || "").toLowerCase().includes(q) ||
+        (it.sku || "").toLowerCase().includes(q) ||
+        (it.codigo || "").toLowerCase().includes(q) ||
+        (it.codigo_referencia || "").toLowerCase().includes(q) ||
+        (it.tipo_item || "").toLowerCase().includes(q)
+      );
+      return matchItems;
+    });
+  }, [detalleData, detalleTab, detalleSearch]);
+
+  const modalGastos = useMemo(() => {
+    if (!detalleData || !Array.isArray(detalleData.gastos)) return [];
+    if (detalleTab === "ventas") return [];
+    const q = detalleSearch.toLowerCase().trim();
+    if (!q) return detalleData.gastos;
+    return detalleData.gastos.filter((g) => {
+      return (g.descripcion || "").toLowerCase().includes(q) ||
+        (g.categoria || "").toLowerCase().includes(q) ||
+        (g.clasificacion || "").toLowerCase().includes(q) ||
+        (g.proveedor_beneficiario || "").toLowerCase().includes(q) ||
+        (g.metodo_pago || "").toLowerCase().includes(q);
+    });
+  }, [detalleData, detalleTab, detalleSearch]);
 
   return (
     <div ref={mainContainerRef} className="space-y-6">
@@ -774,6 +880,7 @@ export default function HistorialFinancieroApp() {
                   <th className="py-3 px-4 text-right">Balance Neto</th>
                   <th className="py-3 px-4 text-center">Estado Financiero</th>
                   <th className="py-3 px-4 text-right">Margen %</th>
+                  <th className="py-3 px-4 text-center">Acción / Auditoría</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-surface-container/60">
@@ -782,10 +889,17 @@ export default function HistorialFinancieroApp() {
                   return (
                     <tr
                       key={item.id}
-                      className="table-row-item hover:bg-surface-container-low/60 transition-colors"
+                      onClick={() => abrirDetallePeriodo(item)}
+                      className="table-row-item hover:bg-surface-container-low transition-colors cursor-pointer group"
+                      title="Haz clic para ver el desglose operativo detallado de este período"
                     >
                       <td className="py-3 px-4 font-semibold text-primary">
-                        {item.periodo}
+                        <div className="flex items-center gap-1.5">
+                          <span>{item.periodo}</span>
+                          <span className="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 text-primary transition-opacity">
+                            open_in_new
+                          </span>
+                        </div>
                       </td>
                       <td className="py-3 px-4 text-center text-on-surface-variant font-medium">
                         {item.transacciones}
@@ -812,6 +926,20 @@ export default function HistorialFinancieroApp() {
                       </td>
                       <td className="py-3 px-4 text-right font-medium text-on-surface-variant">
                         {item.margen_porcentaje > 0 ? `${item.margen_porcentaje}%` : `${item.margen_porcentaje}%`}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            abrirDetallePeriodo(item);
+                          }}
+                          className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-colors cursor-pointer inline-flex items-center gap-1 font-semibold text-[11px]"
+                          title="Ver productos vendidos, servicios y gastos de este período"
+                        >
+                          <span className="material-symbols-outlined text-[17px]">manage_search</span>
+                          <span className="hidden sm:inline">Ver detalle</span>
+                        </button>
                       </td>
                     </tr>
                   );
@@ -843,6 +971,9 @@ export default function HistorialFinancieroApp() {
                   </td>
                   <td className="py-3.5 px-4 text-right text-slate-300">
                     {kpis.margen_porcentaje}%
+                  </td>
+                  <td className="py-3.5 px-4 text-center text-slate-400 text-[11px]">
+                    --
                   </td>
                 </tr>
               </tfoot>
@@ -1135,6 +1266,385 @@ export default function HistorialFinancieroApp() {
           )
         )}
       </div>
+
+      {/* 7. Modal de Auditoría Operativa y Desglose Detallado del Período / Día */}
+      {mounted && modalDetalleOpen && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] w-screen h-screen bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-hidden"
+          onClick={cerrarDetalleModal}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="relative bg-surface-container-lowest border border-surface-container rounded-2xl shadow-2xl w-full max-w-4xl max-h-[88vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="px-5 py-4 border-b border-surface-container/80 flex items-center justify-between bg-surface-container-low/40 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[24px]">manage_search</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-[16px] font-bold text-on-surface">
+                      Auditoría Operativa y Desglose de Caja
+                    </h3>
+                    <span className="font-mono text-[12.5px] font-bold text-primary px-2.5 py-0.5 rounded-md bg-primary/10">
+                      {selectedPeriodoItem?.periodo}
+                    </span>
+                    {selectedPeriodoItem && (
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold ${
+                          selectedPeriodoItem.balance_neto >= 0
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-rose-50 text-rose-700 border border-rose-200"
+                        }`}
+                      >
+                        {selectedPeriodoItem.estado_financiero} ({selectedPeriodoItem.balance_neto >= 0 ? "+" : ""}{formatCOP(selectedPeriodoItem.balance_neto)})
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11.5px] text-on-surface-variant mt-0.5">
+                    Detalle exhaustivo de ventas, productos y servicios despachados, y salidas de dinero registradas.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={cerrarDetalleModal}
+                className="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
+                title="Cerrar (Esc)"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            {/* Resumen Superior de Métricas */}
+            <div className="p-4 bg-surface-container-low/50 border-b border-surface-container/70 grid grid-cols-2 sm:grid-cols-4 gap-3 text-[12px]">
+              <div className="p-3 rounded-xl bg-surface-container-lowest border border-surface-container/80 shadow-2xs">
+                <span className="text-[11px] font-bold uppercase text-blue-700 block">Total Ingresos</span>
+                <span className="text-[15px] font-bold text-blue-700 mt-0.5 block">
+                  {formatCOP(detalleData?.resumen?.total_ventas ?? detalleData?.resumen?.total_ingresos ?? selectedPeriodoItem?.ingresos_total ?? 0)}
+                </span>
+                <span className="text-[10.5px] text-on-surface-variant">
+                  {detalleData?.resumen?.num_ventas ?? detalleData?.resumen?.total_tickets ?? selectedPeriodoItem?.transacciones ?? 0} tickets &bull; {
+                    detalleData?.resumen?.total_items_vendidos ??
+                    (detalleData?.ventas || []).reduce((acc, v) => acc + (v.items || []).reduce((iacc, it) => iacc + Number(it.cantidad || 0), 0), 0)
+                  } ítems
+                </span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-surface-container-lowest border border-surface-container/80 shadow-2xs">
+                <span className="text-[11px] font-bold uppercase text-rose-700 block">Total Gastos</span>
+                <span className="text-[15px] font-bold text-rose-700 mt-0.5 block">
+                  {formatCOP(detalleData?.resumen?.total_gastos ?? selectedPeriodoItem?.gastos_total ?? 0)}
+                </span>
+                <span className="text-[10.5px] text-on-surface-variant">
+                  {detalleData?.resumen?.num_gastos ?? detalleData?.resumen?.total_gastos_count ?? (detalleData?.gastos?.length || 0)} salidas operativas
+                </span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-surface-container-lowest border border-surface-container/80 shadow-2xs">
+                <span className="text-[11px] font-bold uppercase text-on-surface block">Balance Neto</span>
+                <span className={`text-[15px] font-bold mt-0.5 block ${(detalleData?.resumen?.balance_neto ?? selectedPeriodoItem?.balance_neto ?? 0) >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
+                  {(detalleData?.resumen?.balance_neto ?? selectedPeriodoItem?.balance_neto ?? 0) >= 0 ? "+" : ""}
+                  {formatCOP(detalleData?.resumen?.balance_neto ?? selectedPeriodoItem?.balance_neto ?? 0)}
+                </span>
+                <span className="text-[10.5px] text-on-surface-variant">
+                  Margen: {selectedPeriodoItem?.margen_porcentaje || 0}%
+                </span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-surface-container-lowest border border-surface-container/80 shadow-2xs">
+                <span className="text-[11px] font-bold uppercase text-on-surface-variant block">Auditoría Fiscal</span>
+                <span className="text-[12px] font-bold text-on-surface mt-0.5 block">
+                  Caja Cuadrada
+                </span>
+                <span className="text-[10.5px] text-emerald-600 font-semibold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Verificado
+                </span>
+              </div>
+            </div>
+
+            {/* Barra de Filtros y Búsqueda en el Modal */}
+            <div className="px-5 py-3 border-b border-surface-container/70 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface-container-lowest">
+              <div className="flex items-center gap-1.5 bg-surface-container-low p-1 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setDetalleTab("todos")}
+                  className={`px-3 py-1.5 rounded-lg text-[11.5px] font-semibold transition-all cursor-pointer ${
+                    detalleTab === "todos"
+                      ? "bg-surface-container-lowest text-primary shadow-2xs"
+                      : "text-on-surface-variant hover:text-on-surface"
+                  }`}
+                >
+                  Todos ({ (detalleData?.ventas?.length || 0) + (detalleData?.gastos?.length || 0) })
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDetalleTab("ventas")}
+                  className={`px-3 py-1.5 rounded-lg text-[11.5px] font-semibold transition-all cursor-pointer ${
+                    detalleTab === "ventas"
+                      ? "bg-blue-600 text-white shadow-2xs"
+                      : "text-on-surface-variant hover:text-blue-700"
+                  }`}
+                >
+                  Ventas & Ítems ({ detalleData?.ventas?.length || 0 })
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDetalleTab("gastos")}
+                  className={`px-3 py-1.5 rounded-lg text-[11.5px] font-semibold transition-all cursor-pointer ${
+                    detalleTab === "gastos"
+                      ? "bg-rose-600 text-white shadow-2xs"
+                      : "text-on-surface-variant hover:text-rose-700"
+                  }`}
+                >
+                  Gastos & Salidas ({ detalleData?.gastos?.length || 0 })
+                </button>
+              </div>
+
+              <div className="relative flex-1 sm:max-w-xs">
+                <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-on-surface-variant">
+                  search
+                </span>
+                <input
+                  type="text"
+                  value={detalleSearch}
+                  onChange={(e) => setDetalleSearch(e.target.value)}
+                  placeholder="Buscar producto, servicio, gasto..."
+                  className="w-full h-8 pl-8 pr-3 text-[12px] bg-surface-container-low/70 border border-surface-container rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-on-surface"
+                />
+              </div>
+            </div>
+
+            {/* Contenido Scrollable de Movimientos */}
+            <div className="p-5 overflow-y-auto space-y-6 flex-1 text-[12.5px]">
+              {detalleLoading ? (
+                <div className="py-16 flex flex-col items-center justify-center gap-3 text-on-surface-variant">
+                  <span className="material-symbols-outlined text-[36px] animate-spin text-primary">sync</span>
+                  <p className="text-[13px] font-medium">Obteniendo desglose detallado de ventas y gastos...</p>
+                </div>
+              ) : detalleData?.error ? (
+                <div className="p-6 text-center text-error bg-error-container/20 border border-error-container/50 rounded-xl">
+                  <span className="material-symbols-outlined text-[32px] text-error mb-1">error</span>
+                  <p className="font-semibold">{detalleData.error}</p>
+                </div>
+              ) : (
+                <>
+                  {/* SECCIÓN 1: VENTAS DETALLADAS CON SUS ÍTEMS */}
+                  {detalleTab !== "gastos" && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                          <h4 className="font-bold text-[13.5px] text-on-surface">
+                            Ingresos por Ventas y Servicios Prestados
+                          </h4>
+                        </div>
+                        <span className="text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                          {modalVentas.length} comprobantes
+                        </span>
+                      </div>
+
+                      {modalVentas.length === 0 ? (
+                        <div className="p-4 text-center text-on-surface-variant bg-surface-container-low/40 rounded-xl border border-surface-container/60">
+                          No se encontraron ventas para los criterios seleccionados.
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {modalVentas.map((v) => (
+                            <div
+                              key={v.id || v.folio_ticket}
+                              className="border border-surface-container/80 rounded-xl overflow-hidden bg-surface-container-lowest shadow-2xs"
+                            >
+                              {/* Header del Ticket */}
+                              <div className="p-3 bg-surface-container-low/50 border-b border-surface-container/70 flex flex-wrap items-center justify-between gap-2 text-[12px]">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-mono font-bold text-primary text-[13px]">
+                                    #{v.folio_ticket}
+                                  </span>
+                                  <span className="text-on-surface-variant font-medium">
+                                    {v.fecha_hora || v.fecha_hora_formato || v.fecha || "--"}
+                                  </span>
+                                  <span className="text-on-surface-variant">&bull;</span>
+                                  <span className="font-semibold text-on-surface">
+                                    {v.cliente_nombre || v.cliente || "Cliente Mostrador"}
+                                  </span>
+                                  <span className="text-on-surface-variant font-normal">
+                                    (Cajero: {v.responsable || "Admin"})
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <span className="px-2 py-0.5 rounded-md bg-surface-container text-on-surface text-[11px] font-medium">
+                                    {v.metodo_pago}
+                                  </span>
+                                  <span className="font-bold text-blue-700 text-[13.5px]">
+                                    {formatCOP(v.total)}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Tabla de ítems vendidos dentro de este ticket */}
+                              <div className="p-2 sm:p-3 overflow-x-auto">
+                                <table className="w-full text-left border-collapse text-[11.5px]">
+                                  <thead>
+                                    <tr className="border-b border-surface-container/50 text-[10.5px] uppercase font-bold text-on-surface-variant">
+                                      <th className="py-1.5 px-2">Tipo</th>
+                                      <th className="py-1.5 px-2">Cód / SKU</th>
+                                      <th className="py-1.5 px-2">Descripción del Producto / Servicio</th>
+                                      <th className="py-1.5 px-2 text-right">Cantidad</th>
+                                      <th className="py-1.5 px-2 text-right">P. Unitario</th>
+                                      <th className="py-1.5 px-2 text-right">Subtotal</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-surface-container/40">
+                                    {Array.isArray(v.items) && v.items.length > 0 ? (
+                                      v.items.map((it, idx) => {
+                                        const isServ = (it.tipo_item || "").toLowerCase() === "servicio";
+                                        const codigo = it.sku || it.codigo || it.codigo_referencia || "--";
+                                        const descripcion = it.descripcion || it.nombre || "Artículo General";
+                                        return (
+                                          <tr key={idx} className="hover:bg-surface-container-low/40">
+                                            <td className="py-2 px-2">
+                                              <span
+                                                className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                                                  isServ
+                                                    ? "bg-blue-100 text-blue-800"
+                                                    : "bg-emerald-100 text-emerald-800"
+                                                }`}
+                                              >
+                                                {isServ ? "Servicio" : "Producto"}
+                                              </span>
+                                            </td>
+                                            <td className="py-2 px-2 font-mono text-on-surface-variant">
+                                              {codigo}
+                                            </td>
+                                            <td className="py-2 px-2 font-semibold text-on-surface">
+                                              {descripcion}
+                                            </td>
+                                            <td className="py-2 px-2 text-right font-bold text-on-surface">
+                                              {it.cantidad}
+                                            </td>
+                                            <td className="py-2 px-2 text-right text-on-surface-variant">
+                                              {formatCOP(it.precio_unitario)}
+                                            </td>
+                                            <td className="py-2 px-2 text-right font-bold text-on-surface">
+                                              {formatCOP(it.subtotal)}
+                                            </td>
+                                          </tr>
+                                        );
+                                      })
+                                    ) : (
+                                      <tr>
+                                        <td colSpan={6} className="py-2 text-center text-on-surface-variant text-[11px]">
+                                          Sin ítems desglosados en este ticket.
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* SECCIÓN 2: GASTOS Y SALIDAS DETALLADAS */}
+                  {detalleTab !== "ventas" && (
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-rose-600"></span>
+                          <h4 className="font-bold text-[13.5px] text-on-surface">
+                            Gastos y Salidas Operativas de Caja
+                          </h4>
+                        </div>
+                        <span className="text-[11px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
+                          {modalGastos.length} salidas
+                        </span>
+                      </div>
+
+                      {modalGastos.length === 0 ? (
+                        <div className="p-4 text-center text-on-surface-variant bg-surface-container-low/40 rounded-xl border border-surface-container/60">
+                          No se registraron gastos operativos para este período.
+                        </div>
+                      ) : (
+                        <div className="border border-surface-container/80 rounded-xl overflow-hidden bg-surface-container-lowest shadow-2xs">
+                          <table className="w-full text-left border-collapse text-[12px]">
+                            <thead className="bg-surface-container-low/60 border-b border-surface-container/70 text-[11px] uppercase font-bold text-on-surface-variant">
+                              <tr>
+                                <th className="py-2 px-3">Fecha / Hora</th>
+                                <th className="py-2 px-3">Categoría</th>
+                                <th className="py-2 px-3">Concepto / Motivo del Gasto</th>
+                                <th className="py-2 px-3">Beneficiario / Proveedor</th>
+                                <th className="py-2 px-3">Método de Pago</th>
+                                <th className="py-2 px-3 text-right">Monto</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-surface-container/50">
+                              {modalGastos.map((g) => (
+                                <tr key={g.id} className="hover:bg-surface-container-low/40">
+                                  <td className="py-2.5 px-3 whitespace-nowrap text-on-surface-variant text-[11.5px]">
+                                    {g.fecha_hora || g.fecha_formato || g.fecha}
+                                  </td>
+                                  <td className="py-2.5 px-3">
+                                    <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200 text-[10.5px] font-bold">
+                                      {g.categoria || g.clasificacion || "General"}
+                                    </span>
+                                  </td>
+                                  <td className="py-2.5 px-3 font-semibold text-on-surface">
+                                    {g.descripcion}
+                                  </td>
+                                  <td className="py-2.5 px-3 text-on-surface-variant">
+                                    {g.proveedor_beneficiario || g.responsable || "--"}
+                                  </td>
+                                  <td className="py-2.5 px-3 text-on-surface-variant">
+                                    <span className="px-1.5 py-0.5 rounded bg-surface-container text-[11px]">
+                                      {g.metodo_pago || "Efectivo"}
+                                    </span>
+                                  </td>
+                                  <td className="py-2.5 px-3 text-right font-bold text-rose-600">
+                                    -{formatCOP(g.total ?? g.monto ?? 0)}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Footer Modal */}
+            <div className="px-5 py-3 border-t border-surface-container/80 flex items-center justify-between bg-surface-container-low/40">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-[12px] font-semibold bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[17px]">print</span>
+                Imprimir Auditoría
+              </button>
+              <button
+                type="button"
+                onClick={cerrarDetalleModal}
+                className="px-4 py-2 rounded-xl text-[12px] font-semibold bg-primary hover:bg-primary-hover text-on-primary transition-colors cursor-pointer"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

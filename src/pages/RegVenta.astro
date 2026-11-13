@@ -595,6 +595,138 @@ import NavBar from "../components/Nav.astro";
     </div>
   </div>
 
+  <!-- Modal de Detalle de Comprobante / Ticket -->
+  <div
+    id="modal-comprobante-pos"
+    class="fixed inset-0 z-[9999] w-screen h-screen bg-slate-950/75 backdrop-blur-md hidden items-center justify-center p-3 sm:p-6 overflow-hidden"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      class="bg-surface-container-lowest border border-surface-container rounded-2xl shadow-2xl w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+    >
+      <!-- Cabecera -->
+      <div class="px-5 py-4 border-b border-surface-container/80 flex items-center justify-between bg-surface-container-low/40">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">receipt_long</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-[16px] font-bold text-on-surface">Detalle de Factura / Ticket</h3>
+              <span id="pos-modal-ticket-id" class="font-mono text-[13px] font-bold text-primary px-2 py-0.5 rounded-md bg-primary/10">#FAC-...</span>
+            </div>
+            <p class="text-[11.5px] text-on-surface-variant">Desglose de productos y servicios asociados a la venta</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onclick="window.cerrarComprobante()"
+          class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
+          title="Cerrar (Esc)"
+        >
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Contenido scrollable -->
+      <div class="p-5 overflow-y-auto space-y-4 text-[13px]">
+        <!-- Estado de carga -->
+        <div id="pos-modal-loading" class="py-12 flex flex-col items-center justify-center gap-3 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[32px] animate-spin text-primary">progress_activity</span>
+          <span class="text-[13px] font-medium">Consultando detalle de la factura...</span>
+        </div>
+
+        <!-- Contenido principal -->
+        <div id="pos-modal-body" class="space-y-4 hidden">
+          <!-- Metadata Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-xl bg-surface-container-low/60 border border-surface-container/60">
+            <div>
+              <span class="text-[10.5px] font-bold uppercase text-on-surface-variant block">Fecha / Hora</span>
+              <span id="pos-modal-fecha" class="font-semibold text-on-surface text-[12px]">--</span>
+            </div>
+            <div>
+              <span class="text-[10.5px] font-bold uppercase text-on-surface-variant block">Cajero / Vendedor</span>
+              <span id="pos-modal-responsable" class="font-semibold text-on-surface text-[12px] truncate block">--</span>
+            </div>
+            <div>
+              <span class="text-[10.5px] font-bold uppercase text-on-surface-variant block">Cliente</span>
+              <span id="pos-modal-cliente" class="font-semibold text-on-surface text-[12px] truncate block">--</span>
+            </div>
+            <div>
+              <span class="text-[10.5px] font-bold uppercase text-on-surface-variant block">Método de Pago</span>
+              <span id="pos-modal-pago" class="font-semibold text-on-surface text-[12px]">--</span>
+            </div>
+          </div>
+
+          <!-- Tabla de Ítems -->
+          <div class="border border-surface-container/80 rounded-xl overflow-hidden">
+            <div class="px-4 py-2.5 bg-surface-container-low/60 border-b border-surface-container/80 flex items-center justify-between">
+              <span class="font-bold text-[12px] text-on-surface">Artículos y Servicios Vendidos</span>
+              <span id="pos-modal-items-count" class="text-[11px] font-semibold text-on-surface-variant">0 ítems</span>
+            </div>
+            <div class="max-h-60 overflow-y-auto">
+              <table class="w-full text-left border-collapse text-[12px]">
+                <thead class="bg-surface-container-low/40 text-[11px] text-on-surface-variant font-bold border-b border-surface-container/60">
+                  <tr>
+                    <th class="py-2 px-3">Código</th>
+                    <th class="py-2 px-3">Descripción</th>
+                    <th class="py-2 px-2 text-center">Tipo</th>
+                    <th class="py-2 px-3 text-right">Cant.</th>
+                    <th class="py-2 px-3 text-right">P. Unitario</th>
+                    <th class="py-2 px-3 text-right">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody id="pos-modal-items-tbody" class="divide-y divide-surface-container/50">
+                  <!-- Items inyectados -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Resumen Financiero -->
+          <div class="flex flex-col sm:flex-row items-end sm:items-center justify-between gap-3 p-3.5 bg-surface-container-low/70 rounded-xl border border-surface-container/80">
+            <div>
+              <span id="pos-modal-estado-badge" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-tertiary-container text-on-tertiary-container">
+                <span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+                COMPLETADA
+              </span>
+            </div>
+            <div class="space-y-1 text-right">
+              <div class="flex items-center justify-end gap-3 text-on-surface-variant text-[12px]">
+                <span>Subtotal:</span>
+                <span id="pos-modal-subtotal" class="font-medium">COP $0</span>
+              </div>
+              <div class="flex items-center justify-end gap-3 text-[15px] font-bold text-on-surface">
+                <span>Total Facturado:</span>
+                <span id="pos-modal-total" class="text-primary text-[17px]">COP $0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-5 py-3 border-t border-surface-container/80 flex items-center justify-between bg-surface-container-low/40">
+        <button
+          type="button"
+          onclick="window.print()"
+          class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-[12.5px] font-semibold bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors cursor-pointer"
+        >
+          <span class="material-symbols-outlined text-[17px]">print</span>
+          Imprimir
+        </button>
+        <button
+          type="button"
+          onclick="window.cerrarComprobante()"
+          class="px-4 py-2 rounded-xl text-[12.5px] font-semibold bg-primary hover:bg-primary-hover text-on-primary transition-colors cursor-pointer"
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- NOTIFICATION TOAST GLOBAL -->
   <div
     id="posToast"
@@ -1164,7 +1296,13 @@ import NavBar from "../components/Nav.astro";
               <tr class="hover:bg-surface-container-low transition-colors group h-12 ${isAnulada ? "opacity-60 bg-error-container/5" : ""}">
                 <td class="py-2 px-4">
                   <div class="flex flex-col">
-                    <span class="font-semibold ${isAnulada ? "line-through text-on-surface-variant" : "text-primary"}">#${v.folio_ticket}</span>
+                    <button
+                      type="button"
+                      class="text-left font-semibold hover:underline cursor-pointer ${isAnulada ? "line-through text-on-surface-variant" : "text-primary"}"
+                      onclick="window.verComprobante('${v.folio_ticket}')"
+                    >
+                      #${v.folio_ticket}
+                    </button>
                     <span class="text-[10px] text-on-surface-variant">${v.sucursal_nombre || "Principal"}</span>
                   </div>
                 </td>
@@ -1193,7 +1331,7 @@ import NavBar from "../components/Nav.astro";
                 </td>
                 <td class="py-2 px-4 text-right">
                   <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">
-                    <button class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-on-surface cursor-pointer" onclick="window.showPosToast('Ticket #${v.folio_ticket} impreso con éxito.', 'info')" title="Imprimir Comprobante" type="button">
+                    <button class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-primary cursor-pointer" onclick="window.verComprobante('${v.folio_ticket}')" title="Ver comprobante y desglose" type="button">
                       <span class="material-symbols-outlined text-[18px]">receipt</span>
                     </button>
                     ${!isAnulada ? `
@@ -1427,7 +1565,127 @@ import NavBar from "../components/Nav.astro";
       if (historySearch) {
         historySearch.addEventListener("input", () => (window as any).refreshHistory());
       }
+
+      // Cerrar modal comprobante con ESC o clic fuera
+      const modalComp = document.getElementById("modal-comprobante-pos");
+      modalComp?.addEventListener("click", (e) => {
+        if (e.target === modalComp) (window as any).cerrarComprobante();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modalComp && !modalComp.classList.contains("hidden")) {
+          (window as any).cerrarComprobante();
+        }
+      });
     }
+
+    (window as any).verComprobante = async function(ticketOrId: string) {
+      if (!ticketOrId) return;
+      const modal = document.getElementById("modal-comprobante-pos");
+      const loading = document.getElementById("pos-modal-loading");
+      const body = document.getElementById("pos-modal-body");
+      if (!modal || !loading || !body) return;
+
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      loading.classList.remove("hidden");
+      body.classList.add("hidden");
+      document.body.style.overflow = "hidden";
+
+      const ticketClean = ticketOrId.toString().replace(/^#/, "");
+      const ticketIdEl = document.getElementById("pos-modal-ticket-id");
+      if (ticketIdEl) ticketIdEl.textContent = `#${ticketClean}`;
+
+      try {
+        const res = await fetch(`${API_BASE}/${encodeURIComponent(ticketClean)}`);
+        if (!res.ok) throw new Error("No se pudo obtener el comprobante");
+        const json = await res.json();
+        if (!json.success || !json.data) throw new Error(json.message || "Error al cargar datos");
+
+        const v = json.data;
+
+        // Metadatos
+        const fechaEl = document.getElementById("pos-modal-fecha");
+        if (fechaEl) fechaEl.textContent = v.fecha_hora_formato || v.fecha_venta || "--";
+
+        const respEl = document.getElementById("pos-modal-responsable");
+        if (respEl) respEl.textContent = v.responsable || "Sistema";
+
+        const cliEl = document.getElementById("pos-modal-cliente");
+        if (cliEl) cliEl.textContent = v.cliente_nombre || "Cliente Mostrador";
+
+        const pagoEl = document.getElementById("pos-modal-pago");
+        if (pagoEl) pagoEl.textContent = v.metodo_pago || "EFECTIVO";
+
+        // Estado Badge
+        const estadoBadge = document.getElementById("pos-modal-estado-badge");
+        if (estadoBadge) {
+          if (v.estado === "ANULADA") {
+            estadoBadge.className = "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-error-container text-on-error-container";
+            estadoBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-error"></span> ANULADA`;
+          } else {
+            estadoBadge.className = "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-tertiary-container text-on-tertiary-container";
+            estadoBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> COMPLETADA`;
+          }
+        }
+
+        // Items
+        const items = Array.isArray(v.items) ? v.items : [];
+        const itemsCountEl = document.getElementById("pos-modal-items-count");
+        if (itemsCountEl) itemsCountEl.textContent = `${items.length} ${items.length === 1 ? "ítem" : "ítems"}`;
+
+        const tbody = document.getElementById("pos-modal-items-tbody");
+        if (tbody) {
+          if (items.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-on-surface-variant text-[12px]">No se encontraron ítems detallados para esta factura.</td></tr>`;
+          } else {
+            tbody.innerHTML = items.map((it: any) => {
+              const isServ = (it.tipo_item || "").toLowerCase() === "servicio";
+              const codigo = it.sku || it.codigo_referencia || it.codigo || "--";
+              const descripcion = it.descripcion || it.nombre || "Artículo General";
+              const badge = isServ
+                ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700">Servicio</span>`
+                : `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Producto</span>`;
+              return `
+                <tr class="hover:bg-surface-container-low/50">
+                  <td class="py-2.5 px-3 font-mono text-[11px] text-on-surface-variant font-semibold">${codigo}</td>
+                  <td class="py-2.5 px-3 font-medium text-on-surface">${descripcion}</td>
+                  <td class="py-2.5 px-2 text-center">${badge}</td>
+                  <td class="py-2.5 px-3 text-right font-semibold">${it.cantidad}</td>
+                  <td class="py-2.5 px-3 text-right text-on-surface-variant">${formatCOP(it.precio_unitario)}</td>
+                  <td class="py-2.5 px-3 text-right font-bold text-on-surface">${formatCOP(it.subtotal)}</td>
+                </tr>
+              `;
+            }).join("");
+          }
+        }
+
+        // Totales
+        const subtotalEl = document.getElementById("pos-modal-subtotal");
+        if (subtotalEl) subtotalEl.textContent = formatCOP(v.subtotal || v.total);
+
+        const totalEl = document.getElementById("pos-modal-total");
+        if (totalEl) totalEl.textContent = formatCOP(v.total);
+
+        loading.classList.add("hidden");
+        body.classList.remove("hidden");
+      } catch (err: any) {
+        console.error("Error al cargar comprobante POS:", err);
+        loading.innerHTML = `
+          <span class="material-symbols-outlined text-[32px] text-error">error</span>
+          <span class="text-[13px] font-medium text-error">${err.message || "Error al consultar ticket"}</span>
+          <button type="button" onclick="window.cerrarComprobante()" class="mt-2 px-3 py-1.5 rounded-lg bg-surface-container text-[12px] font-semibold text-on-surface hover:bg-surface-container-high">Cerrar</button>
+        `;
+      }
+    };
+
+    (window as any).cerrarComprobante = function() {
+      const modal = document.getElementById("modal-comprobante-pos");
+      if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
+      document.body.style.overflow = "";
+    };
 
     document.addEventListener("astro:page-load", setupSales);
     if (document.readyState === "loading") {
