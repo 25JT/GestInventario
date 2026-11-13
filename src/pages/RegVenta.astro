@@ -766,6 +766,7 @@ import NavBar from "../components/Nav.astro";
     const API_BASE = `${getApiUrl()}/ventas`;
 
     let catalogItems: any[] = [];
+    let lastSalesHistory: any[] = [];
     let currentFilterCat: string = "all";
     let currentCatalogLayout: string = "table";
 
@@ -1258,6 +1259,8 @@ import NavBar from "../components/Nav.astro";
 
           // Renderizar filas de la tabla
           if (!tbody) return;
+          lastSalesHistory = ventas;
+
           if (ventas.length === 0) {
             tbody.innerHTML = `
               <tr>
@@ -1272,6 +1275,19 @@ import NavBar from "../components/Nav.astro";
             return;
           }
 
+          // Obtener usuario en sesión para permisos de anulación
+          let currentAuthUser = null;
+          try {
+            const raw = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+            if (raw) currentAuthUser = JSON.parse(raw);
+          } catch (e) {}
+
+          const rolUpper = String(currentAuthUser?.rol || "").toUpperCase();
+          const isJefeOrAdmin = rolUpper === "JEFE_ADMIN" || rolUpper === "ADMIN" || rolUpper.includes("JEFE") || rolUpper.includes("ADMIN");
+          const myUserId = currentAuthUser?.id;
+          const myUsername = (currentAuthUser?.usuario || "").toLowerCase();
+          const myFullName = `${currentAuthUser?.nombre || ""} ${currentAuthUser?.apellido || ""}`.trim().toLowerCase();
+
           tbody.innerHTML = ventas.map((v: any) => {
             const isAnulada = v.estado === "ANULADA";
             const dateStr = new Date(v.fecha_hora).toLocaleDateString("es-CO", {
@@ -1281,6 +1297,14 @@ import NavBar from "../components/Nav.astro";
               hour: "2-digit",
               minute: "2-digit"
             });
+
+            // Solo el creador de la venta o un Admin/Jefe puede anularla
+            const isOwner = (
+              (myUserId && v.usuario_id && myUserId === v.usuario_id) ||
+              (myUsername && v.usuario && myUsername === v.usuario.toLowerCase()) ||
+              (myFullName && v.vendedor_nombre && myFullName === v.vendedor_nombre.trim().toLowerCase())
+            );
+            const canCancelThis = isJefeOrAdmin || isOwner;
 
             let metodoIcon = "payments";
             let metodoNombre = "Efectivo";
@@ -1334,11 +1358,17 @@ import NavBar from "../components/Nav.astro";
                     <button class="p-1 hover:bg-surface-container rounded-lg text-on-surface-variant hover:text-primary cursor-pointer" onclick="window.verComprobante('${v.folio_ticket}')" title="Ver comprobante y desglose" type="button">
                       <span class="material-symbols-outlined text-[18px]">receipt</span>
                     </button>
-                    ${!isAnulada ? `
-                      <button class="p-1 hover:bg-error-container/40 rounded-lg text-on-surface-variant hover:text-error cursor-pointer" onclick="window.anularVenta('${v.id}', '${v.folio_ticket}')" title="Anular Factura" type="button">
-                        <span class="material-symbols-outlined text-[18px]">delete</span>
-                      </button>
-                    ` : ""}
+                    ${!isAnulada ? (
+                      canCancelThis ? `
+                        <button class="p-1 hover:bg-error-container/40 rounded-lg text-on-surface-variant hover:text-error cursor-pointer" onclick="window.anularVenta('${v.id}', '${v.folio_ticket}')" title="Anular Factura" type="button">
+                          <span class="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      ` : `
+                        <span class="p-1 text-on-surface-variant/40 inline-flex items-center" title="Solo el colaborador que generó esta venta (${v.vendedor_nombre}) o un Administrador/Jefe puede anularla">
+                          <span class="material-symbols-outlined text-[16px]">lock</span>
+                        </span>
+                      `
+                    ) : ""}
                   </div>
                 </td>
               </tr>
@@ -1357,15 +1387,49 @@ import NavBar from "../components/Nav.astro";
 
     // 8. Anular venta y restituir inventario
     (window as any).anularVenta = async function(ventaId: string, folio: string) {
+      let currentAuthUser = null;
+      try {
+        const raw = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+        if (raw) currentAuthUser = JSON.parse(raw);
+      } catch (e) {}
+
+      const rolUpper = String(currentAuthUser?.rol || "").toUpperCase();
+      const isJefeOrAdmin = rolUpper === "JEFE_ADMIN" || rolUpper === "ADMIN" || rolUpper.includes("JEFE") || rolUpper.includes("ADMIN");
+      const myUserId = currentAuthUser?.id;
+      const myUsername = (currentAuthUser?.usuario || "").toLowerCase();
+      const myFullName = `${currentAuthUser?.nombre || ""} ${currentAuthUser?.apellido || ""}`.trim().toLowerCase();
+
+      const ventaTarget = lastSalesHistory.find((s: any) => s.id === ventaId || s.folio_ticket === folio);
+      if (ventaTarget) {
+        const isOwner = (
+          (myUserId && ventaTarget.usuario_id && myUserId === ventaTarget.usuario_id) ||
+          (myUsername && ventaTarget.usuario && myUsername === ventaTarget.usuario.toLowerCase()) ||
+          (myFullName && ventaTarget.vendedor_nombre && myFullName === ventaTarget.vendedor_nombre.trim().toLowerCase())
+        );
+        if (!isJefeOrAdmin && !isOwner) {
+          alert(`No tienes permiso para anular la venta #${folio}.\nSolo el colaborador que generó esta venta (${ventaTarget.vendedor_nombre}) o un Administrador/Jefe puede anularla.`);
+          return;
+        }
+      }
+
       if (!confirm(`¿Estás seguro de anular la venta #${folio}?\nEl inventario de los productos será devuelto a la base de datos automáticamente.`)) {
         return;
       }
 
       try {
+        const token = localStorage.getItem("stock_auth_token") || sessionStorage.getItem("stock_auth_token");
         const res = await fetch(`${API_BASE}/${ventaId}/anular`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ motivo: "Anulación solicitada por usuario" })
+          headers: { 
+            "Content-Type": "application/json",
+            ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+            ...(myUserId ? { "x-user-id": myUserId } : {})
+          },
+          body: JSON.stringify({ 
+            motivo: "Anulación solicitada por usuario",
+            usuario_id: myUserId,
+            usuario_rol: rolUpper
+          })
         });
         const json = await res.json();
         if (json.success) {

@@ -764,6 +764,19 @@ const todayStr = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }
         return;
       }
 
+      // Obtener sesión activa para control de roles
+      let currentAuthUser = null;
+      try {
+        const raw = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+        if (raw) currentAuthUser = JSON.parse(raw);
+      } catch (e) {}
+
+      const rolUpper = String(currentAuthUser?.rol || "").toUpperCase();
+      const isJefeOrAdmin = rolUpper === "JEFE_ADMIN" || rolUpper === "ADMIN" || rolUpper.includes("JEFE") || rolUpper.includes("ADMIN");
+      const myUserId = currentAuthUser?.id;
+      const myUsername = (currentAuthUser?.usuario || "").toLowerCase();
+      const myFullName = `${currentAuthUser?.nombre || ""} ${currentAuthUser?.apellido || ""}`.trim().toLowerCase();
+
       // Filas paginadas
       tbody.innerHTML = pageGastos
         .map((gasto) => {
@@ -779,6 +792,14 @@ const todayStr = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }
           const cleanBranch = escapeHtml(gasto.sucursal_nombre || "Central");
           const cleanUser = escapeHtml(gasto.usuario_nombre || "Admin");
           const cleanPayMethod = escapeHtml(gasto.metodo_pago || "EFECTIVO");
+
+          // Solo el colaborador que creó el gasto o un Admin/Jefe puede eliminarlo
+          const isOwner = (
+            (myUserId && gasto.usuario_id && myUserId === gasto.usuario_id) ||
+            (myUsername && gasto.usuario && myUsername === gasto.usuario.toLowerCase()) ||
+            (myFullName && gasto.usuario_nombre && myFullName === gasto.usuario_nombre.trim().toLowerCase())
+          );
+          const canDeleteGasto = isJefeOrAdmin || isOwner;
 
           return `
             <tr class="expense-row h-12 hover:bg-surface-container-low transition-colors group" data-category="${clasifLower}" data-amount="${gasto.total}">
@@ -816,14 +837,20 @@ const todayStr = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }
               </td>
               <td class="px-4 text-center">
                 <div class="flex items-center justify-center gap-1">
-                  <button
-                    class="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors cursor-pointer"
-                    title="Eliminar Gasto"
-                    type="button"
-                    onclick="window.deleteExpense('${gasto.id}', '${cleanDesc.replace(/'/g, "\\'")}')"
-                  >
-                    <span class="material-symbols-outlined text-[18px] text-error">delete</span>
-                  </button>
+                  ${canDeleteGasto ? `
+                    <button
+                      class="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors cursor-pointer"
+                      title="Eliminar Gasto"
+                      type="button"
+                      onclick="window.deleteExpense('${gasto.id}', '${cleanDesc.replace(/'/g, "\\'")}')"
+                    >
+                      <span class="material-symbols-outlined text-[18px] text-error">delete</span>
+                    </button>
+                  ` : `
+                    <span class="p-1.5 text-on-surface-variant/40 inline-flex items-center" title="Solo el colaborador que registró este gasto (${cleanUser}) o un Administrador/Jefe puede eliminarlo">
+                      <span class="material-symbols-outlined text-[16px]">lock</span>
+                    </span>
+                  `}
                 </div>
               </td>
             </tr>
@@ -960,14 +987,57 @@ const todayStr = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }
       }
     };
 
-    // Eliminar gasto de la base de datos
+    // Eliminar gasto de la base de datos (solo creador o Admin/Jefe)
     (window as any).deleteExpense = async function (id: string, descripcion: string) {
+      let currentAuthUser = null;
+      let token = "";
+      try {
+        const raw = localStorage.getItem("stock_auth_user") || sessionStorage.getItem("stock_auth_user");
+        if (raw) currentAuthUser = JSON.parse(raw);
+        token = localStorage.getItem("stock_auth_token") || sessionStorage.getItem("stock_auth_token") || "";
+      } catch (e) {}
+
+      const rolUpper = String(currentAuthUser?.rol || "").toUpperCase();
+      const isJefeOrAdmin = rolUpper === "JEFE_ADMIN" || rolUpper === "ADMIN" || rolUpper.includes("JEFE") || rolUpper.includes("ADMIN");
+      const myUserId = currentAuthUser?.id;
+      const myUsername = (currentAuthUser?.usuario || "").toLowerCase();
+      const myFullName = `${currentAuthUser?.nombre || ""} ${currentAuthUser?.apellido || ""}`.trim().toLowerCase();
+
+      const gastoTarget = allGastos.find((g: any) => g.id === id);
+      if (gastoTarget) {
+        const isOwner = (
+          (myUserId && gastoTarget.usuario_id && myUserId === gastoTarget.usuario_id) ||
+          (myUsername && gastoTarget.usuario && myUsername === gastoTarget.usuario.toLowerCase()) ||
+          (myFullName && gastoTarget.usuario_nombre && myFullName === gastoTarget.usuario_nombre.trim().toLowerCase())
+        );
+        if (!isJefeOrAdmin && !isOwner) {
+          const msg = `No tienes permiso para eliminar este gasto.\nSolo el colaborador que lo registró (${gastoTarget.usuario_nombre || "el creador"}) o un Administrador/Jefe puede eliminarlo.`;
+          if (window.showExpenseToast) {
+            window.showExpenseToast(msg, "warning");
+          } else {
+            alert(msg);
+          }
+          return;
+        }
+      }
+
       const confirmMsg = `¿Estás seguro de que deseas eliminar este gasto?\n\n"${descripcion || id}"\n\nEsta acción lo borrará permanentemente de la base de datos.`;
       if (!confirm(confirmMsg)) return;
 
       try {
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+          ...(myUserId ? { "x-user-id": myUserId } : {})
+        };
+
         const response = await fetch(`${BACKEND_URL}/api/gastos/${id}`, {
           method: "DELETE",
+          headers,
+          body: JSON.stringify({
+            usuario_id: myUserId,
+            usuario_rol: rolUpper
+          })
         });
         const resData = await response.json();
 
